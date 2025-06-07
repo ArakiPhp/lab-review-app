@@ -44,4 +44,29 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // リレーションの定義
+    // 大学とのリレーション（多対多）
+    public function universities()
+    {
+        return $this->belongsToMany(University::class, 'university_user')->withTimestamps();
+    }
+
+    // 学部とのリレーション（多対多）
+    public function faculties()
+    {
+        return $this->belongsToMany(Faculty::class, 'faculty_user')->withTimestamps();
+    }
+
+    // 研究室とのリレーション（多対多）
+    public function labs()
+    {
+        return $this->belongsToMany(Lab::class, 'lab_user')->withTimestamps();
+    }
+
+    // レビューとのリレーション（一対多）
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }
