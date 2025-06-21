@@ -4,17 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Lab;
 use App\Models\Review;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ReviewController extends Controller
 {
+    use AuthorizesRequests;
+    
     public function create(Lab $lab) {
+        // ポリシーで認可をチェック
+        $this->authorize('create', [Review::class, $lab]);
         return Inertia::render('Review/Create', ['lab' => $lab]);
     }
 
     public function store(Request $request, Lab $lab) {
+        // ポリシーで認可をチェック
+        $this->authorize('create', [Review::class, $lab]);
         // バリデーション
         $validated = $request->validate([
             'mentorship_style' => 'required|integer|min:1|max:5',
@@ -39,15 +46,19 @@ class ReviewController extends Controller
         $review->student_balance = $validated['student_balance'];
         $review->save();
 
-        return redirect()->route('labs.index')->with('success', 'レビューが保存されました。');
+        return redirect()->route('labs.show', ['lab' => $lab])->with('success', 'レビューが保存されました。');
     }
 
     public function edit(Review $review) {
+        // ポリシーで認可をチェック
+        $this->authorize('update', $review);
         $review->load('lab');
         return Inertia::render('Review/Edit', ['review' => $review,]);
     }
 
     public function update(Request $request, Review $review) {
+        // ポリシーで認可をチェック
+        $this->authorize('update', $review);
         // バリデーション
         $validated = $request->validate([
             'mentorship_style' => 'required|integer|min:1|max:5',
@@ -72,9 +83,13 @@ class ReviewController extends Controller
         return redirect()->route('labs.show', ['lab' => $review->lab_id])->with('success', 'レビューが更新されました。');
     }
 
-    // 追加
     public function destroy(Review $review) {
+        // ポリシーで認可をチェック
+        $this->authorize('delete', $review);
+
+        $labId = $review->lab_id; // 追加: 研究室IDを取得
+
         $review->delete();
-        return redirect()->route('labs.show')->with('success', 'レビューが削除されました。');
+        return redirect()->route('labs.show', ['lab' => $labId])->with('success', 'レビューが削除されました。');
     }
 }

@@ -1,9 +1,30 @@
 import React from 'react';
 import { Head, router } from '@inertiajs/react';
 
-// propsとして 'lab' だけでなく、`overallAverage` と `averagePerItem` も受け取る
-export default function Show({ lab, overallAverage, averagePerItem }) {
+// propsとして新しく追加されたプロパティも受け取る
+export default function Show({ 
+    lab, 
+    overallAverage, 
+    averagePerItem, 
+    userReview, 
+    userOverallAverage, 
+    ratingData
+}) {
     const reviewCount = lab.reviews ? lab.reviews.length : 0;
+
+    // ratingColumnsが空の場合、フォールバック用の配列を使用
+    const fallbackRatingColumns = [
+        'mentorship_style',
+        'lab_atmosphere',
+        'achievement_activity',
+        'constraint_level',
+        'facility_quality',
+        'work_style',
+        'student_balance',
+    ];
+    
+    const ratingColumns = ratingData?.columns || fallbackRatingColumns;
+    const actualRatingColumns = ratingColumns.length > 0 ? ratingColumns : fallbackRatingColumns;
 
     const itemLabels = {
         mentorship_style: '指導スタイル',
@@ -34,6 +55,14 @@ export default function Show({ lab, overallAverage, averagePerItem }) {
         }
     };
 
+    const handleCreateReview = () => {
+        router.get(route('review.create', { lab: lab.id }));
+    };
+
+    const handleEditReview = () => {
+        router.get(route('review.edit', { review: userReview.id }));
+    };
+
     return (
         <div>
             <Head title={`${lab.name}の詳細`} />
@@ -50,10 +79,12 @@ export default function Show({ lab, overallAverage, averagePerItem }) {
 
             <h2>レビュー</h2>
             <p>レビュー数: {reviewCount}</p>
-            {/* 新しい総合評価を表示 */}
-            <p><strong>総合評価（各項目の平均の平均）: </strong>{formatAverage(overallAverage)}</p>
+            
+            {/* 全体の平均評価を表示 */}
+            <h3>全体の評価（平均）</h3>
+            <p><strong>総合評価: </strong>{formatAverage(overallAverage)}</p>
 
-            <h3>各評価項目の平均:</h3>
+            <h4>各評価項目の平均:</h4>
             {averagePerItem && Object.keys(averagePerItem).length > 0 ? (
                 <ul>
                     {Object.entries(averagePerItem).map(([itemKey, averageValue]) => (
@@ -68,18 +99,60 @@ export default function Show({ lab, overallAverage, averagePerItem }) {
             ) : (
                 <p>まだ評価データがありません。</p>
             )}
-            { lab.reviews && lab.reviews.length > 0 ? (
+
+            {/* ユーザーのレビューが存在する場合に表示 */}
+            {userReview ? (
                 <div>
-                    {lab.reviews.map((review) => (
-                        <button
-                            key={review.id}
-                            onClick={() => handleDeleteReview(review.id)}
-                        >
-                            レビューID {review.id}を削除
-                        </button>))}
+                    <h3>あなたの投稿したレビュー</h3>
+                    <p><strong>総合評価: </strong>{formatAverage(userOverallAverage)}</p>
+                    
+                    <h4>各評価項目:</h4>
+                    <ul>
+                        {actualRatingColumns && actualRatingColumns.length > 0 ? (
+                            actualRatingColumns.map((column) => {
+                                const value = userReview[column];
+                                return (
+                                    <li key={column}>
+                                        <p>
+                                            <strong>{itemLabels[column] || column}:</strong>
+                                            {value !== null && value !== undefined 
+                                                ? (typeof value === 'number' ? value.toFixed(2) : value)
+                                                : '未評価'}
+                                        </p>
+                                    </li>
+                                )
+                            })
+                        ) : (
+                            <li>評価項目データがありません</li>
+                        )}
+                    </ul>
+                    
+                    {/* ユーザーのレビューにコメントがある場合表示 */}
+                    {userReview.comment && (
+                        <div>
+                            <h4>コメント:</h4>
+                            <p>{userReview.comment}</p>
+                        </div>
+                    )}
+                    
+                    <div>
+                        <button onClick={() => handleDeleteReview(userReview.id)}>
+                            このレビューを削除
+                        </button>
+                        <button onClick={handleEditReview}>
+                            レビューを編集する
+                        </button>
+                    </div>
                 </div>
             ) : (
-                <p>レビューがまだありません。</p>
+                // レビューが存在しない場合はレビュー投稿ボタンを表示
+                <div>
+                    <h3>レビューを投稿</h3>
+                    <p>まだこの研究室のレビューを投稿していません。</p>
+                    <button onClick={handleCreateReview}>
+                        レビューを投稿する
+                    </button>
+                </div>
             )}
         </div>
     );

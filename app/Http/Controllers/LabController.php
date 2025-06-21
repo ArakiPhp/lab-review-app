@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lab;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class LabController extends Controller
@@ -43,11 +44,35 @@ class LabController extends Controller
         // $averagePerItem の値（平均点）をコレクションとして取り出し、その平均を求める
         $overallAverage = $averagePerItem->avg();
 
-        // 修正: 研究室のデータに加えて、求めたレビューの平均値も一緒に渡す
+        // 3. 現在のユーザーのレビューを取得
+        $userReview = null;
+        $userOverallAverage = null;
+        
+        if (Auth::check()) {
+            $userReview = $lab->reviews->where('user_id', Auth::id())->first();
+            
+            // ユーザーのレビューが存在する場合、個別の総合評価を計算
+            if ($userReview) {
+                $userRatings = collect($ratingColumns)->map(function ($column) use ($userReview) {
+                    return $userReview->$column;
+                })->filter(function ($value) {
+                    return $value !== null;
+                });
+                
+                $userOverallAverage = $userRatings->avg();
+            }
+        }
+
+        // 研究室のデータに加えて、求めたレビューの平均値とユーザーのレビューも一緒に渡す
         return Inertia::render('Lab/Show', [
             'lab' => $lab,
             'overallAverage' => $overallAverage,
             'averagePerItem' => $averagePerItem,
+            'userReview' => $userReview,
+            'userOverallAverage' => $userOverallAverage,
+            'ratingData' => [
+                'columns' => $ratingColumns,
+            ],
         ]);
     }
 }
