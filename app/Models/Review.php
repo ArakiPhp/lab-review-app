@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Container\Attributes\Auth;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 
 class Review extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'lab_id',

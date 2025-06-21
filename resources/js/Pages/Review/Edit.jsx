@@ -48,9 +48,16 @@ export default function Edit({ review }) {
         }
     };
 
+    const handleBack = () => {
+        router.get(route('labs.show', { lab: review.lab.id }));
+    };
+
     return (
         <div>
             <Head title={`${review.lab.name}のレビュー編集`} />
+            <button onClick={handleBack}>
+                ← {review.lab.name}の詳細ページに戻る
+            </button>
             <h1>{review.lab.name} のレビュー編集画面</h1>
 
             <form onSubmit={handleSubmit}>

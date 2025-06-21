@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 
-export default function Create({ review }) {
+export default function Create({ lab }) {
     const [data, setData] = useState({
         lab_id: lab.id,
         mentorship_style: 3,
@@ -48,9 +48,16 @@ export default function Create({ review }) {
         }
     };
 
+    const handleBack = () => {
+        router.get(route('labs.show', { lab: lab.id }));
+    };
+
     return (
         <div>
             <Head title={`${lab.name}のレビュー作成`} />
+            <button onClick={handleBack}>
+                ← {lab.name}の詳細ページに戻る
+            </button>
             <h1>{lab.name} のレビュー作成画面</h1>
 
             <form onSubmit={handleSubmit}>
