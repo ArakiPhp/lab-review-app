@@ -1,6 +1,10 @@
 <?php
 
 return [
+    // 基本的なバリデーションメッセージ
+    'required' => ':attribute は必須項目です。',
+    'string' => ':attribute は文字列である必要があります。',
+    'unique' => 'この:attribute は既に登録されています。',
 
     'max' => [
         'numeric' => ':attribute は :max 以下の値にしてください。',
@@ -10,6 +14,21 @@ return [
     ],
 
     'custom' => [
+        // 大学関連
+        'name' => [
+            'unique' => 'この大学名は既に作成されています。',
+            'required' => '大学名は必須項目です。',
+            'max' => '大学名は50文字以下にしてください。',
+        ],
+        
+        // 学部関連（学部作成時のname）
+        'faculty.name' => [
+            'unique' => 'この学部名は既にこの大学に存在します。',
+            'required' => '学部名は必須項目です。',
+            'max' => '学部名は50文字以下にしてください。',
+        ],
+
+        // 既存の評価関連
         'mentorship_style' => [
             'max' => '指導スタイルは5以下の値にしてください。',
             'min' => '指導スタイルは1以上の値にしてください。',
@@ -41,6 +60,8 @@ return [
     ],
 
     'attributes' => [
+        'name' => '大学名',
+        'faculty.name' => '学部名',
         'mentorship_style' => '指導スタイル',
         'lab_atmosphere' => '雰囲気・文化',
         'achievement_activity' => '成果・活動',
@@ -48,14 +69,6 @@ return [
         'facility_quality' => '設備',
         'work_style' => '働き方',
         'student_balance' => '人数バランス',
-    ],
-
-    'custom' => [
-        'name' => [
-            'unique' => 'この大学名は既に作成されています。',
-            'required' => '大学名は必須項目です。',
-            'max' => '大学名は50文字以下にしてください。',
-        ],
     ],
 
 ];
