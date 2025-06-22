@@ -3,6 +3,7 @@
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\UniversityController;
 use App\Models\Lab;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -32,7 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::post(('/labs/{lab}/reviews'), [ReviewController::class, 'store'])->name('review.store');
     Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('review.edit');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('review.update');
-    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('review.destroy'); // 追加
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('review.destroy');
+    Route::get('/universities/create', [UniversityController::class, 'create'])->name('university.create');
+    Route::post('/universities', [UniversityController::class, 'store'])->name('university.store'); // 追加
 });
 
 require __DIR__.'/auth.php';
