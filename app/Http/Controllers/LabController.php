@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Faculty; // 追加
 use App\Models\Lab;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // 追加
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class LabController extends Controller
 {
+    use AuthorizesRequests; // 追加
+    
     public function index()
     {
         $labs = Lab::all();
@@ -74,5 +78,60 @@ class LabController extends Controller
                 'columns' => $ratingColumns,
             ],
         ]);
+    }
+
+    public function create(Faculty $faculty)
+    {
+        // 認可
+        $this->authorize('create', Lab::class);
+
+        // 学部に紐づく大学の情報を取得
+        $university = $faculty->university;
+
+        // Inertiaを使ってLabの作成ページを表示
+        return Inertia::render('Lab/Create', [
+            'faculty' => $faculty,
+            'university' => $university,
+        ]);
+    }
+
+    public function store(Request $request, Faculty $faculty)
+    {
+        // 認可
+        $this->authorize('create', Lab::class);
+
+        // バリデーション
+        $validated = $request->validate([
+            'name' => 'required|string|max:50|unique:labs,name,NULL,id,faculty_id,' . $faculty->id,
+            'description' => 'nullable|string|max:500',
+            'url' => 'nullable|url|max:255',
+            'professor_url' => 'nullable|url|max:255',
+            'gender_ratio_male' => 'required|integer|min:0|max:10',
+            'gender_ratio_female' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:10',
+                function ($attribute, $value, $fail) use ($request) {
+                    $male = (int) $request->input('gender_ratio_male', 0);
+                    $female = (int) $value;
+                    if ($male + $female > 10) {
+                        $fail('男女比の合計は10である必要があります。');
+                    }
+                },
+            ],
+        ]);
+        
+        $lab = new Lab();
+        $lab->name = $validated['name'];
+        $lab->description = $validated['description'];
+        $lab->url = $validated['url'];
+        $lab->professor_url = $validated['professor_url'];
+        $lab->gender_ratio_male = $validated['gender_ratio_male'];
+        $lab->gender_ratio_female = $validated['gender_ratio_female'];
+        $lab->faculty_id = $faculty->id;
+        $lab->save();
+
+        return redirect('/')->with('success', '研究室が作成されました。');
     }
 }
