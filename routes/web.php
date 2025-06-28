@@ -38,7 +38,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/universities/create', [UniversityController::class, 'create'])->name('university.create');
     Route::post('/universities', [UniversityController::class, 'store'])->name('university.store');
     Route::get('/universities/{university}/faculties/create', [FacultyController::class, 'create'])->name('faculty.create');
-    Route::post('/universities/{university}/faculties', [FacultyController::class, 'store'])->name('faculty.store'); // 追加
+    Route::post('/universities/{university}/faculties', [FacultyController::class, 'store'])->name('faculty.store');
+    Route::get('/faculties/{faculty}/labs/create', [LabController::class, 'create'])->name('lab.create');
+    Route::post('/faculties/{faculty}/labs', [LabController::class, 'store'])->name('lab.store'); // 追加
 });
 
 require __DIR__.'/auth.php';
