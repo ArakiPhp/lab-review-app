@@ -10,9 +10,10 @@ class University extends Model
 
     // リレーションの定義
     // ユーザーとのリレーション（多対多）
+    // 修正: 中間テーブル名を明示的に指定
     public function users()
     {
-        return $this->belongsToMany(User::class)->withTimestamps();
+        return $this->belongsToMany(User::class, 'university_edit_histories')->withTimestamps();
     }
 
     // 学部とのリレーション（一対多）
