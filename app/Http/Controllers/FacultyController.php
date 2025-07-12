@@ -33,6 +33,16 @@ class FacultyController extends Controller
         $faculty->university_id = $university->id;
         $faculty->save();
 
-        return redirect('/')->with('success', '学部が作成されました。');
+        return redirect()->route('labs.index')->with('success', '学部が作成されました。'); // 修正: リダイレクト先を変更
+    }
+
+    // 追加
+    public function index(University $university)
+    {
+        $faculties = $university->faculties()->orderBy('name')->get();
+        return Inertia::render('Faculty/Index', [
+            'faculties' => $faculties,
+            'university' => $university
+        ]);
     }
 }

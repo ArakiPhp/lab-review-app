@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lab_user', function (Blueprint $table) {
+        // 修正: テーブル名を変更
+        Schema::create('lab_edit_histories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('lab_id')->constrained('labs')->onDelete('cascade');
+            $table->string('comment')->default(''); // 追加: 編集理由を示すコメント
             $table->timestamps();
         });
     }

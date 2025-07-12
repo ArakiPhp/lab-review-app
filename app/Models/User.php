@@ -47,21 +47,24 @@ class User extends Authenticatable
 
     // リレーションの定義
     // 大学とのリレーション（多対多）
+    // 修正: 中間テーブル名を明示的に指定
     public function universities()
     {
-        return $this->belongsToMany(University::class, 'university_user')->withTimestamps();
+        return $this->belongsToMany(University::class, 'university_edit_histories')->withTimestamps();
     }
 
     // 学部とのリレーション（多対多）
+    // 修正: 中間テーブル名を明示的に指定
     public function faculties()
     {
-        return $this->belongsToMany(Faculty::class, 'faculty_user')->withTimestamps();
+        return $this->belongsToMany(Faculty::class, 'faculty_edit_histories')->withTimestamps();
     }
 
     // 研究室とのリレーション（多対多）
+    // 修正: 中間テーブル名を明示的に指定
     public function labs()
     {
-        return $this->belongsToMany(Lab::class, 'lab_user')->withTimestamps();
+        return $this->belongsToMany(Lab::class, 'lab_edit_histories')->withTimestamps();
     }
 
     // レビューとのリレーション（一対多）

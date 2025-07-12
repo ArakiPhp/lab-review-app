@@ -12,9 +12,10 @@ class Faculty extends Model
 
     // リレーションの定義
     // ユーザーとのリレーション（多対多）
+    // 修正: 中間テーブル名を明示的に指定
     public function users()
     {
-        return $this->belongsToMany(User::class, 'faculty_user')->withTimestamps();
+        return $this->belongsToMany(User::class, 'faculty_edit_histories')->withTimestamps();
     }
 
     // 大学とのリレーション（多対一）
