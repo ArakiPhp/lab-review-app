@@ -33,16 +33,74 @@ class FacultyController extends Controller
         $faculty->university_id = $university->id;
         $faculty->save();
 
-        return redirect()->route('labs.index')->with('success', '学部が作成されました。'); // 修正: リダイレクト先を変更
+        // 追加: 現在ログイン中のユーザーと関連付ける
+        $userId = $request->user()->id;
+        $faculty->users()->attach($userId);
+
+        return redirect()->route('labs.index', ['faculty' => $faculty])->with('success', '学部が作成されました。'); // 修正: 学部IDを渡す
     }
 
-    // 追加
     public function index(University $university)
     {
         $faculties = $university->faculties()->orderBy('name')->get();
         return Inertia::render('Faculty/Index', [
             'faculties' => $faculties,
             'university' => $university
+        ]);
+    }
+
+    // 追加
+    public function edit(Faculty $faculty)
+    {
+        $this->authorize('update', Faculty::class);
+        return Inertia::render('Faculty/Edit', [
+            'faculty' => $faculty,
+        ]);
+    }
+
+    // 追加
+    public function update(Request $request, Faculty $faculty)
+    {
+        $this->authorize('update', Faculty::class);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:50|unique:universities,name,' . $faculty->id,
+            'comment' => 'required|string|max:255',
+        ]);
+
+        $faculty->name = $validated['name'];
+        $faculty->save();
+
+        $userId = $request->user()->id;
+        $faculty->users()->attach($userId, [
+            'comment' => $validated['comment'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('labs.index', ['faculty' => $faculty])->with('success', '大学情報が更新されました。');
+    }
+
+    // 追加
+    public function history(Faculty $faculty)
+    {
+        $editHistory = $faculty->users()
+            ->withPivot('comment', 'created_at', 'updated_at')
+            ->get()
+        ->sortByDesc(fn($user) => $user->pivot->updated_at)
+        ->values()
+        ->map(function ($user) {
+            return [
+                'user' => $user->name,
+                'comment' => $user->pivot->comment,
+                'created_at' => $user->pivot->created_at,
+                'updated_at' => $user->pivot->updated_at,
+            ];
+    });
+
+        return Inertia::render('Faculty/History', [
+            'faculty' => $faculty,
+            'editHistory' => $editHistory,
         ]);
     }
 }

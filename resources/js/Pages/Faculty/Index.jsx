@@ -25,6 +25,13 @@ export default function Index() {
                     </Link>
                 </div>
                 
+                {/* 学部作成ボタン */}
+                <div>
+                    <Link href={route('faculty.create', university.id)}>
+                        <button>学部を作成</button>
+                    </Link>
+                </div>
+                
                 {/* 学部一覧 */}
                 <div>
                     {faculties.length > 0 ? (
@@ -34,11 +41,6 @@ export default function Index() {
                                     <Link href={route('labs.index', { university: university.id, faculty: faculty.id })}>
                                         <h3>{faculty.name}</h3>
                                     </Link>
-                                    {/* <div>
-                                        <Link href={route('faculties.edit', { university: university.id, faculty: faculty.id })}>
-                                            <button>編集</button>
-                                        </Link>
-                                    </div> */}
                                 </div>
                             ))}
                         </div>
