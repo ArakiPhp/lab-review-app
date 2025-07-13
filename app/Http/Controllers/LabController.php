@@ -13,11 +13,10 @@ class LabController extends Controller
 {
     use AuthorizesRequests;
     
-    // 修正: 名前変更、大学・学部のデータも渡す
-    public function home() // 名前変更: 'index' => 'home'
+    public function home()
     {
-        $labs = Lab::with(['faculty.university'])->get(); // 大学・学部のデータも渡す
-        return Inertia::render('Lab/Home', [ // レンダリング先も変更
+        $labs = Lab::with(['faculty.university'])->get();
+        return Inertia::render('Lab/Home', [
             'labs' => $labs,
         ]);
     }
@@ -133,10 +132,12 @@ class LabController extends Controller
         $lab->faculty_id = $faculty->id;
         $lab->save();
 
-        return redirect('/')->with('success', '研究室が作成されました。');
+        $userId = $request->user()->id;
+        $lab->users()->attach($userId);
+
+        return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が作成されました。'); // 修正: リダイレクト先を変更
     }
 
-    // 追加
     public function index(Faculty $faculty)
     {
         $labs = $faculty->labs()->get();
@@ -144,6 +145,88 @@ class LabController extends Controller
         return Inertia::render('Lab/Index', [
             'labs' => $labs,
             'faculty' => $faculty->load('university'),
+        ]);
+    }
+
+    public function edit(Lab $lab)
+    {
+        // 認可
+        $this->authorize('update', $lab);
+
+        $lab->load('faculty.university');
+
+        // Labの編集ページを表示
+        return Inertia::render('Lab/Edit', [
+            'lab' => $lab->load('faculty.university'),
+            'faculty' => $lab->faculty,
+            'university' => $lab->faculty->university,
+        ]);
+    }
+
+    public function update(Request $request, Lab $lab)
+    {
+        $this->authorize('update', Lab::class);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:50|unique:labs,name,' . $lab->id . ',id,faculty_id,' . $lab->faculty_id,
+            'description' => 'nullable|string|max:500',
+            'url' => 'nullable|url|max:255',
+            'professor_url' => 'nullable|url|max:255',
+            'gender_ratio_male' => 'required|integer|min:0|max:10',
+            'gender_ratio_female' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:10',
+                function ($attribute, $value, $fail) use ($request) {
+                    $male = (int) $request->input('gender_ratio_male', 0);
+                    $female = (int) $value;
+                    if ($male + $female !== 10) {
+                        $fail('男女比の合計は10である必要があります。');
+                    }
+                },
+            ],
+            'comment' => 'required|string|max:255',
+        ]);
+        
+        $lab->name = $validated['name'];
+        $lab->description = $validated['description'];
+        $lab->url = $validated['url'];
+        $lab->professor_url = $validated['professor_url'];
+        $lab->gender_ratio_male = $validated['gender_ratio_male'];
+        $lab->gender_ratio_female = $validated['gender_ratio_female'];
+        $lab->faculty_id = $lab->faculty_id;
+        $lab->save();
+
+        $userId = $request->user()->id;
+        $lab->users()->attach($userId, [
+            'comment' => $validated['comment'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が更新されました。');
+    }
+
+    public function history(Lab $lab)
+    {
+        $editHistory = $lab->users()
+            ->withPivot('comment', 'created_at', 'updated_at')
+            ->get()
+        ->sortByDesc(fn($user) => $user->pivot->updated_at)
+        ->values()
+        ->map(function ($user) {
+            return [
+                'user' => $user->name,
+                'comment' => $user->pivot->comment,
+                'created_at' => $user->pivot->created_at,
+                'updated_at' => $user->pivot->updated_at,
+            ];
+    });
+
+        return Inertia::render('Lab/History', [
+            'lab' => $lab,
+            'editHistory' => $editHistory,
         ]);
     }
 }

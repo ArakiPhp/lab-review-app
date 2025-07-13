@@ -27,11 +27,20 @@ export default function Index({ labs, faculty }) {
           <button>編集履歴を見る</button>
         </Link>
       </div>
+      
+      {/* 研究室作成ボタン */}
+      <div>
+        <Link href={route('lab.create', faculty.id)}>
+          <button>研究室を作成</button>
+        </Link>
+      </div>
       <div>
         {labs.length > 0 ? (
           labs.map((lab) => (
             <div key={lab.id}>
-              <p>{lab.name}</p>
+              <Link href={route('labs.show', lab.id)}>
+                <p>{lab.name}</p>
+              </Link>
             </div>
           ))
         ) : (
