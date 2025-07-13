@@ -12,4 +12,11 @@ class LabPolicy
         // 研究室を作成できるのはログインユーザーのみ
         return $user->exists;
     }
+
+    // ユーザーが研究室を更新できるかどうかを判定
+    public function update(User $user)
+    {
+        // 研究室を作成できるのはログインユーザーのみ
+        return $user->exists;
+    }
 }

@@ -26,8 +26,9 @@ Route::get('/faculty/{faculty}/labs', [LabController::class, 'index'])->name('la
 Route::get('/labs/{lab}', [LabController::class, 'show'])->name('labs.show');
 Route::get('/universities', [UniversityController::class, 'index'])->name('universities.index');
 Route::get('/universities/{university}/faculties', [FacultyController::class, 'index'])->name('faculties.index');
-Route::get('/universities/{university}/history', [UniversityController::class, 'history'])->name('university.history'); // 追加
-Route::get('/faculties/{faculty}/history', [FacultyController::class, 'history'])->name('faculty.history'); // 追加
+Route::get('/universities/{university}/history', [UniversityController::class, 'history'])->name('university.history');
+Route::get('/faculties/{faculty}/history', [FacultyController::class, 'history'])->name('faculty.history');
+Route::get('/labs/{lab}/history', [LabController::class, 'history'])->name('lab.history'); // 追加
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -54,12 +55,14 @@ Route::middleware('auth')->group(function () {
     // 学部関連
     Route::get('/universities/{university}/faculties/create', [FacultyController::class, 'create'])->name('faculty.create');
     Route::post('/universities/{university}/faculties', [FacultyController::class, 'store'])->name('faculty.store');
-    Route::get('/faculties/{faculty}/edit', [FacultyController::class, 'edit'])->name('faculty.edit'); // 追加
-    Route::put('/faculties/{faculty}', [FacultyController::class, 'update'])->name('faculty.update'); // 追加
+    Route::get('/faculties/{faculty}/edit', [FacultyController::class, 'edit'])->name('faculty.edit');
+    Route::put('/faculties/{faculty}', [FacultyController::class, 'update'])->name('faculty.update');
     
     // 研究室関連
     Route::get('/faculties/{faculty}/labs/create', [LabController::class, 'create'])->name('lab.create');
     Route::post('/faculties/{faculty}/labs', [LabController::class, 'store'])->name('lab.store');
+    Route::get('/labs/{lab}/edit', [LabController::class, 'edit'])->name('lab.edit'); // 追加
+    Route::put('/labs/{lab}', [LabController::class, 'update'])->name('lab.update'); // 追加
 });
 
 require __DIR__.'/auth.php';

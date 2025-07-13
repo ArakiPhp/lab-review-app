@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 // propsとして新しく追加されたプロパティも受け取る
 export default function Show({ 
@@ -67,6 +67,28 @@ export default function Show({
         <div>
             <Head title={`${lab.name}の詳細`} />
             <h1>{lab.name} の詳細ページ</h1>
+            
+            {/* 研究室一覧に戻るボタン */}
+            <div>
+                <Link href={route('labs.index', lab.faculty_id)}>
+                    <button>研究室一覧に戻る</button>
+                </Link>
+            </div>
+            
+            {/* 研究室編集ボタン */}
+            <div>
+                <Link href={route('lab.edit', lab.id)}>
+                    <button>研究室を編集</button>
+                </Link>
+            </div>
+            
+            {/* 編集履歴ボタン */}
+            <div>
+                <Link href={route('lab.history', lab.id)}>
+                    <button>編集履歴を見る</button>
+                </Link>
+            </div>
+            
             <p>大学: {lab.faculty?.university?.name}</p>
             <p>学部: {lab.faculty?.name}</p>
             <p>研究室の説明: {lab.description}</p>
