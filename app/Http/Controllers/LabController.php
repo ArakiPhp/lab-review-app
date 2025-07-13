@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Faculty; // 追加
+use App\Models\Faculty;
 use App\Models\Lab;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; // 追加
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class LabController extends Controller
 {
-    use AuthorizesRequests; // 追加
+    use AuthorizesRequests;
     
-    public function index()
+    // 修正: 名前変更、大学・学部のデータも渡す
+    public function home() // 名前変更: 'index' => 'home'
     {
-        $labs = Lab::all();
-        return Inertia::render('Lab/Index', [
+        $labs = Lab::with(['faculty.university'])->get(); // 大学・学部のデータも渡す
+        return Inertia::render('Lab/Home', [ // レンダリング先も変更
             'labs' => $labs,
         ]);
     }
@@ -133,5 +134,16 @@ class LabController extends Controller
         $lab->save();
 
         return redirect('/')->with('success', '研究室が作成されました。');
+    }
+
+    // 追加
+    public function index(Faculty $faculty)
+    {
+        $labs = $faculty->labs()->get();
+        
+        return Inertia::render('Lab/Index', [
+            'labs' => $labs,
+            'faculty' => $faculty->load('university'),
+        ]);
     }
 }

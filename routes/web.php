@@ -10,7 +10,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
+// 修正: URLを'/auth'に変更
+Route::get('/auth', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -19,11 +20,14 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/labs', [LabController::class, 'index'])->name('labs.index');
+Route::get('/', [LabController::class, 'home'])->name('labs.home'); // 追加
+
+Route::get('/faculty/{faculty}/labs', [LabController::class, 'index'])->name('labs.index'); // 修正
 Route::get('/labs/{lab}', [LabController::class, 'show'])->name('labs.show');
 Route::get('/universities', [UniversityController::class, 'index'])->name('universities.index');
 Route::get('/universities/{university}/faculties', [FacultyController::class, 'index'])->name('faculties.index');
 Route::get('/universities/{university}/history', [UniversityController::class, 'history'])->name('university.history'); // 追加
+Route::get('/faculties/{faculty}/history', [FacultyController::class, 'history'])->name('faculty.history'); // 追加
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -44,12 +48,14 @@ Route::middleware('auth')->group(function () {
     // 大学関連
     Route::get('/universities/create', [UniversityController::class, 'create'])->name('university.create');
     Route::post('/universities', [UniversityController::class, 'store'])->name('university.store');
-    Route::get('/universities/{university}/edit', [UniversityController::class, 'edit'])->name('university.edit'); // 追加
-    Route::put('/universities/{university}', [UniversityController::class, 'update'])->name('university.update'); // 追加
+    Route::get('/universities/{university}/edit', [UniversityController::class, 'edit'])->name('university.edit');
+    Route::put('/universities/{university}', [UniversityController::class, 'update'])->name('university.update');
 
     // 学部関連
     Route::get('/universities/{university}/faculties/create', [FacultyController::class, 'create'])->name('faculty.create');
     Route::post('/universities/{university}/faculties', [FacultyController::class, 'store'])->name('faculty.store');
+    Route::get('/faculties/{faculty}/edit', [FacultyController::class, 'edit'])->name('faculty.edit'); // 追加
+    Route::put('/faculties/{faculty}', [FacultyController::class, 'update'])->name('faculty.update'); // 追加
     
     // 研究室関連
     Route::get('/faculties/{faculty}/labs/create', [LabController::class, 'create'])->name('lab.create');

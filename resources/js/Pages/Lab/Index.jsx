@@ -1,34 +1,42 @@
-import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import React from 'react';
+import { Head, Link } from '@inertiajs/react';
 
-export default function Index({ labs, query }) {
-  const [search, setSearch] = useState(query || '');
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    router.get(route('universities.index'), { query: search }); // クエリパラメータ付きでGETリクエスト
-  };
-
+export default function Index({ labs, faculty }) {
   return (
     <div>
-      <h1>研究室一覧</h1>
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="大学名で検索"
-        />
-        <button type="submit">検索</button>
-      </form>
+      <Head title={`${faculty.name} - 研究室一覧`} />
+      <h1>{faculty.university.name} {faculty.name} - 研究室一覧</h1>
+      
+      {/* 学部一覧に戻るボタン */}
       <div>
-        {labs.map((lab) => (
-          <div
-            key={lab.id}
-          >
-            <p>{lab.name}</p>
-          </div>
-        ))}
+        <Link href={route('faculties.index', faculty.university.id)}>
+          <button>学部一覧に戻る</button>
+        </Link>
+      </div>
+      
+      {/* 学部編集ボタン */}
+      <div>
+        <Link href={route('faculty.edit', faculty.id)}>
+          <button>学部を編集</button>
+        </Link>
+      </div>
+      
+      {/* 編集履歴ボタン */}
+      <div>
+        <Link href={route('faculty.history', faculty.id)}>
+          <button>編集履歴を見る</button>
+        </Link>
+      </div>
+      <div>
+        {labs.length > 0 ? (
+          labs.map((lab) => (
+            <div key={lab.id}>
+              <p>{lab.name}</p>
+            </div>
+          ))
+        ) : (
+          <p>研究室がありません。</p>
+        )}
       </div>
     </div>
   );
