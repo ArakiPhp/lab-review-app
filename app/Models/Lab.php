@@ -30,4 +30,10 @@ class Lab extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    // 追加: コメントとのリレーション（一対多）
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

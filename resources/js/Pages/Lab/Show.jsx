@@ -63,6 +63,10 @@ export default function Show({
         router.get(route('review.edit', { review: userReview.id }));
     };
 
+    const handleCreateComment = () => {
+        router.get(route('comment.create', { lab: lab.id }));
+    };
+
     return (
         <div>
             <Head title={`${lab.name}の詳細`} />
@@ -87,6 +91,13 @@ export default function Show({
                 <Link href={route('lab.history', lab.id)}>
                     <button>編集履歴を見る</button>
                 </Link>
+            </div>
+            
+            {/* コメント投稿ボタン */}
+            <div>
+                <button onClick={handleCreateComment}>
+                    コメントを投稿する
+                </button>
             </div>
             
             <p>大学: {lab.faculty?.university?.name}</p>
@@ -148,14 +159,6 @@ export default function Show({
                             <li>評価項目データがありません</li>
                         )}
                     </ul>
-                    
-                    {/* ユーザーのレビューにコメントがある場合表示 */}
-                    {userReview.comment && (
-                        <div>
-                            <h4>コメント:</h4>
-                            <p>{userReview.comment}</p>
-                        </div>
-                    )}
                     
                     <div>
                         <button onClick={() => handleDeleteReview(userReview.id)}>
