@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\ProfileController;
@@ -61,8 +62,12 @@ Route::middleware('auth')->group(function () {
     // 研究室関連
     Route::get('/faculties/{faculty}/labs/create', [LabController::class, 'create'])->name('lab.create');
     Route::post('/faculties/{faculty}/labs', [LabController::class, 'store'])->name('lab.store');
-    Route::get('/labs/{lab}/edit', [LabController::class, 'edit'])->name('lab.edit'); // 追加
-    Route::put('/labs/{lab}', [LabController::class, 'update'])->name('lab.update'); // 追加
+    Route::get('/labs/{lab}/edit', [LabController::class, 'edit'])->name('lab.edit');
+    Route::put('/labs/{lab}', [LabController::class, 'update'])->name('lab.update');
+
+    // コメント関連
+    Route::get('/labs/{lab}/comments/create', [CommentController::class, 'create'])->name('comment.create');
+    Route::post('/labs/{lab}/comments', [CommentController::class, 'store'])->name('comment.store');
 });
 
 require __DIR__.'/auth.php';
