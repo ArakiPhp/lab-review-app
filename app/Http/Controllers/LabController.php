@@ -27,6 +27,9 @@ class LabController extends Controller
         // universityはfacultyを経由して取得
         $lab->load(['faculty.university', 'reviews']);
 
+        // コメントデータを取得（投稿者情報も含む）
+        $comments = $lab->comments()->with('user')->latest()->get();
+
         // 平均値を計算するために、評価項目のカラム名を定義
         $ratingColumns = [
             'mentorship_style',
@@ -67,7 +70,8 @@ class LabController extends Controller
             }
         }
 
-        // 研究室のデータに加えて、求めたレビューの平均値とユーザーのレビューも一緒に渡す
+        // 修正:
+        // 研究室のデータに加えて、求めたレビューの平均値とユーザーのレビュー、コメント、認証情報も一緒に渡す
         return Inertia::render('Lab/Show', [
             'lab' => $lab,
             'overallAverage' => $overallAverage,
@@ -76,6 +80,10 @@ class LabController extends Controller
             'userOverallAverage' => $userOverallAverage,
             'ratingData' => [
                 'columns' => $ratingColumns,
+            ],
+            'comments' => $comments, // 追加
+            'auth' => [
+                'user' => Auth::user() // 追加
             ],
         ]);
     }
