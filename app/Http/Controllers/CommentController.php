@@ -42,4 +42,50 @@ class CommentController extends Controller
         return redirect()->route('labs.show', ['lab' => $lab])->with('success', 'コメントが保存されました。');
     }
 
+    // 追加するメソッド
+    public function index(Lab $lab)
+    {
+        $comments = $lab->comments()->with('user')->latest()->get();
+        return Inertia::render('Lab/Show', [
+            'lab' => $lab,
+            'comments' => $comments,
+        ]);
+    }
+
+    public function edit(Comment $comment)
+    {
+        // ポリシーで認可をチェック
+        $this->authorize('update', $comment);
+        return Inertia::render('Comment/Edit', [
+            'comment' => $comment,
+        ]);
+    }
+
+    public function update(Request $request, Comment $comment)
+    {
+        // ポリシーで認可をチェック
+        $this->authorize('update', $comment);
+
+        // バリデーション
+        $validated = $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        // バリデーション済みのデータを更新
+        $comment->content = $validated['content'];
+        $comment->save();
+
+        return redirect()->route('labs.show', ['lab' => $comment->lab])->with('success', 'コメントが更新されました。');
+    }
+
+    public function destroy(Comment $comment)
+    {
+        // ポリシーで認可をチェック
+        $this->authorize('delete', $comment);
+
+        // コメントを削除
+        $comment->delete();
+
+        return redirect()->route('labs.show', ['lab' => $comment->lab])->with('success', 'コメントが削除されました。');
+    }
 }

@@ -8,7 +8,9 @@ export default function Show({
     averagePerItem, 
     userReview, 
     userOverallAverage, 
-    ratingData
+    ratingData,
+    comments,
+    auth
 }) {
     const reviewCount = lab.reviews ? lab.reviews.length : 0;
 
@@ -65,6 +67,25 @@ export default function Show({
 
     const handleCreateComment = () => {
         router.get(route('comment.create', { lab: lab.id }));
+    };
+
+    const handleEditComment = (commentId) => {
+        router.get(route('comment.edit', { comment: commentId }));
+    };
+
+    const handleDeleteComment = (commentId) => {
+        if (confirm('本当に削除してもよろしいですか？')) {
+            router.delete(route('comment.destroy', { comment: commentId }), {
+                onSuccess: () => {
+                    // 成功時の処理
+                    alert('コメントが削除されました。');
+                },
+                onError: (error) => {
+                    // エラー時の処理
+                    alert('コメントの削除に失敗しました。');
+                }
+            });
+        }
     };
 
     return (
@@ -178,6 +199,36 @@ export default function Show({
                         レビューを投稿する
                     </button>
                 </div>
+            )}
+
+            <hr />
+
+            {/* コメント一覧 */}
+            <h2>コメント</h2>
+            {comments && comments.length > 0 ? (
+                <div>
+                    {comments.map((comment) => (
+                        <div key={comment.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
+                            <p><strong>投稿者:</strong> {comment.user?.name || '匿名'}</p>
+                            <p><strong>投稿日:</strong> {new Date(comment.created_at).toLocaleDateString()}</p>
+                            <p><strong>内容:</strong> {comment.content}</p>
+                            
+                            {/* ログインしているユーザーが自分のコメントの場合のみ編集・削除ボタンを表示 */}
+                            {auth && auth.user && auth.user.id === comment.user_id && (
+                                <div>
+                                    <button onClick={() => handleEditComment(comment.id)}>
+                                        編集
+                                    </button>
+                                    <button onClick={() => handleDeleteComment(comment.id)}>
+                                        削除
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p>まだコメントがありません。</p>
             )}
         </div>
     );
