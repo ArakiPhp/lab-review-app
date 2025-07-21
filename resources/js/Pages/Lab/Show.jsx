@@ -10,7 +10,9 @@ export default function Show({
     userOverallAverage, 
     ratingData,
     comments,
-    auth
+    auth,
+    userBookmark,
+    bookmarkCount
 }) {
     const reviewCount = lab.reviews ? lab.reviews.length : 0;
 
@@ -88,6 +90,34 @@ export default function Show({
         }
     };
 
+    // ブックマーク追加
+    const handleAddBookmark = () => {
+        router.post(route('bookmark.store'), {
+            lab_id: lab.id
+        }, {
+            onSuccess: () => {
+                alert('ブックマークに追加しました。');
+            },
+            onError: (error) => {
+                alert('ブックマークの追加に失敗しました。');
+            }
+        });
+    };
+
+    // ブックマーク削除
+    const handleRemoveBookmark = () => {
+        if (confirm('ブックマークを削除してもよろしいですか？')) {
+            router.delete(route('bookmark.destroy', { bookmark: userBookmark.id }), {
+                onSuccess: () => {
+                    alert('ブックマークを削除しました。');
+                },
+                onError: (error) => {
+                    alert('ブックマークの削除に失敗しました。');
+                }
+            });
+        }
+    };
+
     return (
         <div>
             <Head title={`${lab.name}の詳細`} />
@@ -113,6 +143,26 @@ export default function Show({
                     <button>編集履歴を見る</button>
                 </Link>
             </div>
+            
+            {/* ブックマークボタン */}
+            {auth && auth.user && (
+                <div>
+                    {userBookmark ? (
+                        <button onClick={handleRemoveBookmark}>
+                            ブックマークを削除
+                        </button>
+                    ) : (
+                        <button onClick={handleAddBookmark}>
+                            ブックマークに追加
+                        </button>
+                    )}
+                </div>
+            )}
+            
+            {/* ブックマーク数表示 */}
+            {bookmarkCount !== undefined && (
+                <p>ブックマーク数: {bookmarkCount}</p>
+            )}
             
             {/* コメント投稿ボタン */}
             <div>

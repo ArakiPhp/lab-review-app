@@ -70,20 +70,26 @@ class LabController extends Controller
             }
         }
 
+        // 追加: ユーザーのブックマーク状態を取得
+        $userBookmark = $lab->bookmarks()->where('user_id', Auth::id())->first();
+        $bookmarkCount = $lab->bookmarks()->count();
+
         // 修正:
-        // 研究室のデータに加えて、求めたレビューの平均値とユーザーのレビュー、コメント、認証情報も一緒に渡す
+        // 研究室のデータに加えて、求めたレビューの平均値とユーザーのレビュー、コメント、ブックマーク、認証情報も一緒に渡す
         return Inertia::render('Lab/Show', [
             'lab' => $lab,
             'overallAverage' => $overallAverage,
             'averagePerItem' => $averagePerItem,
             'userReview' => $userReview,
             'userOverallAverage' => $userOverallAverage,
+            'userBookmark' => $userBookmark, // 追加
+            'bookmarkCount' => $bookmarkCount, // 追加
             'ratingData' => [
                 'columns' => $ratingColumns,
             ],
-            'comments' => $comments, // 追加
+            'comments' => $comments,
             'auth' => [
-                'user' => Auth::user() // 追加
+                'user' => Auth::user(),
             ],
         ]);
     }
