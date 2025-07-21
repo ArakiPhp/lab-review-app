@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\LabController;
@@ -67,11 +68,14 @@ Route::middleware('auth')->group(function () {
 
     // コメント関連
     Route::get('/labs/{lab}/comments/create', [CommentController::class, 'create'])->name('comment.create');
-    Route::get('/labs/{lab}/comments', [CommentController::class, 'index'])->name('comment.index'); // 追加
     Route::post('/labs/{lab}/comments', [CommentController::class, 'store'])->name('comment.store');
-    Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comment.edit'); // 追加
-    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comment.update'); // 追加
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy'); // 追加
+    Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comment.edit');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comment.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
+
+    // ブックマーク関連
+    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmark.store'); // 追加
+    Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy'); // 追加
 });
 
 require __DIR__.'/auth.php';

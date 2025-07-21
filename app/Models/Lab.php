@@ -31,9 +31,15 @@ class Lab extends Model
         return $this->hasMany(Review::class);
     }
 
-    // 追加: コメントとのリレーション（一対多）
+    // コメントとのリレーション（一対多）
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    // 追加: ブックマークとのリレーション（一対多）
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
     }
 }

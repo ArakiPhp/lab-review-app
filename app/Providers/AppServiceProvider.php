@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
-use App\Models\Comment; // 追加
+use App\Models\Bookmark; // 追加
+use App\Models\Comment;
 use App\Models\Faculty;
 use App\Models\Lab;
 use App\Models\Review;
 use App\Models\University;
-use App\Policies\CommentPolicy; // 追加
+use App\Policies\BookmarkPolicy; // 追加
+use App\Policies\CommentPolicy;
 use App\Policies\FacultyPolicy;
 use App\Policies\LabPolicy;
 use App\Policies\ReviewPolicy;
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(University::class, UniversityPolicy::class);
         Gate::policy(Faculty::class, FacultyPolicy::class);
         Gate::policy(Lab::class, LabPolicy::class);
-        Gate::policy(Comment::class, CommentPolicy::class); // 追加
+        Gate::policy(Comment::class, CommentPolicy::class);
+        Gate::policy(Bookmark::class, BookmarkPolicy::class); // 追加
     }
 }

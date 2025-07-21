@@ -43,15 +43,6 @@ class CommentController extends Controller
     }
 
     // 追加するメソッド
-    public function index(Lab $lab)
-    {
-        $comments = $lab->comments()->with('user')->latest()->get();
-        return Inertia::render('Lab/Show', [
-            'lab' => $lab,
-            'comments' => $comments,
-        ]);
-    }
-
     public function edit(Comment $comment)
     {
         // ポリシーで認可をチェック
