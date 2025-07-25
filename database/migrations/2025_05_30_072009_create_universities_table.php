@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->timestamps();
             $table->softDeletes();
+            $table->unsignedBigInteger('version')->default(1); // 追加
         });
     }
 
