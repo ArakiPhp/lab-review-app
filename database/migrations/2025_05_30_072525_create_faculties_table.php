@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('university_id')->constrained('universities')->onDelete('cascade');
             $table->string('name');
             $table->timestamps();
+            $table->unsignedBigInteger('version')->default(1); // 追加
         });
     }
 

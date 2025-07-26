@@ -6,6 +6,8 @@ use App\Models\Faculty;
 use App\Models\University;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class FacultyController extends Controller
@@ -33,11 +35,10 @@ class FacultyController extends Controller
         $faculty->university_id = $university->id;
         $faculty->save();
 
-        // 追加: 現在ログイン中のユーザーと関連付ける
         $userId = $request->user()->id;
         $faculty->users()->attach($userId);
 
-        return redirect()->route('labs.index', ['faculty' => $faculty])->with('success', '学部が作成されました。'); // 修正: 学部IDを渡す
+        return redirect()->route('labs.index', ['faculty' => $faculty])->with('success', '学部が作成されました。');
     }
 
     public function index(University $university)
@@ -49,7 +50,6 @@ class FacultyController extends Controller
         ]);
     }
 
-    // 追加
     public function edit(Faculty $faculty)
     {
         $this->authorize('update', Faculty::class);
@@ -58,7 +58,6 @@ class FacultyController extends Controller
         ]);
     }
 
-    // 追加
     public function update(Request $request, Faculty $faculty)
     {
         $this->authorize('update', Faculty::class);
@@ -66,22 +65,43 @@ class FacultyController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:universities,name,' . $faculty->id,
             'comment' => 'required|string|max:255',
+            'version' => 'required|integer',
         ]);
 
-        $faculty->name = $validated['name'];
-        $faculty->save();
+        // トランザクション
+        DB::beginTransaction();
 
-        $userId = $request->user()->id;
-        $faculty->users()->attach($userId, [
-            'comment' => $validated['comment'],
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        try {
+            // 現在のバージョンを取得して比較
+            $current = Faculty::find($faculty->id);
+            if ($validated['version'] !== $current->version) {
+                throw ValidationException::withMessages([
+                    'version' => '他のユーザーがこの学部情報を更新しました。最新の情報を確認してください。',
+                ]);
+            }
 
-        return redirect()->route('labs.index', ['faculty' => $faculty])->with('success', '大学情報が更新されました。');
+            // 更新
+            $current->name = $validated['name'];
+            $current->version += 1;
+            $current->save();
+
+            // 履歴保存
+            $userId = $request->user()->id;
+            $current->users()->attach($userId, [
+                'comment' => $validated['comment'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('labs.index', ['faculty' => $current])->with('success', '大学情報が更新されました。');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
-    // 追加
     public function history(Faculty $faculty)
     {
         $editHistory = $faculty->users()

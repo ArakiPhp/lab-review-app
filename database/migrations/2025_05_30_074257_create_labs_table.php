@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('gender_ratio_male');
             $table->unsignedTinyInteger('gender_ratio_female');
             $table->timestamps();
+            $table->unsignedBigInteger('version')->default(1); // 追加
         });
     }
 

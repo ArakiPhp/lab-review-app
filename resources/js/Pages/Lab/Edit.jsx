@@ -9,7 +9,8 @@ export default function Edit({ lab, faculty, university }) {
         professor_url: lab.professor_url || '',
         gender_ratio_male: lab.gender_ratio_male || 5,
         gender_ratio_female: lab.gender_ratio_female || 5,
-        comment: '', // 編集理由
+        comment: '',
+        version: lab.version,
     });
 
     const handleSubmit = (e) => {
@@ -57,6 +58,7 @@ export default function Edit({ lab, faculty, university }) {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {errors.version && <div style={{ color: 'red' }}>{errors.version}</div>}
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                                 研究室名 <span className="text-red-500">*</span>

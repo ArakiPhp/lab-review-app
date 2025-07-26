@@ -78,7 +78,7 @@ class UniversityController extends Controller
         DB::beginTransaction();
 
         try {
-            // 他のユーザーが亢進している可能性がある
+            // 他のユーザーが更新している可能性がある
             // そのため、最初に最新の university を取得
             $current = University::find($university->id);
 
@@ -104,7 +104,7 @@ class UniversityController extends Controller
             DB::commit(); // トランザクション処理終了
 
              // リダイレクト
-            return redirect()->route('faculties.index', ['university' => $university])->with('success', '大学情報が更新されました。');
+            return redirect()->route('faculties.index', ['university' => $current])->with('success', '大学情報が更新されました。');
         } catch (\Exception $e) {
             DB::rollBack(); // エラー時はロールバック
             throw $e;
