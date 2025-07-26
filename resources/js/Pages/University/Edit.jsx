@@ -5,6 +5,7 @@ export default function Edit({ university }) {
     const { data, setData, put, processing, errors } = useForm({
         name: university.name || '',
         comment: '',
+        version: university.version // 追加
     });
 
     const handleSubmit = (e) => {
@@ -20,6 +21,7 @@ export default function Edit({ university }) {
                 <h1>{university.name} - 編集</h1>
                 
                 <form onSubmit={handleSubmit}>
+                    {errors.version && <div style={{ color: 'red' }}>{errors.version}</div>}
                     <div>
                         <label htmlFor="name">大学名:</label>
                         <input

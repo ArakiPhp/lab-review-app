@@ -7,6 +7,8 @@ use App\Models\Lab;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class LabController extends Controller
@@ -70,11 +72,10 @@ class LabController extends Controller
             }
         }
 
-        // 追加: ユーザーのブックマーク状態を取得
+        // ユーザーのブックマーク状態を取得
         $userBookmark = $lab->bookmarks()->where('user_id', Auth::id())->first();
         $bookmarkCount = $lab->bookmarks()->count();
 
-        // 修正:
         // 研究室のデータに加えて、求めたレビューの平均値とユーザーのレビュー、コメント、ブックマーク、認証情報も一緒に渡す
         return Inertia::render('Lab/Show', [
             'lab' => $lab,
@@ -82,8 +83,8 @@ class LabController extends Controller
             'averagePerItem' => $averagePerItem,
             'userReview' => $userReview,
             'userOverallAverage' => $userOverallAverage,
-            'userBookmark' => $userBookmark, // 追加
-            'bookmarkCount' => $bookmarkCount, // 追加
+            'userBookmark' => $userBookmark,
+            'bookmarkCount' => $bookmarkCount,
             'ratingData' => [
                 'columns' => $ratingColumns,
             ],
@@ -149,7 +150,7 @@ class LabController extends Controller
         $userId = $request->user()->id;
         $lab->users()->attach($userId);
 
-        return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が作成されました。'); // 修正: リダイレクト先を変更
+        return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が作成されました。');
     }
 
     public function index(Faculty $faculty)
@@ -201,25 +202,45 @@ class LabController extends Controller
                 },
             ],
             'comment' => 'required|string|max:255',
-        ]);
-        
-        $lab->name = $validated['name'];
-        $lab->description = $validated['description'];
-        $lab->url = $validated['url'];
-        $lab->professor_url = $validated['professor_url'];
-        $lab->gender_ratio_male = $validated['gender_ratio_male'];
-        $lab->gender_ratio_female = $validated['gender_ratio_female'];
-        $lab->faculty_id = $lab->faculty_id;
-        $lab->save();
-
-        $userId = $request->user()->id;
-        $lab->users()->attach($userId, [
-            'comment' => $validated['comment'],
-            'created_at' => now(),
-            'updated_at' => now(),
+            'version' => 'required|integer',
         ]);
 
-        return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が更新されました。');
+        DB::beginTransaction();
+
+        try {
+            // 現在のバージョンを取得して比較
+            $current = Lab::find($lab->id);
+            if ($validated['version'] !== $current->version) {
+                throw ValidationException::withMessages([
+                    'version' => '他のユーザーがこの研究室情報を更新しました。最新の情報を確認してください。',
+                ]);
+            }
+
+            // 更新
+            $current->name = $validated['name'];
+            $current->description = $validated['description'];
+            $current->url = $validated['url'];
+            $current->professor_url = $validated['professor_url'];
+            $lab->gender_ratio_male = $validated['gender_ratio_male'];
+            $lab->gender_ratio_female = $validated['gender_ratio_female'];
+            $current->version += 1;
+            $current->save();
+
+            // 履歴保存
+            $userId = $request->user()->id;
+            $lab->users()->attach($userId, [
+                'comment' => $validated['comment'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::commit();
+            
+            return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が更新されました。');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function history(Lab $lab)
