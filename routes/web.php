@@ -4,6 +4,7 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\LabController;
+use App\Http\Controllers\MyPageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UniversityController;
@@ -74,8 +75,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
 
     // ブックマーク関連
-    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmark.store'); // 追加
-    Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy'); // 追加
+    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmark.store');
+    Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
+
+    // マイページ関連
+    Route::get('/mypage', [MyPageController::class, 'showUser'])->name('mypage.index');
+    Route::get('/mypage/edit', [MyPageController::class, 'editUser'])->name('mypage.edit');
+    Route::put('/mypage', [MyPageController::class, 'updateUser'])->name('mypage.update');
+    Route::delete('/mypage', [MyPageController::class, 'deleteUser'])->name('mypage.delete');
+    Route::get('/mypage/bookmarks', [MyPageController::class, 'showBookmarks'])->name('mypage.bookmarks');
+    Route::delete('/mypage/bookmarks/{bookmark}', [MyPageController::class, 'removeBookmark'])->name('mypage.bookmark.remove'); // 追加
 });
 
 require __DIR__.'/auth.php';
