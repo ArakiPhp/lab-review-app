@@ -1,8 +1,23 @@
 import React from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 
 export default function Index() {
-    const { faculties, university } = usePage().props;
+    const { faculties, university, auth } = usePage().props;
+
+    // 大学削除のハンドラー
+    const handleDeleteUniversity = () => {
+        if (confirm(`本当に「${university.name}」を削除しますか？この操作は取り消せません。`)) {
+            router.delete(route('admin.universities.destroy', university.id), {
+                onSuccess: () => {
+                    console.log('大学が削除されました');
+                },
+                onError: (errors) => {
+                    console.error('削除エラー:', errors);
+                    alert('削除に失敗しました');
+                }
+            });
+        }
+    };
 
     return (
         <>
@@ -17,6 +32,27 @@ export default function Index() {
                         <button>大学を編集</button>
                     </Link>
                 </div>
+                
+                {/* 管理者専用: 大学削除ボタン */}
+                {auth.user?.is_admin && (
+                    <div style={{ marginTop: '10px' }}>
+                        <button 
+                            onClick={handleDeleteUniversity}
+                            style={{
+                                backgroundColor: '#dc2626',
+                                color: 'white',
+                                padding: '8px 16px',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#b91c1c'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#dc2626'}
+                        >
+                            大学を削除（管理者）
+                        </button>
+                    </div>
+                )}
                 
                 {/* 編集履歴ボタン */}
                 <div>

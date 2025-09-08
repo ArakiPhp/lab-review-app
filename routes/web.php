@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FacultyController;
@@ -13,7 +14,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// 修正: URLを'/auth'に変更
+// URLを'/auth'に変更
 Route::get('/auth', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -23,15 +24,15 @@ Route::get('/auth', function () {
     ]);
 });
 
-Route::get('/', [LabController::class, 'home'])->name('labs.home'); // 追加
+Route::get('/', [LabController::class, 'home'])->name('labs.home');
 
-Route::get('/faculty/{faculty}/labs', [LabController::class, 'index'])->name('labs.index'); // 修正
+Route::get('/faculty/{faculty}/labs', [LabController::class, 'index'])->name('labs.index');
 Route::get('/labs/{lab}', [LabController::class, 'show'])->name('labs.show');
 Route::get('/universities', [UniversityController::class, 'index'])->name('universities.index');
 Route::get('/universities/{university}/faculties', [FacultyController::class, 'index'])->name('faculties.index');
 Route::get('/universities/{university}/history', [UniversityController::class, 'history'])->name('university.history');
 Route::get('/faculties/{faculty}/history', [FacultyController::class, 'history'])->name('faculty.history');
-Route::get('/labs/{lab}/history', [LabController::class, 'history'])->name('lab.history'); // 追加
+Route::get('/labs/{lab}/history', [LabController::class, 'history'])->name('lab.history');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -84,7 +85,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/mypage', [MyPageController::class, 'updateUser'])->name('mypage.update');
     Route::delete('/mypage', [MyPageController::class, 'deleteUser'])->name('mypage.delete');
     Route::get('/mypage/bookmarks', [MyPageController::class, 'showBookmarks'])->name('mypage.bookmarks');
-    Route::delete('/mypage/bookmarks/{bookmark}', [MyPageController::class, 'removeBookmark'])->name('mypage.bookmark.remove'); // 追加
+    Route::delete('/mypage/bookmarks/{bookmark}', [MyPageController::class, 'removeBookmark'])->name('mypage.bookmark.remove');
+
+    // 追加: 管理者用ルート
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::delete('/universities/{university}', [AdminController::class, 'destroyUniversity'])->name('universities.destroy');
+        Route::delete('/faculties/{faculty}', [AdminController::class, 'destroyFaculty'])->name('faculties.destroy');
+        Route::delete('/labs/{lab}', [AdminController::class, 'destroyLab'])->name('labs.destroy');
+        Route::delete('/comments/{comment}', [AdminController::class, 'destroyComment'])->name('comments.destroy');
+    });
 });
 
 require __DIR__.'/auth.php';

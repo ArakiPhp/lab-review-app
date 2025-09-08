@@ -21,10 +21,10 @@ class CommentPolicy
         return $user->id === $comment->user_id;
     }
 
-    // 追加: ユーザーがコメントを削除できるかどうかを判定
+    // 修正: ユーザーがコメントを削除できるかどうかを判定
     public function delete(User $user, Comment $comment)
     {
-        // 自分が投稿したコメントのみ削除可能
-        return $user->id === $comment->user_id;
+        // 投稿した本人もしくは管理者のみ削除可能
+        return $user->id === $comment->user_id || $user->is_admin();
     }
 }

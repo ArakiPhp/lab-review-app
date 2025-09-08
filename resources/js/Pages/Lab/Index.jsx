@@ -1,7 +1,24 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 
 export default function Index({ labs, faculty }) {
+  const { auth } = usePage().props;
+
+  // 学部削除のハンドラー
+  const handleDeleteFaculty = () => {
+    if (confirm(`本当に「${faculty.name}」を削除しますか？この操作は取り消せません。`)) {
+      router.delete(route('admin.faculties.destroy', faculty.id), {
+        onSuccess: () => {
+          console.log('学部が削除されました');
+        },
+        onError: (errors) => {
+          console.error('削除エラー:', errors);
+          alert('削除に失敗しました');
+        }
+      });
+    }
+  };
+
   return (
     <div>
       <Head title={`${faculty.name} - 研究室一覧`} />
@@ -20,6 +37,27 @@ export default function Index({ labs, faculty }) {
           <button>学部を編集</button>
         </Link>
       </div>
+      
+      {/* 管理者専用: 学部削除ボタン */}
+      {auth.user?.is_admin && (
+        <div style={{ marginTop: '10px' }}>
+          <button 
+            onClick={handleDeleteFaculty}
+            style={{
+              backgroundColor: '#dc2626',
+              color: 'white',
+              padding: '8px 16px',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#b91c1c'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#dc2626'}
+          >
+            学部を削除（管理者）
+          </button>
+        </div>
+      )}
       
       {/* 編集履歴ボタン */}
       <div>

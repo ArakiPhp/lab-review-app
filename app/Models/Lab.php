@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes; // 追加: 論理削除
 
 class Lab extends Model
 {
+    use SoftDeletes; // 追加: 論理削除
+
     protected $fillable = [
         'name',
         'faculty_id',
@@ -13,7 +16,7 @@ class Lab extends Model
 
     // リレーションの定義
     // ユーザーとのリレーション（多対多）
-    // 修正: 中間テーブル名を明示的に指定
+    // 中間テーブル名を明示的に指定
     public function users()
     {
         return $this->belongsToMany(User::class, 'lab_edit_histories')->withTimestamps();
@@ -37,7 +40,7 @@ class Lab extends Model
         return $this->hasMany(Comment::class);
     }
 
-    // 追加: ブックマークとのリレーション（一対多）
+    // ブックマークとのリレーション（一対多）
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);

@@ -3,16 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Faculty extends Model
 {
+    use SoftDeletes; // 追加: 論理削除
+
     protected $fillable = [
         'name', 'university_id'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($faculty) {
+            // 論理削除時に関連する研究室も論理削除
+            $faculty->labs()->get()->each->delete();
+        });
+    }
+
     // リレーションの定義
     // ユーザーとのリレーション（多対多）
-    // 修正: 中間テーブル名を明示的に指定
+    // 中間テーブル名を明示的に指定
     public function users()
     {
         return $this->belongsToMany(User::class, 'faculty_edit_histories')->withTimestamps();
