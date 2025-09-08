@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes; // 追加
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin', // 追加: 管理者フラグ
     ];
 
     /**
@@ -44,6 +45,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // 追加: 管理者かどうかを判定するメソッド
+    public function is_admin()
+    {
+        return $this->is_admin;
     }
 
     // リレーションの定義
@@ -80,7 +87,7 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
-    // 追加: ブックマークとのリレーション（一対多）
+    // ブックマークとのリレーション（一対多）
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);

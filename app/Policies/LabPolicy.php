@@ -19,4 +19,11 @@ class LabPolicy
         // 研究室を作成できるのはログインユーザーのみ
         return $user->exists;
     }
+
+    // 追加: ユーザーが研究室を削除できるかどうかを判定
+    public function delete(User $user)
+    {
+        // 研究室を削除できるのは管理者のみ
+        return $user->is_admin();
+    }
 }

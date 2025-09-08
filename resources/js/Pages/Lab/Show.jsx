@@ -48,11 +48,9 @@ export default function Show({
         if (confirm('本当に削除してもよろしいですか？')) {
             router.delete(route('review.destroy', { review: reviewId }), {
                 onSuccess: () => {
-                    // 成功時の処理
                     alert('レビューが削除されました。');
                 },
                 onError: (error) => {
-                    // エラー時の処理
                     alert('レビューの削除に失敗しました。');
                 }
             });
@@ -79,12 +77,39 @@ export default function Show({
         if (confirm('本当に削除してもよろしいですか？')) {
             router.delete(route('comment.destroy', { comment: commentId }), {
                 onSuccess: () => {
-                    // 成功時の処理
                     alert('コメントが削除されました。');
                 },
                 onError: (error) => {
-                    // エラー時の処理
                     alert('コメントの削除に失敗しました。');
+                }
+            });
+        }
+    };
+
+    // 管理者用コメント削除
+    const handleAdminDeleteComment = (commentId) => {
+        if (confirm('管理者権限でこのコメントを削除してもよろしいですか？')) {
+            router.delete(route('admin.comments.destroy', { comment: commentId }), {
+                onSuccess: () => {
+                    alert('コメントが削除されました（管理者）。');
+                },
+                onError: (error) => {
+                    alert('コメントの削除に失敗しました。');
+                }
+            });
+        }
+    };
+
+    // 研究室削除（管理者専用）
+    const handleDeleteLab = () => {
+        if (confirm(`本当に「${lab.name}」を削除しますか？この操作は取り消せません。`)) {
+            router.delete(route('admin.labs.destroy', lab.id), {
+                onSuccess: () => {
+                    console.log('研究室が削除されました');
+                },
+                onError: (errors) => {
+                    console.error('削除エラー:', errors);
+                    alert('削除に失敗しました');
                 }
             });
         }
@@ -136,6 +161,27 @@ export default function Show({
                     <button>研究室を編集</button>
                 </Link>
             </div>
+            
+            {/* 管理者専用: 研究室削除ボタン */}
+            {Boolean(auth?.user?.is_admin) && (
+                <div style={{ marginTop: '10px' }}>
+                    <button 
+                        onClick={handleDeleteLab}
+                        style={{
+                            backgroundColor: '#dc2626',
+                            color: 'white',
+                            padding: '8px 16px',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                        onMouseOver={(e) => e.target.style.backgroundColor = '#b91c1c'}
+                        onMouseOut={(e) => e.target.style.backgroundColor = '#dc2626'}
+                    >
+                        研究室を削除（管理者）
+                    </button>
+                </div>
+            )}
             
             {/* 編集履歴ボタン */}
             <div>
@@ -263,15 +309,38 @@ export default function Show({
                             <p><strong>投稿日:</strong> {new Date(comment.created_at).toLocaleDateString()}</p>
                             <p><strong>内容:</strong> {comment.content}</p>
                             
-                            {/* ログインしているユーザーが自分のコメントの場合のみ編集・削除ボタンを表示 */}
-                            {auth && auth.user && auth.user.id === comment.user_id && (
+                            {/* コメントの編集・削除ボタン */}
+                            {auth && auth.user && (
                                 <div>
-                                    <button onClick={() => handleEditComment(comment.id)}>
-                                        編集
-                                    </button>
-                                    <button onClick={() => handleDeleteComment(comment.id)}>
-                                        削除
-                                    </button>
+                                    {/* 自分のコメントの場合は編集・削除ボタン */}
+                                    {auth.user.id === comment.user_id && (
+                                        <>
+                                            <button onClick={() => handleEditComment(comment.id)}>
+                                                編集
+                                            </button>
+                                            <button onClick={() => handleDeleteComment(comment.id)}>
+                                                削除
+                                            </button>
+                                        </>
+                                    )}
+                                    
+                                    {/* 管理者の場合は他人のコメントも削除可能 */}
+                                    {Boolean(auth.user.is_admin) && auth.user.id !== comment.user_id && (
+                                        <button 
+                                            onClick={() => handleAdminDeleteComment(comment.id)}
+                                            style={{
+                                                backgroundColor: '#dc2626',
+                                                color: 'white',
+                                                padding: '4px 8px',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                marginLeft: '5px'
+                                            }}
+                                        >
+                                            削除（管理者）
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>
