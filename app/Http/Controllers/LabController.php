@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Faculty;
 use App\Models\Lab;
+use App\Notifications\ModelChangedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
@@ -145,6 +146,7 @@ class LabController extends Controller
         $lab->gender_ratio_male = $validated['gender_ratio_male'];
         $lab->gender_ratio_female = $validated['gender_ratio_female'];
         $lab->faculty_id = $faculty->id;
+        $lab->created_by = $request->user()->id; // 追加: 作成者のIDを設定
         $lab->save();
 
         $userId = $request->user()->id;
@@ -235,6 +237,21 @@ class LabController extends Controller
             ]);
 
             DB::commit();
+
+            // 追加: 作成者へ通知を送信
+            if ($userId !== $current->created_by && $current->creator) {
+                $changes = collect($current->getChanges())
+                    ->only(['name','description','url','professor_url'])
+                    ->map(fn($new, $key) => [
+                        'old' => $old[$key] ?? null,
+                        'new' => $new,
+                    ])
+                    ->toArray();
+
+                $current->creator->notify(
+                    new ModelChangedNotification('edited', '研究室', $current->name, $changes)
+                );
+            }
             
             return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が更新されました。');
         } catch (\Exception $e) {

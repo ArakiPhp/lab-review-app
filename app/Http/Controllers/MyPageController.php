@@ -12,10 +12,15 @@ class MyPageController extends Controller
     {
         $user = Auth::user();
 
+        // 管理者・一般ユーザー問わず通知を取得
+        $notifications = $user->notifications()->latest()->get();
+
         return Inertia::render('MyPage/Index', [
             'user' => $user,
+            'notifications' => $notifications,
         ]);
     }
+
 
     public function editUser(Request $request)
     {
@@ -63,7 +68,6 @@ class MyPageController extends Controller
         ]);
     }
 
-    // 追加
     public function removeBookmark($bookmarksId)
     {
         /** @var User $user */

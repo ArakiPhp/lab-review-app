@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // 追加: 論理削除
+use Illuminate\Database\Eloquent\SoftDeletes; // 論理削除
 
 class Lab extends Model
 {
-    use SoftDeletes; // 追加: 論理削除
+    use SoftDeletes; // 論理削除
 
     protected $fillable = [
         'name',
@@ -44,5 +44,17 @@ class Lab extends Model
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
+    }
+
+    // 削除依頼とのポリモーフィックリレーション(一対多)
+    public function deletionRequests()
+    {
+        return $this->morphMany(DeletionRequest::class, 'target');
+    }
+
+    // 追加: 作成者とのリレーション（多対一）
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

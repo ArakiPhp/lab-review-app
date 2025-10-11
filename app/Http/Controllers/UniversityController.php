@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\University;
+use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,7 @@ class UniversityController extends Controller
 
         $university = new University();
         $university->name = $validated['name'];
+        $university->created_by = $request->user()->id; // 追加: 作成者のIDを設定
         $university->save();
 
         $userId = $request->user()->id;
@@ -63,7 +65,7 @@ class UniversityController extends Controller
         ]);
     }
 
-    // 修正: versionの更新処理・トランザクション処理
+    // versionの更新処理・トランザクション処理
     public function update(Request $request, University $university)
     {
         $this->authorize('update', University::class);
@@ -71,7 +73,7 @@ class UniversityController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:universities,name,' . $university->id,
             'comment' => 'required|string|max:255',
-            'version' => 'required|integer', // 追加
+            'version' => 'required|integer',
         ]);
 
         // トランザクション開始
@@ -102,6 +104,21 @@ class UniversityController extends Controller
             ]);
 
             DB::commit(); // トランザクション処理終了
+
+            // 追加: 作成者へ通知を送信
+            if ($userId !== $current->created_by && $current->creator) {
+                $changes = collect($current->getChanges())
+                    ->only(['name'])
+                    ->map(fn($new, $key) => [
+                        'old' => $old[$key] ?? null,
+                        'new' => $new,
+                    ])
+                    ->toArray();
+    
+                $current->creator->notify(
+                    new ModelChangedNotification('edited', '大学', $current->name, $changes)
+                );
+            }
 
              // リダイレクト
             return redirect()->route('faculties.index', ['university' => $current])->with('success', '大学情報が更新されました。');

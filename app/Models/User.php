@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -47,7 +48,7 @@ class User extends Authenticatable
         ];
     }
 
-    // 追加: 管理者かどうかを判定するメソッド
+    // 管理者かどうかを判定するメソッド
     public function is_admin()
     {
         return $this->is_admin;
@@ -91,5 +92,11 @@ class User extends Authenticatable
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
+    }
+
+    // 追加: 通知とのリレーション（一対多）
+    public function notifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
     }
 }
