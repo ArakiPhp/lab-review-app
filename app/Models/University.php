@@ -7,11 +7,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class University extends Model
 {
-    use SoftDeletes; // 追加: 論理削除
+    use SoftDeletes; // 論理削除
 
     protected $fillable = ['name'];
 
-    // 追加
     protected static function boot()
     {
         parent::boot();
@@ -34,5 +33,17 @@ class University extends Model
     public function faculties()
     {
         return $this->hasMany(Faculty::class);
+    }
+
+    // 削除依頼とのポリモーフィックリレーション(一対多)
+    public function deletionRequests()
+    {
+        return $this->morphMany(DeletionRequest::class, 'target');
+    }
+
+    // 追加: 作成者とのリレーション（多対一）
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

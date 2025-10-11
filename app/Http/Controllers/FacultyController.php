@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Faculty;
 use App\Models\University;
+use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,7 @@ class FacultyController extends Controller
         $faculty = new Faculty();
         $faculty->name = $validated['name'];
         $faculty->university_id = $university->id;
+        $faculty->created_by = $request->user()->id; // 追加: 作成者のIDを設定
         $faculty->save();
 
         $userId = $request->user()->id;
@@ -94,6 +96,21 @@ class FacultyController extends Controller
             ]);
 
             DB::commit();
+
+            // 追加: 作成者へ通知を送信
+            if ($userId !== $current->created_by && $current->creator) {
+                $changes = collect($current->getChanges())
+                    ->only(['name'])
+                    ->map(fn($new, $key) => [
+                        'old' => $old[$key] ?? null,
+                        'new' => $new,
+                    ])
+                    ->toArray();
+
+                $current->creator->notify(
+                    new ModelChangedNotification('edited', '学部', $current->name, $changes)
+                );
+            }
 
             return redirect()->route('labs.index', ['faculty' => $current])->with('success', '大学情報が更新されました。');
         } catch (\Exception $e) {

@@ -3,9 +3,11 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DeletionRequestController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\MyPageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UniversityController;
@@ -87,12 +89,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/mypage/bookmarks', [MyPageController::class, 'showBookmarks'])->name('mypage.bookmarks');
     Route::delete('/mypage/bookmarks/{bookmark}', [MyPageController::class, 'removeBookmark'])->name('mypage.bookmark.remove');
 
-    // 追加: 管理者用ルート
+    // 追加: 削除依頼関連
+    Route::get('/deletion-requests/create/{type}/{id}', [DeletionRequestController::class, 'create'])->name('deletion_requests.create');
+    Route::post('/deletion-requests', [DeletionRequestController::class, 'store'])->name('deletion_requests.store');
+
+    // 追加: 通知関連
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
+    // 管理者用ルート
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/universities/{university}', [AdminController::class, 'destroyUniversity'])->name('universities.destroy');
         Route::delete('/faculties/{faculty}', [AdminController::class, 'destroyFaculty'])->name('faculties.destroy');
         Route::delete('/labs/{lab}', [AdminController::class, 'destroyLab'])->name('labs.destroy');
         Route::delete('/comments/{comment}', [AdminController::class, 'destroyComment'])->name('comments.destroy');
+        Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('deletion_requests.index'); // 追加
     });
 });
 
