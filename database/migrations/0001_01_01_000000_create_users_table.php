@@ -16,7 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable(); // 修正: ソーシャルログイン用にnullableに変更
+            // 追加: Googleログイン用のカラム
+            $table->string('google_id')->nullable()->unique();
+
             $table->rememberToken();
             $table->timestamps();
         });

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Lab;
+use App\Models\User; // 追加
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,6 +14,10 @@ class LabSeeder extends Seeder
      */
     public function run(): void
     {
+        // 追加: 作成者を管理者に設定
+        $adminId = User::where('email', 'admin@example.com')->value('id')
+            ?? User::first()->id;
+
         // 研究室を適当に５つ作成
         Lab::create([
             'faculty_id' => 4,
@@ -22,6 +27,7 @@ class LabSeeder extends Seeder
             'professor_url' => 'https://example.com/professor1',
             'gender_ratio_male' => 6,
             'gender_ratio_female' => 4,
+            'created_by' => $adminId, // 追加
         ]);
 
         Lab::create([
@@ -32,6 +38,7 @@ class LabSeeder extends Seeder
             'professor_url' => 'https://example.com/professor2',
             'gender_ratio_male' => 5,
             'gender_ratio_female' => 5,
+            'created_by' => $adminId, // 追加
         ]);
 
         Lab::create([
@@ -42,6 +49,7 @@ class LabSeeder extends Seeder
             'professor_url' => 'https://example.com/professor3',
             'gender_ratio_male' => 7,
             'gender_ratio_female' => 3,
+            'created_by' => $adminId, // 追加
         ]);
 
         Lab::create([
@@ -52,6 +60,7 @@ class LabSeeder extends Seeder
             'professor_url' => 'https://example.com/professor4',
             'gender_ratio_male' => 5,
             'gender_ratio_female' => 5,
+            'created_by' => $adminId, // 追加
         ]);
 
         Lab::create([
@@ -62,6 +71,7 @@ class LabSeeder extends Seeder
             'professor_url' => 'https://example.com/professor5',
             'gender_ratio_male' => 4,
             'gender_ratio_female' => 6,
+            'created_by' => $adminId, // 追加
         ]);
     }
 }
