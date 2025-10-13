@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DeletionRequestController;
@@ -27,6 +28,10 @@ Route::get('/auth', function () {
 });
 
 Route::get('/', [LabController::class, 'home'])->name('labs.home');
+
+// 追加: ソーシャルログイン
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
 Route::get('/faculty/{faculty}/labs', [LabController::class, 'index'])->name('labs.index');
 Route::get('/labs/{lab}', [LabController::class, 'show'])->name('labs.show');

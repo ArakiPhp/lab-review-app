@@ -7,6 +7,7 @@ use App\Models\Review; // 追加
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,6 +16,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 追加: 管理者を先に作成
+        $email = 'admin@example.com';
+
+        $admin = User::updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => 'シード管理者',
+                'password' => Hash::make('password'),
+                'is_admin' => true,
+            ]
+        );
+
         // 大学・学部・研究室のSeederクラスを呼び出す
         $this->call([
             UniversitySeeder::class,
