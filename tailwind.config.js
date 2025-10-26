@@ -15,6 +15,11 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+
+            // 追加: メインコンテンツの横幅設定
+            maxWidth: {
+                container: '1024px',
+            },
         },
     },
 
