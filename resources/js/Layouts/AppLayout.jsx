@@ -1,10 +1,12 @@
-export default function AppLayout({ children }) {
+import { Head } from '@inertiajs/react';
+import Header from "../Components/Header"; // 追加
+
+export default function AppLayout({ children, title }) { // 追加: titleをpropsとして受け取る
   return (
-    <div className="min-h-dvh flex flex-col bg-[##EEF5F9]">
+    <div className="min-h-dvh flex flex-col bg-[#EEF5F9]">
+      <Head title={title} />
       {/* Header */}
-      <header className="h-14 border-b border-gray-200 bg-[#EEF5F9] flex items-center px-6">
-        <h1 className="text-lg font-semibold">ヘッダー領域</h1>
-      </header>
+      <Header title={title}/>
 
       {/* Main Content Area */}
       <main className="flex-1 bg-transparent flex">

@@ -16,6 +16,7 @@ class MyPageController extends Controller
         $notifications = $user->notifications()->latest()->get();
 
         return Inertia::render('MyPage/Index', [
+            'title' => "{$user->name}さんのマイページ", // 追加
             'user' => $user,
             'notifications' => $notifications,
         ]);
