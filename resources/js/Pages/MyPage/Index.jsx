@@ -1,8 +1,7 @@
-// resources/js/Pages/MyPage/Index.jsx
 import AppLayout from '@/Layouts/AppLayout'; // 追加: AppLayoutをインポート
 import { Head, Link, router } from '@inertiajs/react';
 
-export default function Index({ user, notifications = [] }) {
+export default function Index({ user, notifications = [], title }) { // 追加: titleをpropsとして受け取る
     const handleDeleteAccount = () => {
         if (confirm('本当に退会しますか？この操作は取り消せません。')) {
             router.delete(route('mypage.delete'));
@@ -12,8 +11,8 @@ export default function Index({ user, notifications = [] }) {
     const unreadCount = notifications.filter(n => !n.read_at).length;
 
     return (
-        <AppLayout>
-            <Head title="マイページ" />
+        <AppLayout title={title}>
+            {/* 今まで「マイページ」を設定していたHeadは削除 */}
 
             <div className="space-y-4">
                 <div className="text-gray-800">
