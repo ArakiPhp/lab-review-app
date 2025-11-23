@@ -2,7 +2,7 @@ import logo from '../Assets/logo/header.svg';
 import hamburgerIcon from '../Assets/icons/hamburger.svg';
 import { Link } from '@inertiajs/react';
 
-const Header = ({ title }) => {
+const Header = ({ title, onOpenSidebar }) => { // 追加: onOpenSidebar を受け取る
   return (
     <header
       className="
@@ -34,8 +34,12 @@ const Header = ({ title }) => {
         {title}
       </h1>
 
-      {/* 右：ハンバーガー */}
-      <button className="ml-auto flex items-center" aria-label="メニューを開く">
+      {/* 右：ハンバーガー onClickにonOpenSidebarを追加 */}
+      <button
+        className="ml-auto flex items-center"
+        aria-label="メニューを開く"
+        onClick={onOpenSidebar}
+      >
         <img
           src={hamburgerIcon}
           alt="メニュー"
