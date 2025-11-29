@@ -12,14 +12,14 @@ export default function Sidebar({ isOpen, onClose, isLoggedIn }) {
   // メニュー定義
   const items = isLoggedIn
     ? [
-        { label: 'ホーム', href: route('labs.home'), icon: home },
+        { label: 'ホーム', href: route('home'), icon: home },
         { label: 'マイページ', href: route('mypage.index'), icon: mypage },
         { label: 'ブックマーク', href: route('mypage.bookmarks'), icon: bookmark },
         { label: 'ランキング', href: null, icon: ranking },
         { label: 'ログアウト', href: route('logout'), method: 'post', icon: logout },
       ]
     : [
-        { label: 'ホーム', href: route('labs.home'), icon: home },
+        { label: 'ホーム', href: route('home'), icon: home },
         { label: '新規登録', href: route('register'), icon: register },
         { label: 'ログイン', href: route('login'), icon: login },
         { label: 'ランキング', href: null, icon: ranking },

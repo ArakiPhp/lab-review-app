@@ -15,14 +15,6 @@ use Inertia\Inertia;
 class LabController extends Controller
 {
     use AuthorizesRequests;
-    
-    public function home()
-    {
-        $labs = Lab::with(['faculty.university'])->get();
-        return Inertia::render('Lab/Home', [
-            'labs' => $labs,
-        ]);
-    }
 
     public function show(Lab $lab)
     {

@@ -2,8 +2,9 @@ import { Head, usePage } from '@inertiajs/react';
 import { useState, useCallback, useEffect } from 'react';
 import Header from "../Components/Header";
 import Sidebar from "../Components/Sidebar";
+import HamburgerMenu from '@/Components/HamburgerMenu';
 
-export default function AppLayout({ children, title }) {
+export default function AppLayout({ children, title, mode='default' }) { // 追加: mode prop を受け取る
   // ユーザーの認証状態を管理
   const { props } = usePage();
   const isLoggedIn = !!props?.auth?.user;
@@ -11,6 +12,9 @@ export default function AppLayout({ children, title }) {
   // サイドバーの開閉状態を管理
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const setSidebarOpen = useCallback((open) => setIsSidebarOpen(Boolean(open)), []);
+
+  // 追加:ホームページかどうか
+  const isHome = mode === 'home';
 
   // 追加: サイドバーが開いている間は、背景のスクロールを防止
   useEffect(() => {
@@ -29,10 +33,20 @@ export default function AppLayout({ children, title }) {
   return (
     <div className="min-h-dvh flex flex-col bg-[#EEF5F9]">
       <Head title={title} />
-      {/* Header 追加: isSidebarOpen */}
-      <Header title={title} onOpenSidebar={() => setSidebarOpen(true)} />
 
-      {/* Main Content Area */}
+      {/* 修正: ホームモード: ハンバーガーアイコンのみを固定表示（サイドバー非表示時のみ） */}
+      {isHome ? (
+        !isSidebarOpen && (
+          <div className="fixed top-4 right-6 z-50">
+            <HamburgerMenu onOpenSidebar={() => setSidebarOpen(true)} />
+          </div>
+        )
+      ) : (
+        /* デフォルト: フルヘッダー表示 */
+        <Header title={title} onOpenSidebar={() => setIsSidebarOpen(true)} />
+      )}
+
+      {/* メインコンテンツ領域 */}
       <main className="flex-1 bg-transparent flex">
         <div
           className="

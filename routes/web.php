@@ -6,6 +6,7 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DeletionRequestController;
 use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LabController;
 use App\Http\Controllers\MyPageController;
 use App\Http\Controllers\NotificationController;
@@ -27,7 +28,8 @@ Route::get('/auth', function () {
     ]);
 });
 
-Route::get('/', [LabController::class, 'home'])->name('labs.home');
+// ホームページ
+Route::get('/', [HomeController::class, 'home'])->name('home');
 
 // 追加: ソーシャルログイン
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
