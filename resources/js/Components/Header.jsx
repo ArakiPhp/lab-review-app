@@ -1,8 +1,8 @@
 import logo from '../Assets/logo/header.svg';
-import hamburgerIcon from '../Assets/icons/hamburger.svg';
+import HamburgerMenu from './HamburgerMenu'; // 修正
 import { Link } from '@inertiajs/react';
 
-const Header = ({ title, onOpenSidebar }) => { // 追加: onOpenSidebar を受け取る
+const Header = ({ title, onOpenSidebar }) => {
   return (
     <header
       className="
@@ -24,7 +24,7 @@ const Header = ({ title, onOpenSidebar }) => { // 追加: onOpenSidebar を受�
     >
       {/* 左：ロゴ */}
       <div className="flex items-center">
-        <Link href={route('labs.home')} aria-label="トップページへ">
+        <Link href={route('home')} aria-label="トップページへ">
           <img src={logo} alt="App Logo" className="h-9 w-auto" />
         </Link>
       </div>
@@ -34,18 +34,8 @@ const Header = ({ title, onOpenSidebar }) => { // 追加: onOpenSidebar を受�
         {title}
       </h1>
 
-      {/* 右：ハンバーガー onClickにonOpenSidebarを追加 */}
-      <button
-        className="ml-auto flex items-center"
-        aria-label="メニューを開く"
-        onClick={onOpenSidebar}
-      >
-        <img
-          src={hamburgerIcon}
-          alt="メニュー"
-          className="h-7 w-7 hover:opacity-80 transition"
-        />
-      </button>
+      {/* 修正: 右：ハンバーガーアイコンメニュー */}
+      <HamburgerMenu onOpenSidebar={onOpenSidebar} />
     </header>
   );
 };
