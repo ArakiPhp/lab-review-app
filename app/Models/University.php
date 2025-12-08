@@ -9,7 +9,10 @@ class University extends Model
 {
     use SoftDeletes; // 論理削除
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'type',
+    ];
 
     protected static function boot()
     {

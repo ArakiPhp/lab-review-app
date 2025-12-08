@@ -1,6 +1,6 @@
 import hamburgerIcon from '../Assets/icons/hamburger.svg';
 
-export default function HamburgerMenu({ onOpenSidebar }) {
+const HamburgerMenu = ({ onOpenSidebar }) => {
   return (
     <button
       onClick={onOpenSidebar}
@@ -15,3 +15,5 @@ export default function HamburgerMenu({ onOpenSidebar }) {
     </button>
   );
 }
+
+export default HamburgerMenu;

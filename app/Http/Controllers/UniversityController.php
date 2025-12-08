@@ -30,7 +30,7 @@ class UniversityController extends Controller
 
         $university = new University();
         $university->name = $validated['name'];
-        $university->created_by = $request->user()->id; // 追加: 作成者のIDを設定
+        $university->created_by = $request->user()->id;
         $university->save();
 
         $userId = $request->user()->id;
@@ -48,7 +48,7 @@ class UniversityController extends Controller
                 $queryBuilder->where('name', 'like', '%' . $query . '%');
             })
             ->orderBy('name')
-            ->paginate(2)
+            ->paginate(10) // 10件ずつ表示に変更
             ->withQueryString();
 
         return Inertia::render('University/Index', [
@@ -105,7 +105,7 @@ class UniversityController extends Controller
 
             DB::commit(); // トランザクション処理終了
 
-            // 追加: 作成者へ通知を送信
+            // 作成者へ通知を送信
             if ($userId !== $current->created_by && $current->creator) {
                 $changes = collect($current->getChanges())
                     ->only(['name'])

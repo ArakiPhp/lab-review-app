@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('universities', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->enum('type', ['national', 'public', 'private']);
             $table->timestamps();
             $table->softDeletes();
-            $table->unsignedBigInteger('version')->default(1); // 追加
+            $table->unsignedBigInteger('version')->default(1);
         });
     }
 
