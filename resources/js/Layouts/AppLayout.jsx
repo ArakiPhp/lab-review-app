@@ -4,7 +4,7 @@ import Header from "../Components/Header";
 import Sidebar from "../Components/Sidebar";
 import HamburgerMenu from '@/Components/HamburgerMenu';
 
-export default function AppLayout({ children, title, mode='default' }) { // 追加: mode prop を受け取る
+const AppLayout = ({ children, title, mode='default' }) => {
   // ユーザーの認証状態を管理
   const { props } = usePage();
   const isLoggedIn = !!props?.auth?.user;
@@ -13,17 +13,17 @@ export default function AppLayout({ children, title, mode='default' }) { // 追�
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const setSidebarOpen = useCallback((open) => setIsSidebarOpen(Boolean(open)), []);
 
-  // 追加:ホームページかどうか
+  // ホームページかどうか
   const isHome = mode === 'home';
 
-  // 追加: サイドバーが開いている間は、背景のスクロールを防止
+  //  サイドバーが開いている間は、背景のスクロールを防止
   useEffect(() => {
     if (isSidebarOpen) document.body.classList.add('overflow-hidden');
     else document.body.classList.remove('overflow-hidden');
     return () => document.body.classList.remove('overflow-hidden');
   }, [isSidebarOpen]);
 
-  // 追加: Escキーでサイドバーを閉じる
+  //  Escキーでサイドバーを閉じる
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && setIsSidebarOpen(false);
     window.addEventListener('keydown', onKey);
@@ -67,3 +67,5 @@ export default function AppLayout({ children, title, mode='default' }) { // 追�
     </div>
   );
 }
+
+export default AppLayout;

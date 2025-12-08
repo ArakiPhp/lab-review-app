@@ -1,12 +1,12 @@
 import searchInputIcon from '../Assets/icons/search/icon-search-input.svg';
 import searchButtonIcon from '../Assets/icons/search/icon-search-button.svg';
 
-export default function SearchBar({
+const SearchBar = ({
   value,
   onChange,
   onSubmit,
   placeholder = '大学名を入力...',
-}) {
+}) => {
   const isDisabled = !value || !value.trim();
 
   const handleSubmit = (e) => {
@@ -65,3 +65,5 @@ export default function SearchBar({
     </form>
   )
 }
+
+export default SearchBar;

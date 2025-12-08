@@ -8,7 +8,7 @@ import logout from '../Assets/icons/sidebar/logout.svg';
 import login from '../Assets/icons/sidebar/login.svg';
 import register from '../Assets/icons/sidebar/register.svg';
 
-export default function Sidebar({ isOpen, onClose, isLoggedIn }) {
+const Sidebar = ({ isOpen, onClose, isLoggedIn }) => {
   // メニュー定義
   const items = isLoggedIn
     ? [
@@ -117,3 +117,5 @@ export default function Sidebar({ isOpen, onClose, isLoggedIn }) {
     </>
   );
 }
+
+export default Sidebar;
