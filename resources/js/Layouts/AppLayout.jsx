@@ -4,6 +4,14 @@ import Header from "../Components/Header";
 import Sidebar from "../Components/Sidebar";
 import HamburgerMenu from '@/Components/HamburgerMenu';
 
+/**
+ * アプリケーションのレイアウトコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {React.ReactNode} props.children - レイアウト内に表示するコンテンツ
+ * @param {string} props.title - ページタイトル
+ * @param {string} [props.mode='default'] - レイアウトモード
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const AppLayout = ({ children, title, mode='default' }) => {
   // ユーザーの認証状態を管理
   const { props } = usePage();
@@ -34,7 +42,7 @@ const AppLayout = ({ children, title, mode='default' }) => {
     <div className="min-h-dvh flex flex-col bg-[#EEF5F9]">
       <Head title={title} />
 
-      {/* 修正: ホームモード: ハンバーガーアイコンのみを固定表示（サイドバー非表示時のみ） */}
+      {/* ホームモード: ハンバーガーアイコンのみを固定表示（サイドバー非表示時のみ） */}
       {isHome ? (
         !isSidebarOpen && (
           <div className="fixed top-4 right-6 z-50">

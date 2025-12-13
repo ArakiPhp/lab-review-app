@@ -44,7 +44,7 @@ class University extends Model
         return $this->morphMany(DeletionRequest::class, 'target');
     }
 
-    // 追加: 作成者とのリレーション（多対一）
+    // 作成者とのリレーション（多対一）
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

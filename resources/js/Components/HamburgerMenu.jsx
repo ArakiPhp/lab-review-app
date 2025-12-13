@@ -1,5 +1,11 @@
 import hamburgerIcon from '../Assets/icons/hamburger.svg';
 
+/**
+ * ハンバーガーメニューボタンコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {Function} props.onOpenSidebar - サイドバーを開くためのコールバック関数
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const HamburgerMenu = ({ onOpenSidebar }) => {
   return (
     <button

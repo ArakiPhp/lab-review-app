@@ -8,6 +8,14 @@ import logout from '../Assets/icons/sidebar/logout.svg';
 import login from '../Assets/icons/sidebar/login.svg';
 import register from '../Assets/icons/sidebar/register.svg';
 
+/**
+ * サイドバーコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {boolean} props.isOpen - サイドバーの開閉状態
+ * @param {Function} props.onClose - サイドバーを閉じるためのコールバック関数
+ * @param {boolean} props.isLoggedIn - ユーザーのログイン状態
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const Sidebar = ({ isOpen, onClose, isLoggedIn }) => {
   // メニュー定義
   const items = isLoggedIn

@@ -34,7 +34,7 @@ class FacultyController extends Controller
         $faculty = new Faculty();
         $faculty->name = $validated['name'];
         $faculty->university_id = $university->id;
-        $faculty->created_by = $request->user()->id; // 追加: 作成者のIDを設定
+        $faculty->created_by = $request->user()->id;
         $faculty->save();
 
         $userId = $request->user()->id;
@@ -43,12 +43,14 @@ class FacultyController extends Controller
         return redirect()->route('labs.index', ['faculty' => $faculty])->with('success', '学部が作成されました。');
     }
 
-    public function index(University $university)
+    public function index(Request $request, University $university)
     {
-        $faculties = $university->faculties()->orderBy('name')->get();
+        $query = $request->input('query', '');
+        $faculties = $university->faculties()->get(); // 修正: 名前のソートを削除
         return Inertia::render('Faculty/Index', [
             'faculties' => $faculties,
-            'university' => $university
+            'university' => $university,
+            'query' => $query,
         ]);
     }
 
@@ -97,7 +99,6 @@ class FacultyController extends Controller
 
             DB::commit();
 
-            // 追加: 作成者へ通知を送信
             if ($userId !== $current->created_by && $current->creator) {
                 $changes = collect($current->getChanges())
                     ->only(['name'])

@@ -1,7 +1,14 @@
 import logo from '../Assets/logo/header.svg';
-import HamburgerMenu from './HamburgerMenu'; // 修正
+import HamburgerMenu from './HamburgerMenu';
 import { Link } from '@inertiajs/react';
 
+/**
+ * ヘッダーコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {string} props.title - ページタイトル
+ * @param {Function} props.onOpenSidebar - サイドバーを開くためのコールバック関数
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const Header = ({ title, onOpenSidebar }) => {
   return (
     <header
@@ -34,7 +41,7 @@ const Header = ({ title, onOpenSidebar }) => {
         {title}
       </h1>
 
-      {/* 修正: 右：ハンバーガーアイコンメニュー */}
+      {/* 右：ハンバーガーアイコンメニュー */}
       <HamburgerMenu onOpenSidebar={onOpenSidebar} />
     </header>
   );

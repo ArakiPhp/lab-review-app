@@ -1,5 +1,11 @@
 import { Link } from '@inertiajs/react';
 
+/**
+ * ページネーションコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {Object} props.paginator - Laravelのページネーションオブジェクト
+ * @returns {JSX.Element|null} コンポーネントのJSX（1ページのみの場合はnull）
+ */
 const Pagination = ({ paginator }) => {
   const canGoPrev = paginator.current_page > 1;
   const canGoNext = paginator.current_page < paginator.last_page;

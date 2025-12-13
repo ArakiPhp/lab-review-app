@@ -4,13 +4,23 @@ import AppLayout from "@/Layouts/AppLayout";
 import logo from "../Assets/logo/Home.svg";
 import SearchBar from "../Components/SearchBar";
 
+/**
+ * ホームページコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {string} [props.query=''] - 検索クエリの初期値
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const Home = ({ query=''}) => {
   const [search, setSearch] = useState(query || '');
 
-  // 検索フォームを送信する関数
+  /**
+   * 検索フォームを送信する関数
+   * @param {Event} e - フォーム送信イベント
+   * @returns {void}
+   */
   const handleSubmit = e => {
     e.preventDefault();
-    router.get('/universities', { query: search });
+    router.get(route('universities.index', { query: search }));
   }
 
   return (
