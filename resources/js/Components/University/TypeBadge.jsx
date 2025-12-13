@@ -8,6 +8,12 @@ const BADGE_MAP = {
   private: PrivateBadge,
 };
 
+/**
+ * 大学種別バッジコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {string} props.type - 大学の種別（national, public, private）
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const TypeBadge = ({ type }) => {
   const Icon = BADGE_MAP[type];
   return (

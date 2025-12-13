@@ -4,6 +4,13 @@ import UniversityCard from '../../Components/University/UniversityCard';
 import BackButton from '../../Components/Common/BackButton';
 import Pagination from "../../Components/Common/Pagination";
 
+/**
+ * 大学一覧ページコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {Object} props.universities - ページネーション付き大学データ
+ * @param {string} props.query - 検索クエリ文字列
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const Index = ({ universities, query}) => {
   const hasResults = universities.data.length > 0;
 
@@ -19,7 +26,7 @@ const Index = ({ universities, query}) => {
           </div>
           <div className="w-full max-w-xl space-y-6 mt-8">
             {universities.data.map(university => (
-              <UniversityCard key={university.id} university={university} />
+              <UniversityCard key={university.id} university={university} query={query} />
             ))}
           </div>
 

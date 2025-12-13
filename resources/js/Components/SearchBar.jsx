@@ -1,6 +1,15 @@
 import searchInputIcon from '../Assets/icons/search/icon-search-input.svg';
 import searchButtonIcon from '../Assets/icons/search/icon-search-button.svg';
 
+/**
+ * 検索バーコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {string} props.value - 入力値
+ * @param {Function} props.onChange - 入力値変更時のコールバック関数
+ * @param {Function} props.onSubmit - フォーム送信時のコールバック関数
+ * @param {string} [props.placeholder='大学名を入力...'] - プレースホルダーテキスト
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const SearchBar = ({
   value,
   onChange,

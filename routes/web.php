@@ -35,7 +35,7 @@ Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
-Route::get('/faculty/{faculty}/labs', [LabController::class, 'index'])->name('labs.index');
+Route::get('/faculties/{faculty}/labs', [LabController::class, 'index'])->name('labs.index');
 Route::get('/labs/{lab}', [LabController::class, 'show'])->name('labs.show');
 Route::get('/universities', [UniversityController::class, 'index'])->name('universities.index');
 Route::get('/universities/{university}/faculties', [FacultyController::class, 'index'])->name('faculties.index');

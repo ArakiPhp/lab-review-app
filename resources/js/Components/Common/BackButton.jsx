@@ -1,5 +1,12 @@
 import { router } from "@inertiajs/react";
 
+/**
+ * 戻るボタンコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {string} props.routerName - 遷移先のルート名
+ * @param {Object} [props.params={}] - ルートに渡すパラメータ
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const BackButton = ({ routerName, params = {}}) => {
   return (
     <button
