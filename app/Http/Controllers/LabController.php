@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Faculty;
 use App\Models\Lab;
+use App\Models\Review;
 use App\Notifications\ModelChangedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -147,13 +148,78 @@ class LabController extends Controller
         return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が作成されました。');
     }
 
-    public function index(Faculty $faculty)
+    public function index(Faculty $faculty, Request $request) // 追加: Request $request
     {
-        $labs = $faculty->labs()->get();
+        // 追加: 平均値を計算するために、評価項目のカラム名を定義
+        $ratingColumns = [
+            'mentorship_style',
+            'lab_atmosphere',
+            'achievement_activity',
+            'constraint_level',
+            'facility_quality',
+            'work_style',
+            'student_balance',
+        ];
+
+        // 追加: UIからソート条件を取得
+        $sort = $request->query('sort', 'overall');
+
+        // 追加: 総合評価の計算式を定義
+        $overallExpr = '(' . implode(' + ', array_map(fn($c) => "reviews.$c", $ratingColumns)) . ') / ' . count($ratingColumns);
+
+        $query = $faculty->labs()
+            ->select('labs.*')
+            ->withCount('reviews')
+            // 各項目の平均値を計算して選択
+            ->withAvg('reviews as avg_mentorship_style', 'mentorship_style')
+            ->withAvg('reviews as avg_lab_atmosphere', 'lab_atmosphere')
+            ->withAvg('reviews as avg_achievement_activity', 'achievement_activity')
+            ->withAvg('reviews as avg_constraint_level', 'constraint_level')
+            ->withAvg('reviews as avg_facility_quality', 'facility_quality')
+            ->withAvg('reviews as avg_work_style', 'work_style')
+            ->withAvg('reviews as avg_student_balance', 'student_balance')
+            // 総合評価を計算して選択
+            ->addSelect([
+                'overall_avg' => Review::query()
+                    ->selectRaw("AVG($overallExpr)")
+                    ->whereColumn('reviews.lab_id', 'labs.id'),
+            ]);
+
+        // 追加: ソート条件に基づいてクエリを修正    
+        $sortMap = [
+            'overall' => 'overall_avg',
+            'mentorship_style' => 'mentorship_style_avg',
+            'lab_atmosphere' => 'lab_atmosphere_avg',
+            'achievement_activity' => 'achievement_activity_avg',
+            'constraint_level' => 'constraint_level_avg',
+            'facility_quality' => 'facility_quality_avg',
+            'work_style' => 'work_style_avg',
+            'student_balance' => 'student_balance_avg',
+            'reviews_count' => 'reviews_count',
+        ];
+
+        $sortColumn = $sortMap[$sort] ?? 'overall_avg';
+
+        // 検索クエリを取得
+        $searchQuery = $request->input('query', '');
+
+        $labs = $query
+            ->orderByRaw("$sortColumn IS NULL")
+            ->orderByDesc($sortColumn)
+            ->paginate(15)
+            ->withQueryString();
+
+        // 各ラボにランク（順位）を追加
+        $labs->getCollection()->transform(function ($lab, $index) use ($labs) {
+            $lab->rank = ($labs->currentPage() - 1) * $labs->perPage() + $index + 1;
+            return $lab;
+        });
         
         return Inertia::render('Lab/Index', [
             'labs' => $labs,
             'faculty' => $faculty->load('university'),
+            'sort' => $sort,
+            'query' => $searchQuery,
         ]);
     }
 

@@ -17,12 +17,13 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->text('url')->nullable();
+            $table->string('professor_name')->nullable();
             $table->text('professor_url')->nullable();
             $table->unsignedTinyInteger('gender_ratio_male');
             $table->unsignedTinyInteger('gender_ratio_female');
             $table->timestamps();
-            $table->softDeletes(); // こっちも忘れていました。追加してください。（笑）
-            $table->unsignedBigInteger('version')->default(1); // 追加
+            $table->softDeletes();
+            $table->unsignedBigInteger('version')->default(1);
         });
     }
 

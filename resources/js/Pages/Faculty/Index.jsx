@@ -24,7 +24,7 @@ const Index = ({ faculties, university, query = '' }) => {
           </div>
           <div className="w-full grid grid-cols-3 gap-6 mt-8 justify-items-center">
             {faculties.map(faculty => (
-              <FacultyCard key={faculty.id} faculty={faculty} routerName="labs.index" />
+              <FacultyCard key={faculty.id} faculty={faculty} query={query} />
             ))}
           </div>
           <div className="mt-auto pt-8 pb-12">
