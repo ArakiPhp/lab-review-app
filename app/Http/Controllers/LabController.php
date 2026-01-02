@@ -148,9 +148,9 @@ class LabController extends Controller
         return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が作成されました。');
     }
 
-    public function index(Faculty $faculty, Request $request) // 追加: Request $request
+    public function index(Faculty $faculty, Request $request)
     {
-        // 追加: 平均値を計算するために、評価項目のカラム名を定義
+        // 評価項目のカラム名を定義
         $ratingColumns = [
             'mentorship_style',
             'lab_atmosphere',
@@ -161,42 +161,34 @@ class LabController extends Controller
             'student_balance',
         ];
 
-        // 追加: UIからソート条件を取得
+        // UIからソート条件を取得
         $sort = $request->query('sort', 'overall');
 
-        // 追加: 総合評価の計算式を定義
-        $overallExpr = '(' . implode(' + ', array_map(fn($c) => "reviews.$c", $ratingColumns)) . ') / ' . count($ratingColumns);
+        // 各評価項目の平均値を計算するためのSQL断片を作成
+        $avgSum = implode(' + ', array_map(fn($c) => "AVG($c)", $ratingColumns));
+        $count = count($ratingColumns);
 
         $query = $faculty->labs()
             ->select('labs.*')
-            ->withCount('reviews')
-            // 各項目の平均値を計算して選択
-            ->withAvg('reviews as avg_mentorship_style', 'mentorship_style')
-            ->withAvg('reviews as avg_lab_atmosphere', 'lab_atmosphere')
-            ->withAvg('reviews as avg_achievement_activity', 'achievement_activity')
-            ->withAvg('reviews as avg_constraint_level', 'constraint_level')
-            ->withAvg('reviews as avg_facility_quality', 'facility_quality')
-            ->withAvg('reviews as avg_work_style', 'work_style')
-            ->withAvg('reviews as avg_student_balance', 'student_balance')
-            // 総合評価を計算して選択
-            ->addSelect([
-                'overall_avg' => Review::query()
-                    ->selectRaw("AVG($overallExpr)")
-                    ->whereColumn('reviews.lab_id', 'labs.id'),
-            ]);
+            ->withCount('reviews');
 
-        // 追加: ソート条件に基づいてクエリを修正    
-        $sortMap = [
-            'overall' => 'overall_avg',
-            'mentorship_style' => 'mentorship_style_avg',
-            'lab_atmosphere' => 'lab_atmosphere_avg',
-            'achievement_activity' => 'achievement_activity_avg',
-            'constraint_level' => 'constraint_level_avg',
-            'facility_quality' => 'facility_quality_avg',
-            'work_style' => 'work_style_avg',
-            'student_balance' => 'student_balance_avg',
-            'reviews_count' => 'reviews_count',
-        ];
+        // 各項目の平均を追加
+        foreach ($ratingColumns as $column) {
+            $query->withAvg("reviews as avg_{$column}", $column);
+        }
+
+        // 総合評価を追加
+        $query->addSelect([
+            'overall_avg' => Review::query()
+                ->selectRaw("($avgSum) / $count")
+                ->whereColumn('reviews.lab_id', 'labs.id'),
+        ]);
+
+        // ソートマップも $ratingColumns から生成
+        $sortMap = ['overall' => 'overall_avg', 'reviews_count' => 'reviews_count'];
+        foreach ($ratingColumns as $column) {
+            $sortMap[$column] = "avg_{$column}";
+        }
 
         $sortColumn = $sortMap[$sort] ?? 'overall_avg';
 
@@ -206,7 +198,7 @@ class LabController extends Controller
         $labs = $query
             ->orderByRaw("$sortColumn IS NULL")
             ->orderByDesc($sortColumn)
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         // 各ラボにランク（順位）を追加
