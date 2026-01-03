@@ -58,7 +58,7 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
             <select
               value={sort}
               onChange={handleSortChange}
-              className="text-sm text-[#747D8C] bg-white border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
+              className="text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
             >
               {sortOptions.map(option => (
                 <option key={option.value} value={option.value}>

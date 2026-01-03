@@ -20,7 +20,7 @@ const Index = ({ faculties, university, query = '' }) => {
       {hasResults ? (
         <div className="flex flex-col items-center min-h-full">
           <div className="w-full flex justify-end">
-            <p className="text-[#747D8C]">{faculties.length}件の検索結果</p>
+            <p className="text-[#747D8C]">{faculties.length}件の学部</p>
           </div>
           <div className="w-full grid grid-cols-3 gap-6 mt-8 justify-items-center">
             {faculties.map(faculty => (
