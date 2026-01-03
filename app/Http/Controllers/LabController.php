@@ -17,7 +17,7 @@ class LabController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show(Lab $lab)
+    public function show(Lab $lab, Request $request)
     {
         // 大学・学部、レビューのデータも一緒に渡す
         // universityはfacultyを経由して取得

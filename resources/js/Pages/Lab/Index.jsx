@@ -93,6 +93,6 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
       )}
     </AppLayout>
   )
-}
+};
 
 export default Index;
