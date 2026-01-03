@@ -53,7 +53,8 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
       {hasResults ? (
         // 1件以上の場合：コンテンツが少なければ戻るボタンは画面下部、多ければスクロール後に表示
         <div className="flex flex-col items-center min-h-full">
-          <div className="w-full flex justify-between items-center">
+          <div className="w-full flex flex-col items-end gap-2">
+            <p className="text-[#747D8C]">{labs.total}件の研究室</p>
             <select
               value={sort}
               onChange={handleSortChange}
@@ -65,7 +66,6 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
                 </option>
               ))}
             </select>
-            <p className="text-[#747D8C]">{labs.total}件の研究室</p>
           </div>
           <div className="w-full max-w-xl space-y-6 mt-8">
             {labs.data.map(lab => (
