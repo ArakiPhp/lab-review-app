@@ -1,6 +1,7 @@
 import { router } from "@inertiajs/react";
 import RankingBadge from '../../Components/Lab/RankingBadge';
 import StarRating from "./Star/StarRating";
+import { formatRating } from "@/utils/formatRating";
 
 /**
  * ソート条件に対応する評価値を取得
@@ -25,15 +26,6 @@ const getRatingValue = (lab, sort) => {
   };
   
   return ratingMap[sort] ?? lab.overall_avg;
-};
-
-/**
- * 評価値をフォーマット
- * @param {number|null} value - 評価値
- * @returns {string|null} フォーマットされた評価値
- */
-const formatRating = (value) => {
-  return value != null ? Number(value).toFixed(2) : null;
 };
 
 /**
