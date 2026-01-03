@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Faculty;
 use App\Models\Lab;
+use App\Models\Review;
 use App\Notifications\ModelChangedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -147,13 +148,70 @@ class LabController extends Controller
         return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が作成されました。');
     }
 
-    public function index(Faculty $faculty)
+    public function index(Faculty $faculty, Request $request)
     {
-        $labs = $faculty->labs()->get();
+        // 評価項目のカラム名を定義
+        $ratingColumns = [
+            'mentorship_style',
+            'lab_atmosphere',
+            'achievement_activity',
+            'constraint_level',
+            'facility_quality',
+            'work_style',
+            'student_balance',
+        ];
+
+        // UIからソート条件を取得
+        $sort = $request->query('sort', 'overall');
+
+        // 各評価項目の平均値を計算するためのSQL断片を作成
+        $avgSum = implode(' + ', array_map(fn($c) => "AVG($c)", $ratingColumns));
+        $count = count($ratingColumns);
+
+        $query = $faculty->labs()
+            ->select('labs.*')
+            ->withCount('reviews');
+
+        // 各項目の平均を追加
+        foreach ($ratingColumns as $column) {
+            $query->withAvg("reviews as avg_{$column}", $column);
+        }
+
+        // 総合評価を追加
+        $query->addSelect([
+            'overall_avg' => Review::query()
+                ->selectRaw("($avgSum) / $count")
+                ->whereColumn('reviews.lab_id', 'labs.id'),
+        ]);
+
+        // ソートマップも $ratingColumns から生成
+        $sortMap = ['overall' => 'overall_avg', 'reviews_count' => 'reviews_count'];
+        foreach ($ratingColumns as $column) {
+            $sortMap[$column] = "avg_{$column}";
+        }
+
+        $sortColumn = $sortMap[$sort] ?? 'overall_avg';
+
+        // 検索クエリを取得
+        $searchQuery = $request->input('query', '');
+
+        $labs = $query
+            ->orderByRaw("$sortColumn IS NULL")
+            ->orderByDesc($sortColumn)
+            ->paginate(10)
+            ->withQueryString();
+
+        // 各ラボにランク（順位）を追加
+        $labs->getCollection()->transform(function ($lab, $index) use ($labs) {
+            $lab->rank = ($labs->currentPage() - 1) * $labs->perPage() + $index + 1;
+            return $lab;
+        });
         
         return Inertia::render('Lab/Index', [
             'labs' => $labs,
             'faculty' => $faculty->load('university'),
+            'sort' => $sort,
+            'query' => $searchQuery,
         ]);
     }
 

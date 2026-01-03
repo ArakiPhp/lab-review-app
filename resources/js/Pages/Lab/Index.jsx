@@ -1,90 +1,98 @@
-import React from 'react';
-import { Head, Link, usePage, router } from '@inertiajs/react';
+import { Head, router } from "@inertiajs/react";
+import AppLayout from '@/Layouts/AppLayout';
+import LabCard from '../../Components/Lab/LabCard';
+import BackButton from '../../Components/Common/BackButton';
+import Pagination from "../../Components/Common/Pagination";
 
-export default function Index({ labs, faculty }) {
-  const { auth } = usePage().props;
+/**
+ * ソートオプションの定義
+ */
+const sortOptions = [
+  { value: 'overall', label: '総合評価の高い順' },
+  { value: 'reviews_count', label: 'レビュー数の多い順' },
+  { value: 'mentorship_style', label: '指導スタイルの高い順' },
+  { value: 'lab_atmosphere', label: '雰囲気・文化の高い順' },
+  { value: 'achievement_activity', label: '成果・活動の高い順' },
+  { value: 'constraint_level', label: '拘束度の高い順' },
+  { value: 'facility_quality', label: '設備の高い順' },
+  { value: 'work_style', label: '働き方の高い順' },
+  { value: 'student_balance', label: '人数バランスの高い順' },
+];
 
-  // 学部削除のハンドラー
-  const handleDeleteFaculty = () => {
-    if (confirm(`本当に「${faculty.name}」を削除しますか？この操作は取り消せません。`)) {
-      router.delete(route('admin.faculties.destroy', faculty.id), {
-        onSuccess: () => {
-          console.log('学部が削除されました');
-        },
-        onError: (errors) => {
-          console.error('削除エラー:', errors);
-          alert('削除に失敗しました');
-        }
-      });
-    }
+/**
+ * 研究室一覧ページコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {Object} props.labs - ページネーション付き研究室データ
+ * @param {Object} props.faculty - 学部オブジェクト
+ * @param {string} props.query - 検索クエリ文字列
+ * @param {string} props.sort - ソート条件
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
+const Index = ({ labs, faculty, query, sort = 'overall' }) => {
+  const hasResults = labs.data.length > 0;
+
+  /**
+   * ソート条件変更時のハンドラ
+   * @param {Event} e - イベントオブジェクト
+   */
+  const handleSortChange = (e) => {
+    const newSort = e.target.value;
+    router.get(route('labs.index', { faculty: faculty.id }), {
+      query,
+      sort: newSort,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+    });
   };
 
   return (
-    <div>
-      <Head title={`${faculty.name} - 研究室一覧`} />
-      <h1>{faculty.university.name} {faculty.name} - 研究室一覧</h1>
-      
-      {/* 学部一覧に戻るボタン */}
-      <div>
-        <Link href={route('faculties.index', faculty.university.id)}>
-          <button>学部一覧に戻る</button>
-        </Link>
-      </div>
-      
-      {/* 学部編集ボタン */}
-      <div>
-        <Link href={route('faculty.edit', faculty.id)}>
-          <button>学部を編集</button>
-        </Link>
-      </div>
-      
-      {/* 管理者専用: 学部削除ボタン */}
-      {auth.user?.is_admin && (
-        <div style={{ marginTop: '10px' }}>
-          <button 
-            onClick={handleDeleteFaculty}
-            style={{
-              backgroundColor: '#dc2626',
-              color: 'white',
-              padding: '8px 16px',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#b91c1c'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#dc2626'}
-          >
-            学部を削除（管理者）
-          </button>
+    <AppLayout title={`${faculty.university.name} ${faculty.name}`}>
+      <Head title={`${faculty.university.name} ${faculty.name}`} />
+
+      {hasResults ? (
+        // 1件以上の場合：コンテンツが少なければ戻るボタンは画面下部、多ければスクロール後に表示
+        <div className="flex flex-col items-center min-h-full">
+          <div className="w-full flex flex-col items-end gap-2">
+            <p className="text-[#747D8C]">{labs.total}件の研究室</p>
+            <select
+              value={sort}
+              onChange={handleSortChange}
+              className="text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
+            >
+              {sortOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="w-full max-w-xl space-y-6 mt-8">
+            {labs.data.map(lab => (
+              <LabCard key={lab.id} lab={lab} query={query} sort={sort} />
+            ))}
+          </div>
+
+          {/* ページネーション */}
+          <Pagination paginator={labs} />
+          
+          <div className="mt-auto pt-8 pb-12">
+            <BackButton routerName="faculties.index" params={{ query, university: faculty.university }} />
+          </div>
+        </div>
+      ) : (
+        // 0件の場合：メッセージを画面中央に、戻るボタンは下部に固定
+        <div className="flex flex-col items-center min-h-full">
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-[#747D8C]">0件の研究室</p>
+          </div>
+          <div className="pt-8 pb-12">
+            <BackButton routerName="faculties.index" params={{ query, university: faculty.university }} />
+          </div>
         </div>
       )}
-      
-      {/* 編集履歴ボタン */}
-      <div>
-        <Link href={route('faculty.history', faculty.id)}>
-          <button>編集履歴を見る</button>
-        </Link>
-      </div>
-      
-      {/* 研究室作成ボタン */}
-      <div>
-        <Link href={route('lab.create', faculty.id)}>
-          <button>研究室を作成</button>
-        </Link>
-      </div>
-      <div>
-        {labs.length > 0 ? (
-          labs.map((lab) => (
-            <div key={lab.id}>
-              <Link href={route('labs.show', lab.id)}>
-                <p>{lab.name}</p>
-              </Link>
-            </div>
-          ))
-        ) : (
-          <p>研究室がありません。</p>
-        )}
-      </div>
-    </div>
-  );
+    </AppLayout>
+  )
 }
+
+export default Index;
