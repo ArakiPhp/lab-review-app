@@ -27,7 +27,7 @@ const Index = ({ labs, faculty, query}) => {
           </div>
           <div className="w-full max-w-xl space-y-6 mt-8">
             {labs.data.map(lab => (
-              <LabCard key={lab.id} lab={lab} routerName="labs.show" />
+              <LabCard key={lab.id} lab={lab} query={query} />
             ))}
           </div>
 

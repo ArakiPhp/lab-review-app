@@ -24,8 +24,6 @@ const StarRating = ({ rating }) => {
       {[...Array(maxStars)].map((_, index) => (
         <StarIcon 
           key={index}
-          fillColor="#F4BB42"
-          emptyColor="#E2EDF6"
           fillPercentage={getStarFillPercentage(index)}
         />
       ))}

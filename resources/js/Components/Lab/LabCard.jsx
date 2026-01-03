@@ -5,11 +5,10 @@ import StarRating from "./Star/StarRating";
 /**
  * 研究室カードコンポーネント
  * @param {Object} props - コンポーネントのprops
- * @param {string} props.routerName - 遷移先のルート名
  * @param {Object} props.lab - 研究室オブジェクト
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const LabCard = ({ routerName, lab }) => {
+const LabCard = ({ lab, query }) => {
   // 総合評価を小数第2位までフォーマット
   const formattedReview = lab.overall_avg != null 
     ? Number(lab.overall_avg).toFixed(2) 
@@ -21,7 +20,7 @@ const LabCard = ({ routerName, lab }) => {
   return (
     <div
       className="bg-[#EEF7FB] rounded-lg shadow-md px-4 py-3 hover:shadow-lg transition-shadow cursor-pointer flex items-start gap-4 relative"
-      onClick={() => router.get(route(routerName, { lab: lab.id }))}
+      onClick={() => router.get(route("labs.show", { lab: lab.id, query }))}
     >
       <div className="absolute top-1 left-1">
         <RankingBadge rank={lab.rank} className="flex-shrink-0 text-3xl" />
