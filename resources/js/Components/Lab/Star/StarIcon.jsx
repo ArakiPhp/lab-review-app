@@ -1,5 +1,13 @@
 import { useId } from "react";
 
+/**
+ * 星アイコンコンポーネント（グラデーション塗りつぶし対応）
+ * @param {Object} props - コンポーネントのprops
+ * @param {string} props.fillColor - 塗りつぶし色
+ * @param {string} [props.emptyColor="#E2EDF6"] - 空の部分の色
+ * @param {number} [props.fillPercentage=100] - 塗りつぶし割合（0〜100）
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const StarIcon = ({ fillColor, emptyColor = "#E2EDF6", fillPercentage = 100 }) => {
   const id = useId();
   const gradientId = `starGradient-${id}`;

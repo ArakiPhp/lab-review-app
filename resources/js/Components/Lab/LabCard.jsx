@@ -1,35 +1,14 @@
 import { router } from "@inertiajs/react";
 import RankingBadge from '../../Components/Lab/RankingBadge';
-import StarIcon from "./StarIcon";
+import StarRating from "./Star/StarRating";
 
-// 星評価コンポーネント（5つ星表示、小数対応）
-const StarRating = ({ rating }) => {
-  const maxStars = 5;
-
-  // 各星の塗りつぶし割合を計算（0〜100%）
-  const getStarFillPercentage = (index) => {
-    if (rating >= index + 1) {
-      return 100; // 完全に塗りつぶし
-    } else if (rating > index) {
-      return (rating - index) * 100; // 部分的に塗りつぶし
-    }
-    return 0; // 塗りつぶしなし
-  };
-
-  return (
-    <div className="flex items-center gap-0.5">
-      {[...Array(maxStars)].map((_, index) => (
-        <StarIcon 
-          key={index}
-          fillColor="#F4BB42"
-          emptyColor="#E2EDF6"
-          fillPercentage={getStarFillPercentage(index)}
-        />
-      ))}
-    </div>
-  );
-};
-
+/**
+ * 研究室カードコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {string} props.routerName - 遷移先のルート名
+ * @param {Object} props.lab - 研究室オブジェクト
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
 const LabCard = ({ routerName, lab }) => {
   // 総合評価を小数第2位までフォーマット
   const formattedReview = lab.overall_avg != null 
