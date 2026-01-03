@@ -12,7 +12,7 @@ import Pagination from "../../Components/Common/Pagination";
  * @param {string} props.query - 検索クエリ文字列
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const Index = ({ labs, faculty, query}) => {
+const Index = ({ labs, faculty, query }) => {
   const hasResults = labs.data.length > 0;
 
   return (

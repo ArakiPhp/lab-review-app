@@ -6,6 +6,7 @@ import StarRating from "./Star/StarRating";
  * 研究室カードコンポーネント
  * @param {Object} props - コンポーネントのprops
  * @param {Object} props.lab - 研究室オブジェクト
+ * @param {string} props.query - 検索クエリ文字列
  * @returns {JSX.Element} コンポーネントのJSX
  */
 const LabCard = ({ lab, query }) => {
