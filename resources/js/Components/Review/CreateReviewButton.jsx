@@ -1,21 +1,23 @@
 import { router } from "@inertiajs/react";
 
 /**
- * 戻るボタンコンポーネント
+ * レビュー作成ボタンコンポーネント
  * @param {Object} props - コンポーネントのprops
  * @param {string} props.routerName - 遷移先のルート名
  * @param {Object} [props.params={}] - ルートに渡すパラメータ
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const BackButton = ({ routerName, params = {}}) => {
+const CreateReviewButton = ({ routerName, params = {}}) => {
   return (
     <button
-        className="px-16 py-2 bg-[#EEF7FB] text-[#747D8C] shadow-md font-bold rounded-md hover:shadow-lg transition-shadow cursor-pointer min-w-[180px]"
+        className="p-1 bg-[#EEF7FB] shadow-md rounded-md hover:shadow-lg transition-shadow cursor-pointer"
         onClick={() => router.get(route(routerName, params))}
       >
-        戻る
+        <span className="px-14 py-1 block border-2 border-[#33E1ED] rounded text-[#747D8C] font-bold">
+          レビューする
+        </span>
     </button>
   );
 }
 
-export default BackButton;
+export default CreateReviewButton;

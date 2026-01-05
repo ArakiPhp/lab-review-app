@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Head, router } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import StarRating from "@/Components/Lab/Star/StarRating";
+import BackButton from "@/Components/Common/BackButton";
+import CreateReviewButton from "@/Components/Review/CreateReviewButton";
 import { formatRating } from "@/utils/formatRating";
 import {
   Chart as ChartJS,
@@ -24,7 +26,7 @@ ChartJS.register(
   Legend
 );
 
-const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview, userBookmark, bookmarkCount }) => {
+const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview, userBookmark, bookmarkCount, query }) => {
 
   const [showAllComments, setShowAllComments] = useState(false);
 
@@ -341,6 +343,12 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                 </div>
               </div>
             </div>
+
+          {/* ボタンエリア */}
+          <div className="mt-auto pt-8 pb-12 flex justify-center gap-4">
+            <BackButton routerName="labs.index" params={{ faculty: lab.faculty, query }} />
+            <CreateReviewButton routerName="review.create" params={{ lab: lab }} />
+          </div>
           </div>
     </AppLayout>
   );
