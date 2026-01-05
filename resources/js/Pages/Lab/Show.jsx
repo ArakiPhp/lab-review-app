@@ -1,4 +1,5 @@
-import { Head } from "@inertiajs/react";
+import { useState } from "react";
+import { Head, router } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import StarRating from "@/Components/Lab/Star/StarRating";
 import { formatRating } from "@/utils/formatRating";
@@ -23,7 +24,50 @@ ChartJS.register(
   Legend
 );
 
-const Show = ({ lab, averagePerItem, overallAverage }) => {
+const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview, userBookmark, bookmarkCount }) => {
+
+  const [showAllComments, setShowAllComments] = useState(false);
+
+  // ブックマーク状態とカウントをローカルstateで管理
+  const [isBookmarked, setIsBookmarked] = useState(auth?.user && userBookmark);
+  const [currentBookmarkCount, setCurrentBookmarkCount] = useState(bookmarkCount || 0);
+  const [bookmarkId, setBookmarkId] = useState(userBookmark?.id || null);
+
+  // ブックマークのトグル処理
+  const handleBookmarkClick = () => {
+    // ログインしていない場合は何もしない
+    if (!auth?.user) {
+      return;
+    }
+
+    if (isBookmarked) {
+      // ブックマーク解除
+      router.delete(route('bookmark.destroy', bookmarkId), {
+        preserveScroll: true,
+        onSuccess: () => {
+          setIsBookmarked(false);
+          setCurrentBookmarkCount((prev) => Math.max(0, prev - 1));
+          setBookmarkId(null);
+        },
+      });
+    } else {
+      // ブックマーク追加
+      router.post(route('bookmark.store'), {
+        lab_id: lab.id,
+      }, {
+        preserveScroll: true,
+        onSuccess: (page) => {
+          setIsBookmarked(true);
+          setCurrentBookmarkCount((prev) => prev + 1);
+          // 新しいブックマークIDを取得（ページデータから）
+          if (page.props.userBookmark) {
+            setBookmarkId(page.props.userBookmark.id);
+          }
+        },
+      });
+    }
+  };
+
   // 7つの評価指標のラベル
   const labels = [
     "指導スタイル",
@@ -108,11 +152,18 @@ const Show = ({ lab, averagePerItem, overallAverage }) => {
     <AppLayout title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`}>
       <Head title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`} />
 
-      <div className="py-12">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <div className="overflow-hidden sm:rounded-lg">
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="flex flex-col min-h-full">
+        {/* レビュー投稿状態を右上に表示 */}
+        <div className="w-full flex flex-col items-end gap-2 mb-4">
+          {auth?.user && userReview ? (
+            <p className="text-[#747D8C]">レビューを投稿済みです。</p>
+          ) : (
+            <p className="text-[#747D8C]">まだ、レビューを投稿していません。</p>
+          )}
+        </div>
+
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* 左側: レーダーチャート */}
                 <div className="flex justify-center items-start">
                   {lab.reviews && lab.reviews.length > 0 ? (
@@ -216,12 +267,81 @@ const Show = ({ lab, averagePerItem, overallAverage }) => {
                       <p className="text-sm text-gray-500">男女比はまだ登録されていません</p>
                     )}
                   </div>
+
+                  {/* コメント一覧 */}
+                  <div className="mt-4">
+                    <h2 className="text-base font-semibold text-gray-800 mb-2">
+                      {comments?.length || 0}件のコメント
+                    </h2>
+                    {comments && comments.length > 0 ? (
+                      <div className="space-y-3">
+                        {/* 最初の1件は常に表示 */}
+                        <div key={comments[0].id} className="border-b border-gray-200 pb-3">
+                          <h3 className="text-sm font-medium text-gray-700">
+                            {comments[0].user?.name || "匿名"}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
+                            {comments[0].content}
+                          </p>
+                        </div>
+
+                        {/* 2件以上の場合、もっと見るボタンまたは残りのコメントを表示 */}
+                        {comments.length > 1 && (
+                          <>
+                            {showAllComments ? (
+                              // 残りのコメントを表示
+                              comments.slice(1).map((comment) => (
+                                <div key={comment.id} className="border-b border-gray-200 pb-3">
+                                  <h3 className="text-sm font-medium text-gray-700">
+                                    {comment.user?.name || "匿名"}
+                                  </h3>
+                                  <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
+                                    {comment.content}
+                                  </p>
+                                </div>
+                              ))
+                            ) : (
+                              // もっと見るボタン
+                              <button
+                                onClick={() => setShowAllComments(true)}
+                                className="text-sm text-gray-600 hover:text-gray-800 hover:underline"
+                              >
+                                もっと見る...
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">まだコメントがありません</p>
+                    )}
+                  </div>
+
+                  {/* ブックマークアイコン */}
+                  <div className="mt-4 flex items-center justify-end">
+                    <div className="flex items-center gap-1 min-w-[50px] justify-end">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        onClick={handleBookmarkClick}
+                        className={`flex-shrink-0 ${auth?.user ? "cursor-pointer hover:opacity-70" : "cursor-default"}`}
+                      >
+                        <path
+                          d="M5 2C4.44772 2 4 2.44772 4 3V21C4 21.3746 4.21048 21.7178 4.54555 21.8892C4.88062 22.0606 5.28335 22.0315 5.59026 21.8137L12 17.229L18.4097 21.8137C18.7166 22.0315 19.1194 22.0606 19.4545 21.8892C19.7895 21.7178 20 21.3746 20 21V3C20 2.44772 19.5523 2 19 2H5Z"
+                          fill={isBookmarked ? "#747D8C" : "transparent"}
+                          stroke="#747D8C"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-600 tabular-nums min-w-[1.5ch] text-left">{currentBookmarkCount}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
     </AppLayout>
   );
 };

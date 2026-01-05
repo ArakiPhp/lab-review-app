@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Lab; // 追加
-use App\Models\Review; // 追加
+use App\Models\Lab;
+use App\Models\Review;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 追加: 管理者を先に作成
+        // 管理者を先に作成
         $email = 'admin@example.com';
 
         $admin = User::updateOrCreate(
@@ -63,5 +63,10 @@ class DatabaseSeeder extends Seeder
                 $createdCombinations[] = $combination;
             }
         }
+
+        // コメントのシード（ユーザー作成後に実行）
+        $this->call([
+            CommentSeeder::class,
+        ]);
     }
 }
