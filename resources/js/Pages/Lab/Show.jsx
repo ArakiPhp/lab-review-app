@@ -204,7 +204,7 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                       <Radar data={chartData} options={chartOptions} />
                     </div>
                   ) : (
-                    <p className="text-center text-gray-500">
+                    <p className="text-center text-[#747D8C]">
                       まだレビューがありません
                     </p>
                   )}
@@ -214,32 +214,32 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                 <div>
                   {/* 総合評価 */}
                   <div className="mb-4">
-                    <h2 className="text-base font-semibold text-gray-800 mb-2">
+                    <h2 className="text-base font-semibold text-black mb-2">
                       総合評価({lab.reviews?.length || 0})
                     </h2>
                     {lab.reviews && lab.reviews.length > 0 ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 ml-4">
                         <StarRating rating={overallAverage || 0} />
                         <span className="text-sm text-[#F4BB42]">
                           {formatRating(overallAverage, "0.00")}
                         </span>
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">まだ評価がありません</p>
+                      <p className="text-sm text-[#747D8C] ml-4">まだ評価がありません</p>
                     )}
                   </div>
 
                   {/* 研究室概要 */}
-                  <h2 className="text-base font-semibold text-gray-800 mb-2">
+                  <h2 className="text-base font-semibold text-black mb-2">
                     研究室概要
                   </h2>
-                  <p className="text-sm text-gray-600 whitespace-pre-wrap leading-tight">
+                  <p className="text-sm text-[#747D8C] whitespace-pre-wrap leading-tight ml-4">
                     {lab.description || "概要はまだ登録されていません"}
                   </p>
 
                   {/* 研究室ページ */}
                   <div className="mt-4">
-                    <h2 className="text-base font-semibold text-gray-800 mb-2">
+                    <h2 className="text-base font-semibold text-black mb-2">
                       研究室ページ
                     </h2>
                     {lab.url ? (
@@ -247,32 +247,32 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                         href={lab.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
+                        className="text-sm text-[#747D8C] hover:text-black hover:underline break-all ml-4"
                       >
                         {lab.url}
                       </a>
                     ) : (
-                      <p className="text-sm text-gray-500">URLはまだ登録されていません</p>
+                      <p className="text-sm text-[#747D8C] ml-4">URLはまだ登録されていません</p>
                     )}
                   </div>
 
                   {/* 教授 */}
                   <div className="mt-4">
-                    <h2 className="text-base font-semibold text-gray-800 mb-2">
+                    <h2 className="text-base font-semibold text-black mb-2">
                       教授  
                     </h2>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-[#747D8C] ml-4">
                       {lab.professor_name ? `${lab.professor_name} 先生` : "教授名はまだ登録されていません"}
                     </p>
                   </div>
 
                   {/* 男女比 */}
                   <div className="mt-4">
-                    <h2 className="text-base font-semibold text-gray-800 mb-2">
+                    <h2 className="text-base font-semibold text-black mb-2">
                       男女比{(lab.gender_ratio_male != null && lab.gender_ratio_female != null) && `(${lab.gender_ratio_male}:${lab.gender_ratio_female})`}
                     </h2>
                     {(lab.gender_ratio_male != null && lab.gender_ratio_female != null) ? (
-                      <div className="flex w-full h-6 rounded overflow-hidden text-sm text-white font-medium">
+                      <div className="flex w-full h-6 rounded overflow-hidden text-sm text-white font-medium ml-4">
                         {lab.gender_ratio_male > 0 && (
                           <div
                             className="flex items-center justify-center"
@@ -297,23 +297,23 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">男女比はまだ登録されていません</p>
+                      <p className="text-sm text-[#747D8C] ml-4">男女比はまだ登録されていません</p>
                     )}
                   </div>
 
                   {/* コメント一覧 */}
                   <div className="mt-4">
-                    <h2 className="text-base font-semibold text-gray-800 mb-2">
+                    <h2 className="text-base font-semibold text-black mb-2">
                       {comments?.length || 0}件のコメント
                     </h2>
                     {comments && comments.length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="space-y-3 ml-4">
                         {/* 最初の1件は常に表示 */}
                         <div key={comments[0].id} className="border-b border-gray-200 pb-3">
-                          <h3 className="text-sm font-medium text-gray-700">
+                          <h3 className="text-sm font-medium text-black">
                             {comments[0].user?.name || "匿名"}
                           </h3>
-                          <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
+                          <p className="text-sm text-[#747D8C] mt-1 whitespace-pre-wrap">
                             {comments[0].content}
                           </p>
                         </div>
@@ -325,10 +325,10 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                               // 残りのコメントを表示
                               comments.slice(1).map((comment) => (
                                 <div key={comment.id} className="border-b border-gray-200 pb-3">
-                                  <h3 className="text-sm font-medium text-gray-700">
+                                  <h3 className="text-sm font-medium text-black">
                                     {comment.user?.name || "匿名"}
                                   </h3>
-                                  <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
+                                  <p className="text-sm text-[#747D8C] mt-1 whitespace-pre-wrap">
                                     {comment.content}
                                   </p>
                                 </div>
@@ -337,7 +337,7 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                               // もっと見るボタン
                               <button
                                 onClick={() => setShowAllComments(true)}
-                                className="text-sm text-gray-600 hover:text-gray-800 hover:underline"
+                                className="text-sm text-[#747D8C] hover:text-black hover:underline"
                               >
                                 もっと見る...
                               </button>
@@ -346,7 +346,7 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">まだコメントがありません</p>
+                      <p className="text-sm text-[#747D8C] ml-4">まだコメントがありません</p>
                     )}
                   </div>
 
