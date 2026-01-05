@@ -17,7 +17,7 @@ class LabController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show(Lab $lab)
+    public function show(Lab $lab, Request $request)
     {
         // 大学・学部、レビューのデータも一緒に渡す
         // universityはfacultyを経由して取得
@@ -70,6 +70,9 @@ class LabController extends Controller
         $userBookmark = $lab->bookmarks()->where('user_id', Auth::id())->first();
         $bookmarkCount = $lab->bookmarks()->count();
 
+        // 検索クエリを取得
+        $searchQuery = $request->input('query', '');
+
         // 研究室のデータに加えて、求めたレビューの平均値とユーザーのレビュー、コメント、ブックマーク、認証情報も一緒に渡す
         return Inertia::render('Lab/Show', [
             'lab' => $lab,
@@ -79,6 +82,7 @@ class LabController extends Controller
             'userOverallAverage' => $userOverallAverage,
             'userBookmark' => $userBookmark,
             'bookmarkCount' => $bookmarkCount,
+            'query' => $searchQuery,
             'ratingData' => [
                 'columns' => $ratingColumns,
             ],

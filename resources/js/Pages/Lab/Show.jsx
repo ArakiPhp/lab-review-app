@@ -1,354 +1,388 @@
-import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { useState } from "react";
+import { Head, router } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
+import StarRating from "@/Components/Lab/Star/StarRating";
+import BackButton from "@/Components/Common/BackButton";
+import CreateReviewButton from "@/Components/Review/CreateReviewButton";
+import { formatRating } from "@/utils/formatRating";
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Radar } from "react-chartjs-2";
 
-// propsとして新しく追加されたプロパティも受け取る
-export default function Show({ 
-    lab, 
-    overallAverage, 
-    averagePerItem, 
-    userReview, 
-    userOverallAverage, 
-    ratingData,
-    comments,
-    auth,
-    userBookmark,
-    bookmarkCount
-}) {
-    const reviewCount = lab.reviews ? lab.reviews.length : 0;
+// Chart.jsのコンポーネントを登録
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
-    // ratingColumnsが空の場合、フォールバック用の配列を使用
-    const fallbackRatingColumns = [
-        'mentorship_style',
-        'lab_atmosphere',
-        'achievement_activity',
-        'constraint_level',
-        'facility_quality',
-        'work_style',
-        'student_balance',
-    ];
-    
-    const ratingColumns = ratingData?.columns || fallbackRatingColumns;
-    const actualRatingColumns = ratingColumns.length > 0 ? ratingColumns : fallbackRatingColumns;
+const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview, userBookmark, bookmarkCount, query }) => {
 
-    const itemLabels = {
-        mentorship_style: '指導スタイル',
-        lab_atmosphere: '雰囲気・文化',
-        achievement_activity: '成果・活動',
-        constraint_level: '拘束度',
-        facility_quality: '設備',
-        work_style: '働き方',
-        student_balance: '人数バランス',
-    };
+  const [showAllComments, setShowAllComments] = useState(false);
 
-    const formatAverage = (value) => {
-        return value !== null && value !== undefined ? value.toFixed(2) : 'データなし';
-    };
+  // ブックマーク状態とカウントをローカルstateで管理
+  const [isBookmarked, setIsBookmarked] = useState(auth?.user && userBookmark);
+  const [currentBookmarkCount, setCurrentBookmarkCount] = useState(bookmarkCount || 0);
+  const [bookmarkId, setBookmarkId] = useState(userBookmark?.id || null);
 
-    const handleDeleteReview = (reviewId) => {
-        if (confirm('本当に削除してもよろしいですか？')) {
-            router.delete(route('review.destroy', { review: reviewId }), {
-                onSuccess: () => {
-                    alert('レビューが削除されました。');
-                },
-                onError: (error) => {
-                    alert('レビューの削除に失敗しました。');
-                }
-            });
-        }
-    };
+  // ブックマークのトグル処理
+  const handleBookmarkClick = () => {
+    // ログインしていない場合は何もしない
+    if (!auth?.user) {
+      return;
+    }
 
-    const handleCreateReview = () => {
-        router.get(route('review.create', { lab: lab.id }));
-    };
+    if (isBookmarked) {
+      // ブックマーク解除
+      router.delete(route('bookmark.destroy', bookmarkId), {
+        preserveScroll: true,
+        onSuccess: () => {
+          setIsBookmarked(false);
+          setCurrentBookmarkCount((prev) => Math.max(0, prev - 1));
+          setBookmarkId(null);
+        },
+      });
+    } else {
+      // ブックマーク追加
+      router.post(route('bookmark.store'), {
+        lab_id: lab.id,
+      }, {
+        preserveScroll: true,
+        onSuccess: (page) => {
+          setIsBookmarked(true);
+          setCurrentBookmarkCount((prev) => prev + 1);
+          // 新しいブックマークIDを取得（ページデータから）
+          if (page.props.userBookmark) {
+            setBookmarkId(page.props.userBookmark.id);
+          }
+        },
+      });
+    }
+  };
 
-    const handleEditReview = () => {
-        router.get(route('review.edit', { review: userReview.id }));
-    };
+  // 7つの評価指標のラベル
+  const labels = [
+    "指導スタイル",
+    "雰囲気・文化",
+    "成果・活動",
+    "拘束度",
+    "設備",
+    "働き方",
+    "人数バランス",
+  ];
 
-    const handleCreateComment = () => {
-        router.get(route('comment.create', { lab: lab.id }));
-    };
+  // LabControllerから渡された平均評価データを配列に変換
+  const averageRatings = averagePerItem
+    ? [
+        averagePerItem.mentorship_style || 0,
+        averagePerItem.lab_atmosphere || 0,
+        averagePerItem.achievement_activity || 0,
+        averagePerItem.constraint_level || 0,
+        averagePerItem.facility_quality || 0,
+        averagePerItem.work_style || 0,
+        averagePerItem.student_balance || 0,
+      ]
+    : [0, 0, 0, 0, 0, 0, 0];
 
-    const handleEditComment = (commentId) => {
-        router.get(route('comment.edit', { comment: commentId }));
-    };
+  // ログインユーザーのレビューデータを配列に変換
+  const userRatings = userReview
+    ? [
+        userReview.mentorship_style || 0,
+        userReview.lab_atmosphere || 0,
+        userReview.achievement_activity || 0,
+        userReview.constraint_level || 0,
+        userReview.facility_quality || 0,
+        userReview.work_style || 0,
+        userReview.student_balance || 0,
+      ]
+    : null;
 
-    const handleDeleteComment = (commentId) => {
-        if (confirm('本当に削除してもよろしいですか？')) {
-            router.delete(route('comment.destroy', { comment: commentId }), {
-                onSuccess: () => {
-                    alert('コメントが削除されました。');
-                },
-                onError: (error) => {
-                    alert('コメントの削除に失敗しました。');
-                }
-            });
-        }
-    };
+  // レーダーチャートのデータセットを構築
+  const datasets = [
+    {
+      label: "全投稿者の平均評価",
+      data: averageRatings,
+      backgroundColor: "rgba(51, 225, 237, 0.2)",
+      borderColor: "rgba(51, 225, 237, 1)",
+      borderWidth: 2,
+      pointBackgroundColor: "rgba(51, 225, 237, 1)",
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: "rgba(51, 225, 237, 1)",
+    },
+  ];
 
-    // 管理者用コメント削除
-    const handleAdminDeleteComment = (commentId) => {
-        if (confirm('管理者権限でこのコメントを削除してもよろしいですか？')) {
-            router.delete(route('admin.comments.destroy', { comment: commentId }), {
-                onSuccess: () => {
-                    alert('コメントが削除されました（管理者）。');
-                },
-                onError: (error) => {
-                    alert('コメントの削除に失敗しました。');
-                }
-            });
-        }
-    };
+  // ログインユーザーのレビューがある場合、データセットに追加
+  if (userRatings) {
+    datasets.push({
+      label: "あなたの投稿済み評価",
+      data: userRatings,
+      backgroundColor: "rgba(244, 187, 66, 0.2)",
+      borderColor: "rgba(244, 187, 66, 1)",
+      borderWidth: 2,
+      pointBackgroundColor: "rgba(244, 187, 66, 1)",
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: "rgba(244, 187, 66, 1)",
+    });
+  }
 
-    // 研究室削除（管理者専用）
-    const handleDeleteLab = () => {
-        if (confirm(`本当に「${lab.name}」を削除しますか？この操作は取り消せません。`)) {
-            router.delete(route('admin.labs.destroy', lab.id), {
-                onSuccess: () => {
-                    console.log('研究室が削除されました');
-                },
-                onError: (errors) => {
-                    console.error('削除エラー:', errors);
-                    alert('削除に失敗しました');
-                }
-            });
-        }
-    };
+  // レーダーチャートのデータ
+  const chartData = {
+    labels: labels,
+    datasets: datasets,
+  };
 
-    // ブックマーク追加
-    const handleAddBookmark = () => {
-        router.post(route('bookmark.store'), {
-            lab_id: lab.id
-        }, {
-            onSuccess: () => {
-                alert('ブックマークに追加しました。');
-            },
-            onError: (error) => {
-                alert('ブックマークの追加に失敗しました。');
-            }
-        });
-    };
+  // レーダーチャートのオプション
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    scales: {
+      r: {
+        angleLines: {
+          display: true,
+        },
+        suggestedMin: 0,
+        suggestedMax: 5,
+        ticks: {
+          stepSize: 1,
+          font: {
+            size: 12,
+          },
+        },
+        pointLabels: {
+          font: {
+            size: 14,
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            return `${context.dataset.label}: ${context.raw.toFixed(2)}`;
+          },
+        },
+      },
+    },
+  };
 
-    // ブックマーク削除
-    const handleRemoveBookmark = () => {
-        if (confirm('ブックマークを削除してもよろしいですか？')) {
-            router.delete(route('bookmark.destroy', { bookmark: userBookmark.id }), {
-                onSuccess: () => {
-                    alert('ブックマークを削除しました。');
-                },
-                onError: (error) => {
-                    alert('ブックマークの削除に失敗しました。');
-                }
-            });
-        }
-    };
+  return (
+    <AppLayout title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`}>
+      <Head title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`} />
 
-    return (
-        <div>
-            <Head title={`${lab.name}の詳細`} />
-            <h1>{lab.name} の詳細ページ</h1>
-            
-            {/* 研究室一覧に戻るボタン */}
-            <div>
-                <Link href={route('labs.index', lab.faculty_id)}>
-                    <button>研究室一覧に戻る</button>
-                </Link>
-            </div>
-            
-            {/* 研究室編集ボタン */}
-            <div>
-                <Link href={route('lab.edit', lab.id)}>
-                    <button>研究室を編集</button>
-                </Link>
-            </div>
-            
-            {/* 管理者専用: 研究室削除ボタン */}
-            {Boolean(auth?.user?.is_admin) && (
-                <div style={{ marginTop: '10px' }}>
-                    <button 
-                        onClick={handleDeleteLab}
-                        style={{
-                            backgroundColor: '#dc2626',
-                            color: 'white',
-                            padding: '8px 16px',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                        }}
-                        onMouseOver={(e) => e.target.style.backgroundColor = '#b91c1c'}
-                        onMouseOut={(e) => e.target.style.backgroundColor = '#dc2626'}
-                    >
-                        研究室を削除（管理者）
-                    </button>
-                </div>
-            )}
-            
-            {/* 編集履歴ボタン */}
-            <div>
-                <Link href={route('lab.history', lab.id)}>
-                    <button>編集履歴を見る</button>
-                </Link>
-            </div>
-            
-            {/* ブックマークボタン */}
-            {auth && auth.user && (
-                <div>
-                    {userBookmark ? (
-                        <button onClick={handleRemoveBookmark}>
-                            ブックマークを削除
-                        </button>
-                    ) : (
-                        <button onClick={handleAddBookmark}>
-                            ブックマークに追加
-                        </button>
-                    )}
-                </div>
-            )}
-            
-            {/* ブックマーク数表示 */}
-            {bookmarkCount !== undefined && (
-                <p>ブックマーク数: {bookmarkCount}</p>
-            )}
-            
-            {/* コメント投稿ボタン */}
-            <div>
-                <button onClick={handleCreateComment}>
-                    コメントを投稿する
-                </button>
-            </div>
-            
-            <p>大学: {lab.faculty?.university?.name}</p>
-            <p>学部: {lab.faculty?.name}</p>
-            <p>研究室の説明: {lab.description}</p>
-            <p>研究室のURL: <a href={lab.url} target="_blank" rel="noopener noreferrer">{lab.url}</a></p>
-            <p>教授のURL: <a href={lab.professor_url} target="_blank" rel="noopener noreferrer">{lab.professor_url}</a></p>
-            <p>男女比（男）: {lab.gender_ratio_male}</p>
-            <p>男女比（女）: {lab.gender_ratio_female}</p>
-
-            <hr />
-
-            <h2>レビュー</h2>
-            <p>レビュー数: {reviewCount}</p>
-            
-            {/* 全体の平均評価を表示 */}
-            <h3>全体の評価（平均）</h3>
-            <p><strong>総合評価: </strong>{formatAverage(overallAverage)}</p>
-
-            <h4>各評価項目の平均:</h4>
-            {averagePerItem && Object.keys(averagePerItem).length > 0 ? (
-                <ul>
-                    {Object.entries(averagePerItem).map(([itemKey, averageValue]) => (
-                        <li key={itemKey}>
-                            <p>
-                                <strong>{itemLabels[itemKey] || itemKey}:</strong>
-                                {formatAverage(averageValue)}
-                            </p>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p>まだ評価データがありません。</p>
-            )}
-
-            {/* ユーザーのレビューが存在する場合に表示 */}
-            {userReview ? (
-                <div>
-                    <h3>あなたの投稿したレビュー</h3>
-                    <p><strong>総合評価: </strong>{formatAverage(userOverallAverage)}</p>
-                    
-                    <h4>各評価項目:</h4>
-                    <ul>
-                        {actualRatingColumns && actualRatingColumns.length > 0 ? (
-                            actualRatingColumns.map((column) => {
-                                const value = userReview[column];
-                                return (
-                                    <li key={column}>
-                                        <p>
-                                            <strong>{itemLabels[column] || column}:</strong>
-                                            {value !== null && value !== undefined 
-                                                ? (typeof value === 'number' ? value.toFixed(2) : value)
-                                                : '未評価'}
-                                        </p>
-                                    </li>
-                                )
-                            })
-                        ) : (
-                            <li>評価項目データがありません</li>
-                        )}
-                    </ul>
-                    
-                    <div>
-                        <button onClick={() => handleDeleteReview(userReview.id)}>
-                            このレビューを削除
-                        </button>
-                        <button onClick={handleEditReview}>
-                            レビューを編集する
-                        </button>
-                    </div>
-                </div>
-            ) : (
-                // レビューが存在しない場合はレビュー投稿ボタンを表示
-                <div>
-                    <h3>レビューを投稿</h3>
-                    <p>まだこの研究室のレビューを投稿していません。</p>
-                    <button onClick={handleCreateReview}>
-                        レビューを投稿する
-                    </button>
-                </div>
-            )}
-
-            <hr />
-
-            {/* コメント一覧 */}
-            <h2>コメント</h2>
-            {comments && comments.length > 0 ? (
-                <div>
-                    {comments.map((comment) => (
-                        <div key={comment.id} style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
-                            <p><strong>投稿者:</strong> {comment.user?.name || '匿名'}</p>
-                            <p><strong>投稿日:</strong> {new Date(comment.created_at).toLocaleDateString()}</p>
-                            <p><strong>内容:</strong> {comment.content}</p>
-                            
-                            {/* コメントの編集・削除ボタン */}
-                            {auth && auth.user && (
-                                <div>
-                                    {/* 自分のコメントの場合は編集・削除ボタン */}
-                                    {auth.user.id === comment.user_id && (
-                                        <>
-                                            <button onClick={() => handleEditComment(comment.id)}>
-                                                編集
-                                            </button>
-                                            <button onClick={() => handleDeleteComment(comment.id)}>
-                                                削除
-                                            </button>
-                                        </>
-                                    )}
-                                    
-                                    {/* 管理者の場合は他人のコメントも削除可能 */}
-                                    {Boolean(auth.user.is_admin) && auth.user.id !== comment.user_id && (
-                                        <button 
-                                            onClick={() => handleAdminDeleteComment(comment.id)}
-                                            style={{
-                                                backgroundColor: '#dc2626',
-                                                color: 'white',
-                                                padding: '4px 8px',
-                                                border: 'none',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer',
-                                                marginLeft: '5px'
-                                            }}
-                                        >
-                                            削除（管理者）
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <p>まだコメントがありません。</p>
-            )}
+      <div className="flex flex-col min-h-full">
+        {/* レビュー投稿状態を右上に表示 */}
+        <div className="w-full flex flex-col items-end gap-2 mb-4">
+          {auth?.user && userReview ? (
+            <p className="text-[#747D8C]">レビューを投稿済みです。</p>
+          ) : (
+            <p className="text-[#747D8C]">まだ、レビューを投稿していません。</p>
+          )}
         </div>
-    );
-}
+
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* 左側: レーダーチャート */}
+                <div className="flex justify-center items-start">
+                  {lab.reviews && lab.reviews.length > 0 ? (
+                    <div className="w-full max-w-sm">
+                      <Radar data={chartData} options={chartOptions} />
+                    </div>
+                  ) : (
+                    <p className="text-center text-[#747D8C]">
+                      まだレビューがありません
+                    </p>
+                  )}
+                </div>
+
+                {/* 右側: 総合評価と研究室概要 */}
+                <div>
+                  {/* 総合評価 */}
+                  <div className="mb-4">
+                    <h2 className="text-base font-semibold text-black mb-2">
+                      総合評価({lab.reviews?.length || 0})
+                    </h2>
+                    {lab.reviews && lab.reviews.length > 0 ? (
+                      <div className="flex items-center gap-2 ml-4">
+                        <StarRating rating={overallAverage || 0} />
+                        <span className="text-sm text-[#F4BB42]">
+                          {formatRating(overallAverage, "0.00")}
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-[#747D8C] ml-4">まだ評価がありません</p>
+                    )}
+                  </div>
+
+                  {/* 研究室概要 */}
+                  <h2 className="text-base font-semibold text-black mb-2">
+                    研究室概要
+                  </h2>
+                  <p className="text-sm text-[#747D8C] whitespace-pre-wrap leading-tight ml-4">
+                    {lab.description || "概要はまだ登録されていません"}
+                  </p>
+
+                  {/* 研究室ページ */}
+                  <div className="mt-4">
+                    <h2 className="text-base font-semibold text-black mb-2">
+                      研究室ページ
+                    </h2>
+                    {lab.url ? (
+                      <a
+                        href={lab.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-[#747D8C] hover:text-black hover:underline break-all ml-4"
+                      >
+                        {lab.url}
+                      </a>
+                    ) : (
+                      <p className="text-sm text-[#747D8C] ml-4">URLはまだ登録されていません</p>
+                    )}
+                  </div>
+
+                  {/* 教授 */}
+                  <div className="mt-4">
+                    <h2 className="text-base font-semibold text-black mb-2">
+                      教授  
+                    </h2>
+                    <p className="text-sm text-[#747D8C] ml-4">
+                      {lab.professor_name ? `${lab.professor_name} 先生` : "教授名はまだ登録されていません"}
+                    </p>
+                  </div>
+
+                  {/* 男女比 */}
+                  <div className="mt-4">
+                    <h2 className="text-base font-semibold text-black mb-2">
+                      男女比{(lab.gender_ratio_male != null && lab.gender_ratio_female != null) && `(${lab.gender_ratio_male}:${lab.gender_ratio_female})`}
+                    </h2>
+                    {(lab.gender_ratio_male != null && lab.gender_ratio_female != null) ? (
+                      <div className="flex w-full h-6 rounded overflow-hidden text-sm text-white font-medium ml-4">
+                        {lab.gender_ratio_male > 0 && (
+                          <div
+                            className="flex items-center justify-center"
+                            style={{
+                              backgroundColor: "#7BB3CE",
+                              width: `${(lab.gender_ratio_male / (lab.gender_ratio_male + lab.gender_ratio_female)) * 100}%`,
+                            }}
+                          >
+                            男
+                          </div>
+                        )}
+                        {lab.gender_ratio_female > 0 && (
+                          <div
+                            className="flex items-center justify-center"
+                            style={{
+                              backgroundColor: "#E89EB9",
+                              width: `${(lab.gender_ratio_female / (lab.gender_ratio_male + lab.gender_ratio_female)) * 100}%`,
+                            }}
+                          >
+                            女
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-[#747D8C] ml-4">男女比はまだ登録されていません</p>
+                    )}
+                  </div>
+
+                  {/* コメント一覧 */}
+                  <div className="mt-4">
+                    <h2 className="text-base font-semibold text-black mb-2">
+                      {comments?.length || 0}件のコメント
+                    </h2>
+                    {comments && comments.length > 0 ? (
+                      <div className="space-y-3 ml-4">
+                        {/* 最初の1件は常に表示 */}
+                        <div key={comments[0].id} className="border-b border-gray-200 pb-3">
+                          <h3 className="text-sm font-medium text-black">
+                            {comments[0].user?.name || "匿名"}
+                          </h3>
+                          <p className="text-sm text-[#747D8C] mt-1 whitespace-pre-wrap">
+                            {comments[0].content}
+                          </p>
+                        </div>
+
+                        {/* 2件以上の場合、もっと見るボタンまたは残りのコメントを表示 */}
+                        {comments.length > 1 && (
+                          <>
+                            {showAllComments ? (
+                              // 残りのコメントを表示
+                              comments.slice(1).map((comment) => (
+                                <div key={comment.id} className="border-b border-gray-200 pb-3">
+                                  <h3 className="text-sm font-medium text-black">
+                                    {comment.user?.name || "匿名"}
+                                  </h3>
+                                  <p className="text-sm text-[#747D8C] mt-1 whitespace-pre-wrap">
+                                    {comment.content}
+                                  </p>
+                                </div>
+                              ))
+                            ) : (
+                              // もっと見るボタン
+                              <button
+                                onClick={() => setShowAllComments(true)}
+                                className="text-sm text-[#747D8C] hover:text-black hover:underline"
+                              >
+                                もっと見る...
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-[#747D8C] ml-4">まだコメントがありません</p>
+                    )}
+                  </div>
+
+                  {/* ブックマークアイコン */}
+                  <div className="mt-4 flex items-center justify-end">
+                    <div className="flex items-center gap-1 min-w-[50px] justify-end">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        onClick={handleBookmarkClick}
+                        className={`flex-shrink-0 ${auth?.user ? "cursor-pointer hover:opacity-70" : "cursor-default"}`}
+                      >
+                        <path
+                          d="M5 2C4.44772 2 4 2.44772 4 3V21C4 21.3746 4.21048 21.7178 4.54555 21.8892C4.88062 22.0606 5.28335 22.0315 5.59026 21.8137L12 17.229L18.4097 21.8137C18.7166 22.0315 19.1194 22.0606 19.4545 21.8892C19.7895 21.7178 20 21.3746 20 21V3C20 2.44772 19.5523 2 19 2H5Z"
+                          fill={isBookmarked ? "#747D8C" : "transparent"}
+                          stroke="#747D8C"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-600 tabular-nums min-w-[1.5ch] text-left">{currentBookmarkCount}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          {/* ボタンエリア */}
+          <div className="mt-auto pt-8 pb-12 flex justify-center gap-4">
+            <BackButton routerName="labs.index" params={{ faculty: lab.faculty, query }} />
+            <CreateReviewButton routerName="review.create" params={{ lab: lab }} />
+          </div>
+          </div>
+    </AppLayout>
+  );
+};
+
+export default Show;
