@@ -94,22 +94,53 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
       ]
     : [0, 0, 0, 0, 0, 0, 0];
 
+  // ログインユーザーのレビューデータを配列に変換
+  const userRatings = userReview
+    ? [
+        userReview.mentorship_style || 0,
+        userReview.lab_atmosphere || 0,
+        userReview.achievement_activity || 0,
+        userReview.constraint_level || 0,
+        userReview.facility_quality || 0,
+        userReview.work_style || 0,
+        userReview.student_balance || 0,
+      ]
+    : null;
+
+  // レーダーチャートのデータセットを構築
+  const datasets = [
+    {
+      label: "全投稿者の平均評価",
+      data: averageRatings,
+      backgroundColor: "rgba(51, 225, 237, 0.2)",
+      borderColor: "rgba(51, 225, 237, 1)",
+      borderWidth: 2,
+      pointBackgroundColor: "rgba(51, 225, 237, 1)",
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: "rgba(51, 225, 237, 1)",
+    },
+  ];
+
+  // ログインユーザーのレビューがある場合、データセットに追加
+  if (userRatings) {
+    datasets.push({
+      label: "あなたの投稿済み評価",
+      data: userRatings,
+      backgroundColor: "rgba(244, 187, 66, 0.2)",
+      borderColor: "rgba(244, 187, 66, 1)",
+      borderWidth: 2,
+      pointBackgroundColor: "rgba(244, 187, 66, 1)",
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: "rgba(244, 187, 66, 1)",
+    });
+  }
+
   // レーダーチャートのデータ
   const chartData = {
     labels: labels,
-    datasets: [
-      {
-        label: "全投稿者の平均評価",
-        data: averageRatings,
-        backgroundColor: "rgba(51, 225, 237, 0.2)",
-        borderColor: "rgba(51, 225, 237, 1)",
-        borderWidth: 2,
-        pointBackgroundColor: "rgba(51, 225, 237, 1)",
-        pointBorderColor: "#fff",
-        pointHoverBackgroundColor: "#fff",
-        pointHoverBorderColor: "rgba(51, 225, 237, 1)",
-      },
-    ],
+    datasets: datasets,
   };
 
   // レーダーチャートのオプション
