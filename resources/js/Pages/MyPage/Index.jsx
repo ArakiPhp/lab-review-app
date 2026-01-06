@@ -1,53 +1,59 @@
-import AppLayout from '@/Layouts/AppLayout'; // 追加: AppLayoutをインポート
-import { Head, Link, router } from '@inertiajs/react';
+import AppLayout from "@/Layouts/AppLayout";
+import { Head } from "@inertiajs/react";
+import UserInfoBar from "@/Components/MyPage/UserInfoBar";
 
-export default function Index({ user, notifications = [], title }) { // 追加: titleをpropsとして受け取る
-    const handleDeleteAccount = () => {
-        if (confirm('本当に退会しますか？この操作は取り消せません。')) {
-            router.delete(route('mypage.delete'));
-        }
-    };
+const Index = ({ title, user }) => {
+	return (
+		<AppLayout title={title}>
+			<Head title={title} />
 
-    const unreadCount = notifications.filter(n => !n.read_at).length;
+			{/* 基本情報 */}
+			<div className="flex items-center justify-between border-b border-black pb-2 w-full">
+				<h2 className="text-xl font-bold text-black">基本情報</h2>
+				<span className="text-sm text-[#747D8C]">
+					利用開始日: {user?.created_at ? new Date(user.created_at).toLocaleDateString('ja-JP') : ''}
+				</span>
+			</div>
 
-    return (
-        <AppLayout title={title}>
-            {/* 今まで「マイページ」を設定していたHeadは削除 */}
+			{/* ニックネーム */}
+			<div className="mt-6 mb-4 flex items-center">
+				<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">ニックネーム</h3>
+				<div className="w-96">
+					<UserInfoBar value={user?.name} onOpenEditModal={() => {}} />
+				</div>
+			</div>
 
-            <div className="space-y-4">
-                <div className="text-gray-800">
-                    <div className={user.is_admin ? 'text-red-500' : ''}>
-                        未読の通知: {unreadCount}件
-                    </div>
-                    <Link href={route('notifications.index')}>
-                        <button className="mt-2 px-4 py-1 bg-gray-200 rounded-md hover:bg-gray-300">
-                            通知一覧を見る
-                        </button>
-                    </Link>
-                </div>
+			{/* e-Mailアドレス */}
+			<div className="mt-6 mb-4 flex items-center">
+				<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">e-Mailアドレス</h3>
+				<div className="w-96">
+					<UserInfoBar value={user?.email} onOpenEditModal={() => {}} />
+				</div>
+			</div>
 
-                <h3 className="text-lg font-semibold">ユーザー情報</h3>
-                <p>名前: {user.name}</p>
-                <p>メールアドレス: {user.email}</p>
-                <p>登録日: {new Date(user.created_at).toLocaleDateString('ja-JP')}</p>
+			{/* パスワード */}
+			<div className="mt-6 mb-4 flex items-center">
+				<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">パスワード</h3>
+				<div className="w-96">
+					<UserInfoBar value="••••••••" onOpenEditModal={() => {}} />
+				</div>
+			</div>
 
-                <div className="space-x-2">
-                    <Link href={route('mypage.edit')}>
-                        <button className="px-3 py-1 border rounded-md hover:bg-gray-100">編集する</button>
-                    </Link>
+			{/* 退会 */}
+			<div className="mt-6 mb-4 flex items-center">
+				<button
+					type="button"
+					onClick={() => {}}
+					className="text-lg font-semibold text-[#747D8C] hover:underline cursor-pointer text-left"
+				>
+					退会
+				</button>
+			</div>
 
-                    <Link href={route('mypage.bookmarks')}>
-                        <button className="px-3 py-1 border rounded-md hover:bg-gray-100">ブックマーク済み研究室</button>
-                    </Link>
-
-                    <button
-                        onClick={handleDeleteAccount}
-                        className="px-3 py-1 border rounded-md text-red-600 hover:bg-red-50"
-                    >
-                        退会する
-                    </button>
-                </div>
-            </div>
-        </AppLayout>
-    );
+			{/* ブックマーク済み研究室 */}
+			<h2 className="text-xl font-bold text-black border-b border-black pb-2 w-full mt-8">ブックマーク済み研究室</h2>
+		</AppLayout>
+	);
 }
+
+export default Index;
