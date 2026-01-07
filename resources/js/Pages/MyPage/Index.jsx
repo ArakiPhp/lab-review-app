@@ -1,8 +1,10 @@
 import AppLayout from "@/Layouts/AppLayout";
 import { Head } from "@inertiajs/react";
 import UserInfoBar from "@/Components/MyPage/UserInfoBar";
+import LabCard from "@/Components/Lab/LabCard";
 
-const Index = ({ title, user }) => {
+const Index = ({ title, user, bookmarks = [] }) => {
+	console.log('ブックマーク一覧', bookmarks);
 	return (
 		<AppLayout title={title}>
 			<Head title={title} />
@@ -51,7 +53,27 @@ const Index = ({ title, user }) => {
 			</div>
 
 			{/* ブックマーク済み研究室 */}
-			<h2 className="text-xl font-bold text-black border-b border-black pb-2 w-full mt-8">ブックマーク済み研究室</h2>
+			<div className="flex items-center justify-between border-b border-black pb-2 w-full mt-8">
+				<h2 className="text-xl font-bold text-black">ブックマーク済み研究室</h2>
+				<span className="text-sm text-[#747D8C]">保存済み: {bookmarks.length}件</span>
+			</div>
+			<div className="mt-4 grid gap-4 grid-cols-1">
+				{bookmarks.length === 0 ? (
+					<p className="text-[#747D8C]">ブックマーク済みの研究室はありません。</p>
+				) : (
+					bookmarks.map((lab) => (
+						<div className="w-full" key={lab.id}>
+							<div className="flex flex-col items-center w-full">
+								{/* 大学・学部名の表示 */}
+								<div className="mb-2 text-lg font-semibold text-[#747D8C] text-center">
+									{lab.faculty?.university?.name} {lab.faculty?.name}
+								</div>
+								<div className="flex justify-center w-full"><div className="max-w-xl w-full"><LabCard lab={lab} /></div></div>
+							</div>
+						</div>
+					))
+				)}
+			</div>
 		</AppLayout>
 	);
 }
