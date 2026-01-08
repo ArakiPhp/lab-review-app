@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Head, router } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import StarRating from "@/Components/Lab/Star/StarRating";
-import BackButton from "@/Components/Common/BackButton";
+import Breadcrumb from "@/Components/Common/Breadcrumb";
 import CreateReviewButton from "@/Components/Review/CreateReviewButton";
 import { formatRating } from "@/utils/formatRating";
 import {
@@ -50,7 +50,12 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
   const [currentBookmarkCount, setCurrentBookmarkCount] = useState(bookmarkCount || 0);
   const [bookmarkId, setBookmarkId] = useState(userBookmark?.id || null);
 
-  // ブックマークのトグル処理
+  /**
+   * ブックマークのトグル処理
+   * ログインしていない場合は何もしない。
+   * 既にブックマーク済みなら解除、未ブックマークなら追加する。
+   * @returns {void}
+   */
   const handleBookmarkClick = () => {
     // ログインしていない場合は何もしない
     if (!auth?.user) {
@@ -199,16 +204,21 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
   return (
     <AppLayout title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`}>
       <Head title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`} />
-
-      <div className="flex flex-col min-h-full">
-        {/* レビュー投稿状態を右上に表示 */}
-        <div className="w-full flex flex-col items-end gap-2 mb-4">
+      {/* パンくずリスト＋レビュー投稿状態 横並び */}
+      <div className="w-full flex flex-row items-center justify-between mb-2">
+        <div>
+          <Breadcrumb university={lab.faculty.university} faculty={lab.faculty} lab={lab} query={query} />
+        </div>
+        <div>
           {auth?.user && userReview ? (
             <p className="text-[#747D8C]">レビューを投稿済みです。</p>
           ) : (
             <p className="text-[#747D8C]">まだ、レビューを投稿していません。</p>
           )}
         </div>
+      </div>
+
+      <div className="flex flex-col min-h-full">
 
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -392,7 +402,6 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
 
           {/* ボタンエリア */}
           <div className="mt-auto pt-8 pb-12 flex justify-center gap-4">
-            <BackButton routerName="labs.index" params={{ faculty: lab.faculty, query }} />
             <CreateReviewButton routerName="review.create" params={{ lab: lab }} />
           </div>
           </div>
