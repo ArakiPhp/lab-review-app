@@ -26,6 +26,21 @@ ChartJS.register(
   Legend
 );
 
+/**
+ * 研究室詳細ページコンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {Object} props.lab - 研究室オブジェクト
+ * @param {Object} props.averagePerItem - 各評価項目の平均値
+ * @param {number} props.overallAverage - 総合評価の平均値
+ * @param {Array} props.comments - コメント一覧
+ * @param {Object} props.auth - 認証情報
+ * @param {Object|null} props.userReview - ログインユーザーのレビュー
+ * @param {Object|null} props.userBookmark - ログインユーザーのブックマーク
+ * @param {number} props.bookmarkCount - ブックマーク数
+ * @param {string} props.query - 検索クエリ文字列
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
+
 const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview, userBookmark, bookmarkCount, query }) => {
 
   const [showAllComments, setShowAllComments] = useState(false);
