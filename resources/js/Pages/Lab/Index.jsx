@@ -1,8 +1,8 @@
 import { Head, router } from "@inertiajs/react";
 import AppLayout from '@/Layouts/AppLayout';
 import LabCard from '../../Components/Lab/LabCard';
-import BackButton from '../../Components/Common/BackButton';
 import Pagination from "../../Components/Common/Pagination";
+import Breadcrumb from "../../Components/Common/Breadcrumb";
 
 /**
  * ソートオプションの定義
@@ -53,19 +53,26 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
       {hasResults ? (
         // 1件以上の場合：コンテンツが少なければ戻るボタンは画面下部、多ければスクロール後に表示
         <div className="flex flex-col items-center min-h-full">
-          <div className="w-full flex flex-col items-end gap-2">
-            <p className="text-[#747D8C]">{labs.total}件の研究室</p>
-            <select
-              value={sort}
-              onChange={handleSortChange}
-              className="text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
-            >
-              {sortOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+          <div className="w-full flex flex-row items-center justify-between">
+            {/* パンくずリスト 左寄せ */}
+            <div>
+              <Breadcrumb university={faculty.university} faculty={faculty} query={query} />
+            </div>
+            {/* 研究室件数 右寄せ＋ソート */}
+            <div className="flex flex-col items-end gap-2">
+              <p className="text-[#747D8C]">{labs.total}件の研究室</p>
+              <select
+                value={sort}
+                onChange={handleSortChange}
+                className="text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
+              >
+                {sortOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="w-full max-w-xl space-y-6 mt-8">
             {labs.data.map(lab => (
@@ -76,18 +83,12 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
           {/* ページネーション */}
           <Pagination paginator={labs} />
           
-          <div className="mt-auto pt-8 pb-12">
-            <BackButton routerName="faculties.index" params={{ query, university: faculty.university }} />
-          </div>
         </div>
       ) : (
         // 0件の場合：メッセージを画面中央に、戻るボタンは下部に固定
         <div className="flex flex-col items-center min-h-full">
           <div className="flex-1 flex items-center justify-center">
             <p className="text-[#747D8C]">0件の研究室</p>
-          </div>
-          <div className="pt-8 pb-12">
-            <BackButton routerName="faculties.index" params={{ query, university: faculty.university }} />
           </div>
         </div>
       )}
