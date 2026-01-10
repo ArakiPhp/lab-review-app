@@ -61,7 +61,7 @@ const Modal = ({ isOpen, onClose, children, title, size = 'md' }) => {
         <div
          className={`
             w-full ${sizeClasses[size]}
-            bg-white rounded-lg shadow-xl
+            bg-[#EEF7FB] rounded-lg shadow-xl
             transform transition-all duration-300
             ${isOpen ? 'scale-100 translate-y-0' : 'scale-95 -translate-y-4'}
           `}
@@ -71,7 +71,7 @@ const Modal = ({ isOpen, onClose, children, title, size = 'md' }) => {
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute top-3 right-3 text-[#747D8C] hover:opacity-80 transition"
             aria-label="閉じる"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
