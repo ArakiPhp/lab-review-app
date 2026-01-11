@@ -75,6 +75,7 @@ const LoginForm = ({ onClose }) => {
     e.preventDefault();
     post(route('login'), {
       onSuccess: () => onClose(),
+      preserveScroll: true,
     });
   };
 
@@ -167,6 +168,7 @@ const RegisterForm = ({ onClose }) => {
     e.preventDefault();
     post(route('register'), {
       onSuccess: () => onClose(),
+      preserveScroll: true,
     });
   };
 
