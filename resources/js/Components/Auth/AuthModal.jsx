@@ -141,7 +141,7 @@ const LoginForm = ({ onClose }) => {
       </div>
 
       {/* 送信ボタン */}
-      <div className="mt-6">
+      <div className="mt-6 flex justify-center">
         <AuthSubmitButton mode="login" disabled={processing} />
       </div>
     </form>
@@ -254,7 +254,7 @@ const RegisterForm = ({ onClose }) => {
       </div>
 
       {/* 送信ボタン */}
-      <div className="mt-6">
+      <div className="mt-6 flex justify-center">
         <AuthSubmitButton mode="register" disabled={processing} />
       </div>
     </form>
