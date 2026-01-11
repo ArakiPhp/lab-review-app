@@ -6,6 +6,12 @@ return [
     'string' => ':attribute は文字列である必要があります。',
     'unique' => 'この:attribute は既に登録されています。',
 
+    'email' => ':attribute は有効なメールアドレスである必要があります。',
+    'confirmed' => ':attribute の確認が一致しません。',
+    'min' => [
+        'string'  => ':attribute は :min 文字以上にしてください。',
+    ],
+
     'max' => [
         'numeric' => ':attribute は :max 以下の値にしてください。',
         'file'    => ':attribute は :max KB以下のファイルにしてください。',
@@ -28,7 +34,7 @@ return [
             'max' => '学部名は50文字以下にしてください。',
         ],
 
-        // 追加: 研究室関連（研究室作成時のname）
+        // 研究室関連（研究室作成時のname）
         'lab.name' => [
             'unique' => 'この研究室名は既にこの学部に存在します。',
             'required' => '研究室名は必須項目です。',
@@ -67,6 +73,10 @@ return [
     ],
 
     'attributes' => [
+        'nickname' => 'ニックネーム',
+        'email' => 'メールアドレス',
+        'password' => 'パスワード',
+        'password_confirmation' => 'パスワード（確認用）',
         'name' => '大学名',
         'faculty.name' => '学部名',
         'mentorship_style' => '指導スタイル',

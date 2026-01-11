@@ -82,28 +82,26 @@ const LoginForm = ({ onClose }) => {
   return (
     <form onSubmit={submit}>
       {/* 入力欄 */}
+      {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
       <FieldBar className="mb-4">
         <input
           type="email"
           value={data.email}
           onChange={e => setData('email', e.target.value)}
           placeholder="メールアドレス"
-          required
           className="w-full outline-none bg-transparent border-none focus:outline-none focus:ring-0"
         />
       </FieldBar>
-      {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+      {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
       <FieldBar className="mb-4">
         <input
           type="password"
           value={data.password}
           onChange={e => setData('password', e.target.value)}
           placeholder="パスワード"
-          required
           className="w-full outline-none bg-transparent border-none focus:outline-none focus:ring-0"
         />
       </FieldBar>
-      {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
 
       {/* Google ログイン追加部分 */}
       <div className="my-6">
@@ -158,7 +156,7 @@ const LoginForm = ({ onClose }) => {
  */
 const RegisterForm = ({ onClose }) => {
   const { data, setData, post, processing, errors } = useForm({
-    name: '',
+    nickname: '',
     email: '',
     password: '',
     password_confirmation: '',
@@ -174,17 +172,18 @@ const RegisterForm = ({ onClose }) => {
 
   return (
     <form onSubmit={submit}>
+      {errors.nickname && <p className="text-red-500 text-sm">{errors.nickname}</p>}
       <FieldBar className="mb-4">
         {/* 入力欄 */}
         <input
           type="text"
-          value={data.name}
-          onChange={e => setData('name', e.target.value)}
+          value={data.nickname}
+          onChange={e => setData('nickname', e.target.value)}
           placeholder="ニックネーム"
           className="w-full outline-none bg-transparent border-none focus:outline-none focus:ring-0"
         />
       </FieldBar>
-      {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+      {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
       <FieldBar className="mb-4">
         <input
           type="email"
@@ -194,7 +193,7 @@ const RegisterForm = ({ onClose }) => {
           className="w-full outline-none bg-transparent border-none focus:outline-none focus:ring-0"
         />
       </FieldBar>
-      {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+      {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
       <FieldBar className="mb-4">
         <input
           type="password"
@@ -204,7 +203,9 @@ const RegisterForm = ({ onClose }) => {
           className="w-full outline-none bg-transparent border-none focus:outline-none focus:ring-0"
         />
       </FieldBar>
-      {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+      {errors.password_confirmation && (
+        <p className="text-red-500 text-sm">{errors.password_confirmation}</p>
+      )}
       <FieldBar className="mb-4">
         <input
           type="password"
@@ -214,9 +215,6 @@ const RegisterForm = ({ onClose }) => {
           className="w-full outline-none bg-transparent border-none focus:outline-none focus:ring-0"
         />
       </FieldBar>
-      {errors.password_confirmation && (
-        <p className="text-red-500 text-sm">{errors.password_confirmation}</p>
-      )}
 
       {/* Google ログイン追加部分 */}
       <div className="my-6">
