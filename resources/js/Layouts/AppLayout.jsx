@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import Header from "../Components/Header";
 import Sidebar from "../Components/Sidebar";
 import HamburgerMenu from '@/Components/HamburgerMenu';
+import AuthModal from '@/Components/Auth/AuthModal';
 
 /**
  * アプリケーションのレイアウトコンポーネント
@@ -23,6 +24,9 @@ const AppLayout = ({ children, title, mode='default' }) => {
 
   // ホームページかどうか
   const isHome = mode === 'home';
+
+  // 認証モーダルの状態（'login' | 'register' | null）を管理
+  const [authModal, setAuthModal] = useState(null);
 
   //  サイドバーが開いている間は、背景のスクロールを防止
   useEffect(() => {
@@ -70,8 +74,21 @@ const AppLayout = ({ children, title, mode='default' }) => {
           {children || <p className="text-gray-400 text-center">メインコンテンツ領域</p>}
         </div>
       </main>
+
       {/* サイドバー */}
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} isLoggedIn={isLoggedIn} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        isLoggedIn={isLoggedIn}
+        onOpenAuthModal={setAuthModal}
+      />
+
+      {/* 認証モーダル */}
+      <AuthModal
+        mode={authModal}
+        onClose={() => setAuthModal(null)}
+        switchMode={(mode) => setAuthModal(mode)}
+      />
     </div>
   );
 }
