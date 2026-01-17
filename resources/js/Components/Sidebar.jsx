@@ -14,9 +14,20 @@ import register from '../Assets/icons/sidebar/register.svg';
  * @param {boolean} props.isOpen - サイドバーの開閉状態
  * @param {Function} props.onClose - サイドバーを閉じるためのコールバック関数
  * @param {boolean} props.isLoggedIn - ユーザーのログイン状態
+ * @param {Function} props.onOpenAuthModal - 認証モーダルを開く関数（引数に'mode'を取る）
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const Sidebar = ({ isOpen, onClose, isLoggedIn }) => {
+const Sidebar = ({ isOpen, onClose, isLoggedIn, onOpenAuthModal }) => {
+  const handleLoginClick = () => {
+    onClose();
+    onOpenAuthModal('login');
+  };
+
+  const handleRegisterClick = () => {
+    onClose();
+    onOpenAuthModal('register');
+  };
+  
   // メニュー定義
   const items = isLoggedIn
     ? [
@@ -28,8 +39,8 @@ const Sidebar = ({ isOpen, onClose, isLoggedIn }) => {
       ]
     : [
         { label: 'ホーム', href: route('home'), icon: home },
-        { label: '新規登録', href: route('register'), icon: register },
-        { label: 'ログイン', href: route('login'), icon: login },
+        { label: '新規登録', onClick: handleRegisterClick, icon: register },
+        { label: 'ログイン', onClick: handleLoginClick, icon: login },
         { label: 'ランキング', href: null, icon: ranking },
       ];
 
@@ -102,6 +113,18 @@ const Sidebar = ({ isOpen, onClose, isLoggedIn }) => {
                     <img src={it.icon} alt="" className="h-8 w-8" />
                     {it.label}
                   </Link>
+                ) : it.onClick ? (
+                  <button
+                    type='button'
+                    onClick={it.onClick}
+                    className="
+                      text-expand text-lg w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg
+                      hover:transition text-[#747D8C] font-medium
+                    "
+                    >
+                      <img src={it.icon} alt="" className="h-8 w-8" />
+                      {it.label}
+                    </button>
                 ) : (
                   <span
                     className="
