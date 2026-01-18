@@ -3,9 +3,12 @@ import { Head } from "@inertiajs/react";
 import UserInfoBar from "@/Components/MyPage/UserInfoBar";
 import LabCard from "@/Components/Lab/LabCard";
 import { useState, useRef } from "react";
+import CreateUniversityModal from "@/Components/University/CreateUniversityModal";
 import NotificationIcon from "@/Assets/icons/notification.svg";
 
 const Index = ({ title, user, bookmarks = [] }) => {
+	// 大学作成モーダルの開閉状態
+	const [isUniversityModalOpen, setUniversityModalOpen] = useState(false);
 	// 横スクロール用インデックス
 	const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -153,6 +156,25 @@ const Index = ({ title, user, bookmarks = [] }) => {
 						</div>
 					)}
 				</div>
+
+				{/* 作成済み大学 */}
+				<div className="flex items-center justify-between border-b border-black pb-2 w-full">
+				<h2 className="text-xl font-bold text-black">作成済み大学</h2>
+				<span className="text-sm text-[#747D8C]">
+					作成件数: 0件
+				</span>
+				</div>
+				<div className="mt-4 flex flex-col items-center">
+				<p className="text-[#747D8C]">作成済みの大学はありません。</p>
+				<button
+					type="button"
+					onClick={() => setUniversityModalOpen(true)}
+				>
+					追加
+				</button>
+				</div>
+				{/* 大学作成モーダル */}
+				<CreateUniversityModal isOpen={isUniversityModalOpen} onClose={() => setUniversityModalOpen(false)} />
 			</div>
 		</AppLayout>
 	);
