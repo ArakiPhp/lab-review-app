@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import AppLayout from '@/Layouts/AppLayout';
 import FacultyCard from '../../Components/Faculty/FacultyCard';
 import Breadcrumb from '../../Components/Common/Breadcrumb';
-import MenuPopover from "@/Components/University/MenuPopover";
+import MenuPopover from "@/Components/Common/MenuPopover";
 import KebabIcon from "@/Components/Common/KebabIcon";
 import EditUniversityModal from "@/Components/University/EditUniversityModal";
 import CreateFacultyModal from "@/Components/Faculty/CreateFacultyModal";
@@ -72,7 +72,7 @@ const Index = ({ faculties, university, query = '' }) => {
               >
                 <KebabIcon />
               </button>
-              {isMenuOpen && <MenuPopover onAddFacultyClick={handleAddFacultyClick} onEditClick={handleEditClick} />}
+              {isMenuOpen && <MenuPopover addLabel="学部を追加する" onAddClick={handleAddFacultyClick} onEditClick={handleEditClick} />}
             </div>
           </div>
         </div>
@@ -96,7 +96,7 @@ const Index = ({ faculties, university, query = '' }) => {
         onClose={() => setIsCreateModalOpen(false)}
         university={university}
       />
-      {/* 学部編集モーダル */}
+      {/* 大学編集モーダル */}
       <EditUniversityModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
