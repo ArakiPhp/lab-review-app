@@ -3,6 +3,10 @@ import AppLayout from '@/Layouts/AppLayout';
 import LabCard from '../../Components/Lab/LabCard';
 import Pagination from "../../Components/Common/Pagination";
 import Breadcrumb from "../../Components/Common/Breadcrumb";
+import MenuPopover from "@/Components/Common/MenuPopover";
+import KebabIcon from "@/Components/Common/KebabIcon";
+import EditFacultyModal from "@/Components/Faculty/EditFacultyModal";
+import { useState, useEffect, useRef } from "react";
 
 /**
  * ソートオプションの定義
@@ -29,7 +33,36 @@ const sortOptions = [
  * @returns {JSX.Element} コンポーネントのJSX
  */
 const Index = ({ labs, faculty, query, sort = 'overall' }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const menuRef = useRef(null);
   const hasResults = labs.data.length > 0;
+
+  // 外側クリックでメニューポップオーバーを閉じる
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  /**
+   * メニューポップオーバーの「編集する」クリック時の処理
+   * @returns {void}
+   */
+  const handleEditClick = () => {
+    setIsMenuOpen(false);
+    setIsEditModalOpen(true);
+  }
 
   /**
    * ソート条件変更時のハンドラ
@@ -50,48 +83,60 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
     <AppLayout title={`${faculty.university.name} ${faculty.name}`}>
       <Head title={`${faculty.university.name} ${faculty.name}`} />
 
-      {hasResults ? (
-        // 1件以上の場合：コンテンツが少なければ戻るボタンは画面下部、多ければスクロール後に表示
-        <div className="flex flex-col items-center min-h-full">
-          <div className="w-full flex flex-row items-center justify-between">
-            {/* パンくずリスト 左寄せ */}
-            <div>
-              <Breadcrumb university={faculty.university} faculty={faculty} query={query} />
-            </div>
-            {/* 研究室件数 右寄せ＋ソート */}
-            <div className="flex flex-col items-end gap-2">
-              <p className="text-[#747D8C]">{labs.total}件の研究室</p>
-              <select
-                value={sort}
-                onChange={handleSortChange}
-                className="text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
+      <div className="flex flex-col items-center min-h-full">
+        <div className="w-full flex flex-row items-center justify-between">
+          {/* パンくずリスト 左寄せ */}
+          <div>
+            <Breadcrumb university={faculty.university} faculty={faculty} query={query} />
+          </div>
+          {/* 研究室件数 + ケバブメニュー 右寄せ＋ソート */}
+          <div className="flex items-center gap-2">
+            <p className="text-[#747D8C]">{labs.total}件の研究室</p>
+            <select
+              value={sort}
+              onChange={handleSortChange}
+              className="text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
+            >
+              {sortOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {/* ケバブメニュー */}
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 rounded-full"
               >
-                {sortOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <KebabIcon />
+              </button>
+              {isMenuOpen && <MenuPopover addLabel="研究室を追加する" onEditClick={handleEditClick} />}
             </div>
           </div>
-          <div className="w-full max-w-xl space-y-6 mt-8">
-            {labs.data.map(lab => (
-              <LabCard key={lab.id} lab={lab} query={query} sort={sort} />
-            ))}
-          </div>
-
-          {/* ページネーション */}
-          <Pagination paginator={labs} />
-          
         </div>
-      ) : (
-        // 0件の場合：メッセージを画面中央に、戻るボタンは下部に固定
-        <div className="flex flex-col items-center min-h-full">
+        {hasResults ? (
+          <>
+            <div className="w-full max-w-xl space-y-6 mt-8">
+              {labs.data.map(lab => (
+                <LabCard key={lab.id} lab={lab} query={query} sort={sort} />
+              ))}
+            </div>
+            {/* ページネーション */}
+            <Pagination paginator={labs} />
+          </>
+        ) : (
           <div className="flex-1 flex items-center justify-center">
-            <p className="text-[#747D8C]">0件の研究室</p>
+            <p className="text-[#747D8C]">まだ研究室は登録されていません。</p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+      {/* 学部編集モーダル */}
+      <EditFacultyModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        faculty={faculty}
+      />
     </AppLayout>
   )
 };
