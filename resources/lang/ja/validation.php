@@ -79,6 +79,7 @@ return [
         'password_confirmation' => 'パスワード（確認用）',
         'name' => '大学名',
         'faculty.name' => '学部名',
+        'comment' => '編集理由',
         'mentorship_style' => '指導スタイル',
         'lab_atmosphere' => '雰囲気・文化',
         'achievement_activity' => '成果・活動',
