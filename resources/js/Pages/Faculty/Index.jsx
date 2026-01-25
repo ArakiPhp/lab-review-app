@@ -1,47 +1,92 @@
 import { Head } from "@inertiajs/react";
+import { useState, useEffect, useRef } from "react";
 import AppLayout from '@/Layouts/AppLayout';
 import FacultyCard from '../../Components/Faculty/FacultyCard';
 import Breadcrumb from '../../Components/Common/Breadcrumb';
+import MenuPopover from "@/Components/University/MenuPopover";
+import KebabIcon from "@/Components/Common/KebabIcon";
+import EditUniversityModal from "@/Components/University/EditUniversityModal";
 
-/**
- * 学部一覧ページコンポーネント
- * @param {Object} props - コンポーネントのprops
- * @param {Array} props.faculties - 学部データの配列
- * @param {Object} props.university - 大学オブジェクト
- * @param {string} [props.query=''] - 検索クエリ文字列
- * @returns {JSX.Element} コンポーネントのJSX
- */
 const Index = ({ faculties, university, query = '' }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const menuRef = useRef(null);
+
   const hasResults = faculties.length > 0;
+
+  // 外側クリックでメニューポップオーバーを閉じる
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  /**
+   * メニューポップオーバーの「編集する」クリック時の処理
+   * @returns {void}
+   */
+  const handleEditClick = () => {
+    setIsMenuOpen(false);
+    setIsEditModalOpen(true);
+  }
 
   return (
     <AppLayout title={`${university.name}の学部一覧`}>
       <Head title={`${university.name}の学部一覧`} />
-      {hasResults ? (
-        <div className="flex flex-col items-center min-h-full">
-          <div className="w-full flex flex-row items-center justify-between">
-            {/* パンくずリスト 左寄せ */}
-            <div>
-              <Breadcrumb university={university} query={query} />
-            </div>
-            {/* 学部件数 右寄せ */}
-            <p className="text-[#747D8C]">{faculties.length}件の学部</p>
+      <div className="flex flex-col items-center min-h-full">
+        {/* ヘッダー部分（共通） */}
+        <div className="w-full flex flex-row items-center justify-between">
+          {/* パンくずリスト 左寄せ */}
+          <div>
+            <Breadcrumb university={university} query={query} />
           </div>
+          {/* 学部件数 + ケバブメニュー 右寄せ */}
+          <div className="flex items-center gap-2">
+            <p className="text-[#747D8C]">{faculties.length}件の学部</p>
+            {/* ケバブメニュー */}
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 rounded-full"
+              >
+                <KebabIcon />
+              </button>
+              {isMenuOpen && <MenuPopover onEditClick={handleEditClick} />}
+            </div>
+          </div>
+        </div>
+
+        {/* コンテンツ部分 */}
+        {hasResults ? (
           <div className="w-full grid grid-cols-3 gap-6 mt-8 justify-items-center">
             {faculties.map(faculty => (
               <FacultyCard key={faculty.id} faculty={faculty} query={query} />
             ))}
           </div>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center min-h-full">
+        ) : (
           <div className="flex-1 flex items-center justify-center">
-            <p className="text-[#747D8C]">0件の学部</p>
+            <p className="text-[#747D8C]">まだ学部が登録されていません。</p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+      {/* 学部編集モーダル */}
+      <EditUniversityModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        university={university}
+      />
     </AppLayout>
-  )	
-}
+  );
+};
 
 export default Index;

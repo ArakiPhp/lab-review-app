@@ -26,10 +26,12 @@ class UniversityController extends Controller
         
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:universities,name',
+            'type' => 'required|string|in:national,public,private',
         ]);
 
         $university = new University();
         $university->name = $validated['name'];
+        $university->type = $validated['type'];
         $university->created_by = $request->user()->id;
         $university->save();
 
@@ -72,6 +74,7 @@ class UniversityController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:universities,name,' . $university->id,
+            'type' => 'required|string|in:national,public,private',
             'comment' => 'required|string|max:255',
             'version' => 'required|integer',
         ]);
@@ -92,6 +95,7 @@ class UniversityController extends Controller
 
             // データ更新
             $current->name = $validated['name'];
+            $current->type = $validated['type'];
             $current->version += 1; // バージョンを1増やす
             $current->save();
 
