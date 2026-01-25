@@ -6,9 +6,11 @@ import Breadcrumb from '../../Components/Common/Breadcrumb';
 import MenuPopover from "@/Components/University/MenuPopover";
 import KebabIcon from "@/Components/Common/KebabIcon";
 import EditUniversityModal from "@/Components/University/EditUniversityModal";
+import CreateFacultyModal from "@/Components/Faculty/CreateFacultyModal";
 
 const Index = ({ faculties, university, query = '' }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -30,6 +32,15 @@ const Index = ({ faculties, university, query = '' }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMenuOpen]);
+
+  /**
+   * メニューポップオーバーの「学部を追加する」クリック時の処理
+   * @returns {void}
+   */
+  const handleAddFacultyClick = () => {
+    setIsMenuOpen(false);
+    setIsCreateModalOpen(true);
+  }
 
   /**
    * メニューポップオーバーの「編集する」クリック時の処理
@@ -61,7 +72,7 @@ const Index = ({ faculties, university, query = '' }) => {
               >
                 <KebabIcon />
               </button>
-              {isMenuOpen && <MenuPopover onEditClick={handleEditClick} />}
+              {isMenuOpen && <MenuPopover onAddFacultyClick={handleAddFacultyClick} onEditClick={handleEditClick} />}
             </div>
           </div>
         </div>
@@ -79,6 +90,12 @@ const Index = ({ faculties, university, query = '' }) => {
           </div>
         )}
       </div>
+      {/* 学部作成モーダル */}
+      <CreateFacultyModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        university={university}
+      />
       {/* 学部編集モーダル */}
       <EditUniversityModal
         isOpen={isEditModalOpen}

@@ -1,12 +1,13 @@
 /**
  * メニューポップオーバーコンポーネント
  * @param {Object} props - コンポーネントのプロパティ
+ * @pram {function} props.onAddFacultyClick - 「学部を追加する」クリック時のハンドラ
  * @param {Function} props.onEditClick - 「編集する」クリック時のハンドラ
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const MenuPopover = ({ onEditClick }) => {
+const MenuPopover = ({ onAddFacultyClick, onEditClick }) => {
   const menuItems = [
-    { label: '学部を追加する', onClick: () => {} },
+    { label: '学部を追加する', onClick: onAddFacultyClick },
     { label: '編集する', onClick: onEditClick },
     { label: '編集履歴を見る', onClick: () => {} },
     { label: '削除依頼をする', onClick: () => {} },
