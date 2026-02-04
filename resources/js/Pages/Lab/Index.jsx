@@ -6,6 +6,7 @@ import Breadcrumb from "../../Components/Common/Breadcrumb";
 import MenuPopover from "@/Components/Common/MenuPopover";
 import KebabIcon from "@/Components/Common/KebabIcon";
 import EditFacultyModal from "@/Components/Faculty/EditFacultyModal";
+import CreateLabModal from "@/Components/Lab/CreateLabModal";
 import { useState, useEffect, useRef } from "react";
 
 /**
@@ -34,6 +35,7 @@ const sortOptions = [
  */
 const Index = ({ labs, faculty, query, sort = 'overall' }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const menuRef = useRef(null);
   const hasResults = labs.data.length > 0;
@@ -54,6 +56,15 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMenuOpen]);
+
+  /**
+   * メニューポップオーバーの「研究室を追加する」クリック時の処理
+   * @returns {void}
+   */
+  const handleAddLabClick = () => {
+    setIsMenuOpen(false);
+    setIsCreateModalOpen(true);
+  }
 
   /**
    * メニューポップオーバーの「編集する」クリック時の処理
@@ -111,7 +122,7 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
               >
                 <KebabIcon />
               </button>
-              {isMenuOpen && <MenuPopover addLabel="研究室を追加する" onEditClick={handleEditClick} />}
+              {isMenuOpen && <MenuPopover addLabel="研究室を追加する" onAddClick={handleAddLabClick} onEditClick={handleEditClick} />}
             </div>
           </div>
         </div>
@@ -131,6 +142,12 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
           </div>
         )}
       </div>
+      {/* 研究室追加モーダル */}
+      <CreateLabModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        faculty={faculty}
+      />
       {/* 学部編集モーダル */}
       <EditFacultyModal
         isOpen={isEditModalOpen}
