@@ -116,9 +116,9 @@ class LabController extends Controller
         // バリデーション
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:labs,name,NULL,id,faculty_id,' . $faculty->id,
-            'description' => 'nullable|string|max:150', // 修正
+            'description' => 'nullable|string|max:150',
             'url' => 'nullable|url|max:255',
-            'professor_name' => 'nullable|string|max:25', // 追加
+            'professor_name' => 'nullable|string|max:25',
             'professor_url' => 'nullable|url|max:255',
             'gender_ratio_male' => 'required|integer|min:0|max:10',
             'gender_ratio_female' => [
@@ -140,7 +140,7 @@ class LabController extends Controller
         $lab->name = $validated['name'];
         $lab->description = $validated['description'];
         $lab->url = $validated['url'];
-        $lab->professor_name = $validated['professor_name'] ?? null; // 追加
+        $lab->professor_name = $validated['professor_name'];
         $lab->professor_url = $validated['professor_url'];
         $lab->gender_ratio_male = $validated['gender_ratio_male'];
         $lab->gender_ratio_female = $validated['gender_ratio_female'];
@@ -240,10 +240,13 @@ class LabController extends Controller
     {
         $this->authorize('update', Lab::class);
 
+        // dd('update called', $request->all());
+
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:labs,name,' . $lab->id . ',id,faculty_id,' . $lab->faculty_id,
-            'description' => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:150',
             'url' => 'nullable|url|max:255',
+            'professor_name' => 'nullable|string|max:25',
             'professor_url' => 'nullable|url|max:255',
             'gender_ratio_male' => 'required|integer|min:0|max:10',
             'gender_ratio_female' => [
@@ -263,6 +266,8 @@ class LabController extends Controller
             'version' => 'required|integer',
         ]);
 
+        // dd('validated', $validated);
+
         DB::beginTransaction();
 
         try {
@@ -278,9 +283,10 @@ class LabController extends Controller
             $current->name = $validated['name'];
             $current->description = $validated['description'];
             $current->url = $validated['url'];
+            $current->professor_name = $validated['professor_name'];
             $current->professor_url = $validated['professor_url'];
-            $lab->gender_ratio_male = $validated['gender_ratio_male'];
-            $lab->gender_ratio_female = $validated['gender_ratio_female'];
+            $current->gender_ratio_male = $validated['gender_ratio_male'];
+            $current->gender_ratio_female = $validated['gender_ratio_female'];
             $current->version += 1;
             $current->save();
 
@@ -294,7 +300,7 @@ class LabController extends Controller
 
             DB::commit();
 
-            // 追加: 作成者へ通知を送信
+            // 作成者へ通知を送信
             if ($userId !== $current->created_by && $current->creator) {
                 $changes = collect($current->getChanges())
                     ->only(['name','description','url','professor_url'])
