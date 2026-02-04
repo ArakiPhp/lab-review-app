@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Head, router } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import StarRating from "@/Components/Lab/Star/StarRating";
 import Breadcrumb from "@/Components/Common/Breadcrumb";
 import CreateReviewButton from "@/Components/Review/CreateReviewButton";
+import MenuPopover from "@/Components/Common/MenuPopover";
+import KebabIcon from "@/Components/Common/KebabIcon";
+import EditLabModal from "@/Components/Lab/EditLabModal";
 import { formatRating } from "@/utils/formatRating";
 import {
   Chart as ChartJS,
@@ -44,6 +47,35 @@ ChartJS.register(
 const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview, userBookmark, bookmarkCount, query }) => {
 
   const [showAllComments, setShowAllComments] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // 外側クリックでメニューポップオーバーを閉じる
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  /**
+   * メニューポップオーバーの「編集する」クリック時の処理
+   * @returns {void}
+   */
+  const handleEditClick = () => {
+    setIsMenuOpen(false);
+    setIsEditModalOpen(true);
+  };
 
   // ブックマーク状態とカウントをローカルstateで管理
   const [isBookmarked, setIsBookmarked] = useState(auth?.user && userBookmark);
@@ -204,17 +236,29 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
   return (
     <AppLayout title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`}>
       <Head title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`} />
-      {/* パンくずリスト＋レビュー投稿状態 横並び */}
-      <div className="w-full flex flex-row items-center justify-between mb-2">
+      {/* パンくずリスト＋レビュー投稿状態＋ケバブメニュー 横並び */}
+      <div className="w-full flex flex-row items-center justify-between">
+        {/* パンくずリスト 左寄せ */}
         <div>
           <Breadcrumb university={lab.faculty.university} faculty={lab.faculty} lab={lab} query={query} />
         </div>
-        <div>
+        {/* レビュー投稿状態 + ケバブメニュー 右寄せ */}
+        <div className="flex items-center gap-2">
           {auth?.user && userReview ? (
             <p className="text-[#747D8C]">レビューを投稿済みです。</p>
           ) : (
             <p className="text-[#747D8C]">まだ、レビューを投稿していません。</p>
           )}
+          {/* ケバブメニュー */}
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-full"
+            >
+              <KebabIcon />
+            </button>
+            {isMenuOpen && <MenuPopover onEditClick={handleEditClick} />}
+          </div>
         </div>
       </div>
 
@@ -405,6 +449,12 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
             <CreateReviewButton routerName="review.create" params={{ lab: lab }} />
           </div>
           </div>
+      {/* 研究室編集モーダル */}
+      <EditLabModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        lab={lab}
+      />
     </AppLayout>
   );
 };
