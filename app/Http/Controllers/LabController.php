@@ -6,6 +6,7 @@ use App\Models\Faculty;
 use App\Models\Lab;
 use App\Models\Review;
 use App\Notifications\ModelChangedNotification;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
@@ -13,12 +14,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class LabController extends Controller
 {
     use AuthorizesRequests;
 
-    public function show(Lab $lab, Request $request)
+    public function show(Lab $lab, Request $request): Response
     {
         // 大学・学部、レビューのデータも一緒に渡す
         // universityはfacultyを経由して取得
@@ -94,22 +96,7 @@ class LabController extends Controller
         ]);
     }
 
-    public function create(Faculty $faculty)
-    {
-        // 認可
-        $this->authorize('create', Lab::class);
-
-        // 学部に紐づく大学の情報を取得
-        $university = $faculty->university;
-
-        // Inertiaを使ってLabの作成ページを表示
-        return Inertia::render('Lab/Create', [
-            'faculty' => $faculty,
-            'university' => $university,
-        ]);
-    }
-
-    public function store(Request $request, Faculty $faculty)
+    public function store(Request $request, Faculty $faculty): RedirectResponse
     {
         // 認可
         $this->authorize('create', Lab::class);
@@ -155,7 +142,7 @@ class LabController extends Controller
         return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が作成されました。');
     }
 
-    public function index(Faculty $faculty, Request $request)
+    public function index(Faculty $faculty, Request $request): Response
     {
         // 評価項目のカラム名を定義
         $ratingColumns = [
@@ -222,22 +209,7 @@ class LabController extends Controller
         ]);
     }
 
-    public function edit(Lab $lab)
-    {
-        // 認可
-        $this->authorize('update', $lab);
-
-        $lab->load('faculty.university');
-
-        // Labの編集ページを表示
-        return Inertia::render('Lab/Edit', [
-            'lab' => $lab->load('faculty.university'),
-            'faculty' => $lab->faculty,
-            'university' => $lab->faculty->university,
-        ]);
-    }
-
-    public function update(Request $request, Lab $lab)
+    public function update(Request $request, Lab $lab): RedirectResponse
     {
         $this->authorize('update', Lab::class);
 
@@ -326,7 +298,7 @@ class LabController extends Controller
         return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が更新されました。');
     }
 
-    public function history(Lab $lab)
+    public function history(Lab $lab): Response
     {
         $query = request('query', '');
 
