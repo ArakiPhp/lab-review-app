@@ -330,9 +330,26 @@ const Show = ({ lab, averagePerItem, overallAverage, comments, auth, userReview,
                     <h2 className="text-base font-semibold text-black mb-2">
                       教授  
                     </h2>
-                    <p className="text-sm text-[#747D8C] ml-4">
-                      {lab.professor_name ? `${lab.professor_name} 先生` : "教授名はまだ登録されていません"}
-                    </p>
+                    {lab.professor_name ? (
+                      lab.professor_url ? (
+                        <a
+                          href={lab.professor_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-[#747D8C] hover:text-black hover:underline break-all ml-4"
+                        >
+                          {`${lab.professor_name} 先生`}
+                        </a>
+                      ) : (
+                        <p className="text-sm text-[#747D8C] ml-4">
+                          {`${lab.professor_name} 先生`}
+                        </p>
+                      )
+                    ) : (
+                      <p className="text-sm text-[#747D8C] ml-4">
+                        教授名はまだ登録されていません
+                      </p>
+                    )}
                   </div>
 
                   {/* 男女比 */}

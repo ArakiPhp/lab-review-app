@@ -240,8 +240,6 @@ class LabController extends Controller
     {
         $this->authorize('update', Lab::class);
 
-        // dd('update called', $request->all());
-
         $validated = $request->validate([
             'name' => 'required|string|max:50|unique:labs,name,' . $lab->id . ',id,faculty_id,' . $lab->faculty_id,
             'description' => 'nullable|string|max:150',
@@ -265,8 +263,6 @@ class LabController extends Controller
             'comment' => 'required|string|max:255',
             'version' => 'required|integer',
         ]);
-
-        // dd('validated', $validated);
 
         DB::beginTransaction();
 
