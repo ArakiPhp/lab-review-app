@@ -27,21 +27,33 @@ return [
             'max' => '大学名は50文字以下にしてください。',
         ],
         
-        // 学部関連（学部作成時のname）
+        // 学部関連
         'faculty.name' => [
             'unique' => 'この学部名は既にこの大学に存在します。',
             'required' => '学部名は必須項目です。',
             'max' => '学部名は50文字以下にしてください。',
         ],
 
-        // 研究室関連（研究室作成時のname）
+        // 研究室関連
         'lab.name' => [
             'unique' => 'この研究室名は既にこの学部に存在します。',
             'required' => '研究室名は必須項目です。',
             'max' => '研究室名は50文字以下にしてください。',
         ],
+        'description' => [
+            'max' => '説明は150文字以下にしてください。',
+        ],
+        'professor_name' => [
+            'max' => '教授名は25文字以下にしてください。',
+        ],
+        'url' => [
+            'url' => 'URLは有効なURL形式で入力してください。',
+        ],
+        'professor_url' => [
+            'url' => '教授のURLは有効なURL形式で入力してください。',
+        ],
 
-        // 既存の評価関連
+        // レビュー関連
         'mentorship_style' => [
             'max' => '指導スタイルは5以下の値にしてください。',
             'min' => '指導スタイルは1以上の値にしてください。',
@@ -80,6 +92,10 @@ return [
         'name' => '大学名',
         'faculty.name' => '学部名',
         'comment' => '編集理由',
+        'description' => '説明',
+        'professor_name' => '教授名',
+        'url' => 'URL',
+        'professor_url' => '教授のURL',
         'mentorship_style' => '指導スタイル',
         'lab_atmosphere' => '雰囲気・文化',
         'achievement_activity' => '成果・活動',
