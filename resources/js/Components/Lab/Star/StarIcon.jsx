@@ -4,16 +4,25 @@ import { useId } from "react";
  * 星アイコンコンポーネント（グラデーション塗りつぶし対応）
  * @param {Object} props - コンポーネントのprops
  * @param {number} [props.fillPercentage=100] - 塗りつぶし割合（0〜100）
+ * @param {number} [props.size=16] - アイコンサイズ(px)
+ * @param {string} [props.className] - 追加クラス
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const StarIcon = ({ fillPercentage }) => {
+const StarIcon = ({ fillPercentage, size = 16, className }) => {
   const id = useId();
   const gradientId = `starGradient-${id}`;
   const fillColor = "#F4BB42";
   const emptyColor = "#E2EDF6";
 
   return (
-    <svg width="16" height="16" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 42 42"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
       <defs>
         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset={`${fillPercentage}%`} stopColor={fillColor} />

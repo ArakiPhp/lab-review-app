@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReviewRatingRequest;
 use App\Models\Lab;
 use App\Models\Review;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -19,19 +19,10 @@ class ReviewController extends Controller
         return Inertia::render('Review/Create', ['lab' => $lab]);
     }
 
-    public function store(Request $request, Lab $lab) {
+    public function store(ReviewRatingRequest $request, Lab $lab) {
         // ポリシーで認可をチェック
         $this->authorize('create', [Review::class, $lab]);
-        // バリデーション
-        $validated = $request->validate([
-            'mentorship_style' => 'required|integer|min:1|max:5',
-            'lab_atmosphere' => 'required|integer|min:1|max:5',
-            'achievement_activity' => 'required|integer|min:1|max:5',
-            'constraint_level' => 'required|integer|min:1|max:5',
-            'facility_quality' => 'required|integer|min:1|max:5',
-            'work_style' => 'required|integer|min:1|max:5',
-            'student_balance' => 'required|integer|min:1|max:5',
-        ]);
+        $validated = $request->validated();
 
         // バリデーション済みのデータを保存
         $review = new Review();
@@ -56,19 +47,10 @@ class ReviewController extends Controller
         return Inertia::render('Review/Edit', ['review' => $review,]);
     }
 
-    public function update(Request $request, Review $review) {
+    public function update(ReviewRatingRequest $request, Review $review) {
         // ポリシーで認可をチェック
         $this->authorize('update', $review);
-        // バリデーション
-        $validated = $request->validate([
-            'mentorship_style' => 'required|integer|min:1|max:5',
-            'lab_atmosphere' => 'required|integer|min:1|max:5',
-            'achievement_activity' => 'required|integer|min:1|max:5',
-            'constraint_level' => 'required|integer|min:1|max:5',
-            'facility_quality' => 'required|integer|min:1|max:5',
-            'work_style' => 'required|integer|min:1|max:5',
-            'student_balance' => 'required|integer|min:1|max:5',
-        ]);
+        $validated = $request->validated();
 
         // バリデーション済みのデータを更新
         $review->mentorship_style = $validated['mentorship_style'];
