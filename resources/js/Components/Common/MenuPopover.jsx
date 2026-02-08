@@ -8,7 +8,7 @@
  */
 const MenuPopover = ({ addLabel, onAddClick, onEditClick }) => {
   const menuItems = [
-    { label: addLabel, onClick: onAddClick },
+    ...(addLabel ? [{ label: addLabel, onClick: onAddClick }] : []), // 修正
     { label: '編集する', onClick: onEditClick },
     { label: '編集履歴を見る', onClick: () => {} },
     { label: '削除依頼をする', onClick: () => {} },

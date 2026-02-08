@@ -4,9 +4,11 @@ import AppLayout from '@/Layouts/AppLayout';
 import StarRating from '@/Components/Lab/Star/StarRating';
 import Breadcrumb from '@/Components/Common/Breadcrumb';
 import CreateReviewModal from '@/Components/Review/CreateReviewModal';
+import EditReviewModal from '@/Components/Review/EditReviewModal';
 import MenuPopover from '@/Components/Common/MenuPopover';
 import KebabIcon from '@/Components/Common/KebabIcon';
 import EditLabModal from '@/Components/Lab/EditLabModal';
+import AlertModal from '@/Components/Common/AlertModal';
 import { formatRating } from '@/utils/formatRating';
 import {
   Chart as ChartJS,
@@ -51,7 +53,10 @@ const Show = ({
   const [showAllComments, setShowAllComments] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isLabEditModalOpen, setIsLabEditModalOpen] = useState(false);
+  const [isReviewEditModalOpen, setIsReviewEditModalOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const menuRef = useRef(null);
 
   // 外側クリックでメニューポップオーバーを閉じる
@@ -84,9 +89,9 @@ const Show = ({
    * メニューポップオーバーの「編集する」クリック時の処理
    * @returns {void}
    */
-  const handleEditClick = () => {
+  const handleLabEditClick = () => {
     setIsMenuOpen(false);
-    setIsEditModalOpen(true);
+    setIsLabEditModalOpen(true);
   };
 
   // ブックマーク状態とカウントをローカルstateで管理
@@ -266,7 +271,13 @@ const Show = ({
         {/* レビュー投稿状態 + ケバブメニュー 右寄せ */}
         <div className="flex items-center gap-2">
           {auth?.user && userReview ? (
-            <p className="text-[#747D8C]">レビューを投稿済みです。</p>
+            <button
+              type="button"
+              onClick={() => setIsReviewEditModalOpen(true)}
+              className="text-[#747D8C] hover:underline cursor-pointer"
+            >
+              レビューを投稿済みです。
+            </button>
           ) : (
             <p className="text-[#747D8C]">まだ、レビューを投稿していません。</p>
           )}
@@ -277,9 +288,8 @@ const Show = ({
             </button>
             {isMenuOpen && (
               <MenuPopover
-                addLabel="レビューを投稿する"
-                onAddClick={handleAddReviewClick}
-                onEditClick={handleEditClick}
+                {...(!userReview ? { addLabel: 'レビューを投稿する', onAddClick: handleAddReviewClick } : {})}
+                onEditClick={handleLabEditClick}
               />
             )}
           </div>
@@ -483,10 +493,49 @@ const Show = ({
         onClose={() => setIsCreateModalOpen(false)}
         lab={lab}
       />
+      {/* レビュー編集モーダル */}
+      <EditReviewModal
+        isOpen={isReviewEditModalOpen}
+        onClose={() => setIsReviewEditModalOpen(false)}
+        lab={lab}
+        review={userReview}
+        onDelete={() => {
+          setIsReviewEditModalOpen(false);
+          setIsDeleteAlertOpen(true);
+        }}
+      />
+
+      {/* レビュー削除確認モーダル */}
+      <AlertModal
+        isOpen={isDeleteAlertOpen}
+        onClose={() => {
+          setIsDeleteAlertOpen(false);
+          setIsReviewEditModalOpen(true);
+        }}
+        title="レビューの削除"
+        message="投稿済みのレビューを削除します。本当に削除しますか？"
+        actionLabel="削除する"
+        cancelLabel="キャンセル"
+        isProcessing={isDeleting}
+        onAction={() => {
+          setIsDeleting(true);
+          router.delete(route('review.destroy', userReview.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+              setIsDeleteAlertOpen(false);
+              setIsDeleting(false);
+            },
+            onError: () => {
+              setIsDeleting(false);
+            },
+          });
+        }}
+      />
+
       {/* 研究室編集モーダル */}
       <EditLabModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
+        isOpen={isLabEditModalOpen}
+        onClose={() => setIsLabEditModalOpen(false)}
         lab={lab}
       />
     </AppLayout>
