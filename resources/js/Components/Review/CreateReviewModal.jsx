@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../Common/Modal';
 import ReviewSubmitButton from './ReviewSubmitButton';
 import StarIcon from '@/Components/Lab/Star/StarIcon';
@@ -10,10 +10,11 @@ import StarIcon from '@/Components/Lab/Star/StarIcon';
  * @param {boolean} props.isOpen - モーダルの開閉状態
  * @param {Function} props.onClose - モーダルを閉じる
  * @param {Object} props.lab - 研究室オブジェクト
+ * @param {Object} props.review - レビューオブジェクト
  * @returns {JSX.Element} コンポーネントのJSX
  */
 
-const CreateReviewModal = ({ isOpen, onClose, lab }) => {
+const CreateReviewModal = ({ isOpen, onClose, lab, review }) => {
   return (
     <Modal
       isOpen={isOpen}
@@ -24,7 +25,7 @@ const CreateReviewModal = ({ isOpen, onClose, lab }) => {
       <div className="h-[300px] flex flex-col">
         {/* フォーム領域 */}
         <div className="flex-1 overflow-y-auto">
-          <CreateReviewForm onClose={onClose} lab={lab} />
+          <CreateReviewForm onClose={onClose} lab={lab} review={review} />
         </div>
       </div>
     </Modal>
@@ -36,9 +37,10 @@ const CreateReviewModal = ({ isOpen, onClose, lab }) => {
  * @param {Object} props
  * @param {Function} props.onClose - モーダルを閉じる
  * @param {Object} props.lab - 研究室オブジェクト
+ * @param {Object} props.review - レビューオブジェクト
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const CreateReviewForm = ({ onClose, lab }) => {
+const CreateReviewForm = ({ onClose, lab, review }) => {
   const { data, setData, post, processing, errors, reset } = useForm({
     mentorship_style: 0,
     lab_atmosphere: 0,
@@ -49,6 +51,19 @@ const CreateReviewForm = ({ onClose, lab }) => {
     student_balance: 0,
   });
 
+  useEffect(() => {
+    reset();
+    setData({
+      mentorship_style: 0,
+      lab_atmosphere: 0,
+      achievement_activity: 0,
+      constraint_level: 0,
+      facility_quality: 0,
+      work_style: 0,
+      student_balance: 0,
+    });
+  }, [review]);
+
   const handleRatingSelect = (field) => (value) => {
     setData(field, value);
   };
@@ -56,7 +71,10 @@ const CreateReviewForm = ({ onClose, lab }) => {
   const submit = e => {
     e.preventDefault();
     post(route('review.store', lab.id), {
-      onSuccess: () => onClose(),
+      onSuccess: () => {
+        reset();
+        onClose();
+      },
       preserveScroll: true,
     });
   };

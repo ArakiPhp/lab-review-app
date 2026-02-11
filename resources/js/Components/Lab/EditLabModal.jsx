@@ -1,4 +1,5 @@
 import { useForm } from '@inertiajs/react';
+import { useEffect } from 'react';
 import Modal from '../Common/Modal';
 import LabSubmitButton from './LabSubmitButton';
 import InputField from '../Common/InputField';
@@ -50,10 +51,28 @@ const EditLabForm = ({ onClose, lab }) => {
     version: lab?.version ?? 1,
   });
 
+  useEffect(() => {
+    reset();
+    setData({
+      name: lab?.name ?? '',
+      description: lab?.description ?? '',
+      url: lab?.url ?? '',
+      professor_name: lab?.professor_name ?? '',
+      professor_url: lab?.professor_url ?? '',
+      gender_ratio_male: lab?.gender_ratio_male ?? 5,
+      gender_ratio_female: lab?.gender_ratio_female ?? 5,
+      comment: '',
+      version: lab?.version ?? 1,
+    });
+  }, [lab]);
+
   const submit = e => {
     e.preventDefault();
     put(route('lab.update', lab.id), {
-      onSuccess: () => onClose(),
+      onSuccess: () => {
+        reset();
+        onClose();
+      },
       preserveScroll: true,
     });
   };

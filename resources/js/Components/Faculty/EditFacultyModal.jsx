@@ -1,4 +1,5 @@
 import { useForm } from '@inertiajs/react';
+import { useEffect } from 'react';
 import Modal from '../Common/Modal';
 import FacultySubmitButton from './FacultySubmitButton';
 import InputField from '../Common/InputField';
@@ -44,10 +45,22 @@ const EditFacultyForm = ({ onClose, faculty }) => {
     version: faculty?.version ?? 1,
   });
 
+  useEffect(() => {
+    reset();
+    setData({
+      name: faculty?.name ?? '',
+      comment: '',
+      version: faculty?.version ?? 1,
+    })
+  }, [faculty]);
+
   const submit = e => {
     e.preventDefault();
     put(route('faculty.update', faculty.id), {
-      onSuccess: () => onClose(),
+      onSuccess: () => {
+        reset();
+        onClose();
+      },
       preserveScroll: true,
     });
   };

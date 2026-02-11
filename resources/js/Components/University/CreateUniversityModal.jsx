@@ -37,7 +37,7 @@ const CreateUniversityModal = ({ isOpen, onClose }) => {
  * @returns {JSX.Element} コンポーネントのJSX
  */
 const CreateUniversityForm = ({ onClose }) => {
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const { data, setData, post, processing, errors } = useForm({
     name: '',
     type: 'national',
   });

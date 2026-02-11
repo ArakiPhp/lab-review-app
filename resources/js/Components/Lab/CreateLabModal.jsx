@@ -38,7 +38,7 @@ const CreateLabModal = ({ isOpen, onClose, faculty }) => {
  * @returns {JSX.Element} コンポーネントのJSX
  */
 const CreateLabForm = ({ onClose, faculty }) => {
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const { data, setData, post, processing, errors } = useForm({
     name: '',
     description: '',
     url: '',
