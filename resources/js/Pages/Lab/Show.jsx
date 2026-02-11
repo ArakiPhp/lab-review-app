@@ -301,13 +301,9 @@ const Show = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* 左側: レーダーチャート */}
             <div className="flex justify-center items-start">
-              {lab.reviews && lab.reviews.length > 0 ? (
-                <div className="w-full max-w-sm">
-                  <Radar data={chartData} options={chartOptions} />
-                </div>
-              ) : (
-                <p className="text-center text-[#747D8C]">まだレビューがありません</p>
-              )}
+              <div className="w-full max-w-sm">
+                <Radar data={chartData} options={chartOptions} />
+              </div>
             </div>
 
             {/* 右側: 総合評価と研究室概要 */}
