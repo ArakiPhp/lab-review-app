@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../Common/Modal';
 import ReviewSubmitButton from './ReviewSubmitButton';
 import StarIcon from '@/Components/Lab/Star/StarIcon';
@@ -11,13 +11,12 @@ import TrashIcon from '@/Assets/icons/trash.svg';
  * @param {Object} props
  * @param {boolean} props.isOpen - モーダルの開閉状態
  * @param {Function} props.onClose - モーダルを閉じる
- * @param {Object} props.lab - 研究室オブジェクト
  * @param {Object} props.review - 編集するレビューオブジェクト
  * @param {Function} props.onDelete - 削除ボタン押下時のコールバック
  * @returns {JSX.Element} コンポーネントのJSX
  */
 
-const EditReviewModal = ({ isOpen, onClose, lab, review, onDelete }) => {
+const EditReviewModal = ({ isOpen, onClose, review, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleClose = () => {
@@ -63,7 +62,7 @@ const EditReviewModal = ({ isOpen, onClose, lab, review, onDelete }) => {
       <div className="h-[300px] flex flex-col">
         {/* フォーム領域 */}
         <div className="flex-1 overflow-y-auto">
-          <EditReviewForm onClose={handleClose} lab={lab} review={review} isEditing={isEditing} />
+          <EditReviewForm onClose={handleClose} review={review} isEditing={isEditing} />
         </div>
       </div>
     </Modal>
@@ -74,11 +73,10 @@ const EditReviewModal = ({ isOpen, onClose, lab, review, onDelete }) => {
  * レビュー編集フォーム
  * @param {Object} props
  * @param {Function} props.onClose - モーダルを閉じる
- * @param {Object} props.lab - 研究室オブジェクト
  * @param {Object} props.review - 編集するレビューオブジェクト
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const EditReviewForm = ({ onClose, lab, review, isEditing }) => {
+const EditReviewForm = ({ onClose, review, isEditing }) => {
   const { data, setData, put, processing, errors, reset } = useForm({
     mentorship_style: review?.mentorship_style || 0,
     lab_atmosphere: review?.lab_atmosphere || 0,
@@ -89,6 +87,19 @@ const EditReviewForm = ({ onClose, lab, review, isEditing }) => {
     student_balance: review?.student_balance || 0,
   });
 
+  useEffect(() => {
+    reset();
+    setData({
+      mentorship_style: review?.mentorship_style || 0,
+      lab_atmosphere: review?.lab_atmosphere || 0,
+      achievement_activity: review?.achievement_activity || 0,
+      constraint_level: review?.constraint_level || 0,
+      facility_quality: review?.facility_quality || 0,
+      work_style: review?.work_style || 0,
+      student_balance: review?.student_balance || 0,
+    });
+  }, [review]);
+
   const handleRatingSelect = (field) => (value) => {
     setData(field, value);
   };
@@ -96,7 +107,10 @@ const EditReviewForm = ({ onClose, lab, review, isEditing }) => {
   const submit = e => {
     e.preventDefault();
     put(route('review.update', review.id), {
-      onSuccess: () => onClose(),
+      onSuccess: () => {
+        reset();
+        onClose();
+      },
       preserveScroll: true,
     });
   };

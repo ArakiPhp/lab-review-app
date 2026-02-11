@@ -493,7 +493,6 @@ const Show = ({
       <EditReviewModal
         isOpen={isReviewEditModalOpen}
         onClose={() => setIsReviewEditModalOpen(false)}
-        lab={lab}
         review={userReview}
         onDelete={() => {
           setIsReviewEditModalOpen(false);
