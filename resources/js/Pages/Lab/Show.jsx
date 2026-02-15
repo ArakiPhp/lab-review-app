@@ -9,6 +9,7 @@ import MenuPopover from '@/Components/Common/MenuPopover';
 import KebabIcon from '@/Components/Common/KebabIcon';
 import EditLabModal from '@/Components/Lab/EditLabModal';
 import AlertModal from '@/Components/Common/AlertModal';
+import CommentListModal from '@/Components/Comment/CommentListModal';
 import { formatRating } from '@/utils/formatRating';
 import {
   Chart as ChartJS,
@@ -50,7 +51,7 @@ const Show = ({
   bookmarkCount,
   query,
 }) => {
-  const [showAllComments, setShowAllComments] = useState(false);
+  const [isCommentListModalOpen, setIsCommentListModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isLabEditModalOpen, setIsLabEditModalOpen] = useState(false);
@@ -424,31 +425,14 @@ const Show = ({
                       </p>
                     </div>
 
-                    {/* 2件以上の場合、もっと見るボタンまたは残りのコメントを表示 */}
+                    {/* 2件以上の場合、もっと見るボタンを表示 */}
                     {comments.length > 1 && (
-                      <>
-                        {showAllComments ? (
-                          // 残りのコメントを表示
-                          comments.slice(1).map(comment => (
-                            <div key={comment.id} className="border-b border-gray-200 pb-3">
-                              <h3 className="text-sm font-medium text-black">
-                                {comment.user?.name || '匿名'}
-                              </h3>
-                              <p className="text-sm text-[#747D8C] mt-1 whitespace-pre-wrap">
-                                {comment.content}
-                              </p>
-                            </div>
-                          ))
-                        ) : (
-                          // もっと見るボタン
-                          <button
-                            onClick={() => setShowAllComments(true)}
-                            className="text-sm text-[#747D8C] hover:text-black hover:underline"
-                          >
-                            もっと見る...
-                          </button>
-                        )}
-                      </>
+                      <button
+                        onClick={() => setIsCommentListModalOpen(true)}
+                        className="text-sm text-[#747D8C] hover:text-black hover:underline"
+                      >
+                        もっと見る...
+                      </button>
                     )}
                   </div>
                 ) : (
@@ -532,6 +516,14 @@ const Show = ({
         isOpen={isLabEditModalOpen}
         onClose={() => setIsLabEditModalOpen(false)}
         lab={lab}
+      />
+
+      {/* コメント一覧表示モーダル */}
+      <CommentListModal
+        isOpen={isCommentListModalOpen}
+        onClose={() => setIsCommentListModalOpen(false)}
+        labId={lab.id}
+        totalCount={comments?.length || 0}
       />
     </AppLayout>
   );

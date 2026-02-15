@@ -41,9 +41,9 @@ class CommentSeeder extends Seeder
             '英語力はどの程度求められますか？',
         ];
 
-        // 各研究室に対して1〜5件のコメントを生成
+        // 各研究室に対して1〜50件のコメントを生成
         foreach ($labs as $lab) {
-            $commentCount = rand(1, 5);
+            $commentCount = rand(1, 50);
             $selectedUsers = $users->random(min($commentCount, $users->count()));
 
             foreach ($selectedUsers as $user) {
