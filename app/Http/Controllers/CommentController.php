@@ -14,16 +14,7 @@ class CommentController extends Controller
 {
     use AuthorizesRequests;
 
-    public function create(Lab $lab)
-    {
-        // ポリシーで認可をチェック
-        $this->authorize('create', Comment::class);
-        return Inertia::render('Comment/Create', [
-            'lab' => $lab,
-        ]);
-    }
-
-    public function store(Request $request, Lab $lab)
+    public function store(Request $request, Lab $lab): JsonResponse
     {
         // ポリシーで認可をチェック
         $this->authorize('create', Comment::class);
@@ -40,7 +31,7 @@ class CommentController extends Controller
         $comment->content = $validated['content'];
         $comment->save();
 
-        return redirect()->route('labs.show', ['lab' => $lab])->with('success', 'コメントが保存されました。');
+        return response()->json($comment->load('user'), 201);
     }
 
     // 追加するメソッド
