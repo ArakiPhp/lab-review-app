@@ -31,7 +31,7 @@ Route::get('/auth', function () {
 // ホームページ
 Route::get('/', [HomeController::class, 'home'])->name('home');
 
-// 追加: ソーシャルログイン
+// ソーシャルログイン
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
@@ -42,6 +42,7 @@ Route::get('/universities/{university}/faculties', [FacultyController::class, 'i
 Route::get('/universities/{university}/history', [UniversityController::class, 'history'])->name('university.history');
 Route::get('/faculties/{faculty}/history', [FacultyController::class, 'history'])->name('faculty.history');
 Route::get('/labs/{lab}/history', [LabController::class, 'history'])->name('lab.history');
+Route::get('/labs/{lab}/comments', [CommentController::class, 'index'])->name('comment.index');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -96,11 +97,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/mypage/bookmarks', [MyPageController::class, 'showBookmarks'])->name('mypage.bookmarks');
     Route::delete('/mypage/bookmarks/{bookmark}', [MyPageController::class, 'removeBookmark'])->name('mypage.bookmark.remove');
 
-    // 追加: 削除依頼関連
+    // 削除依頼関連
     Route::get('/deletion-requests/create/{type}/{id}', [DeletionRequestController::class, 'create'])->name('deletion_requests.create');
     Route::post('/deletion-requests', [DeletionRequestController::class, 'store'])->name('deletion_requests.store');
 
-    // 追加: 通知関連
+    // 通知関連
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
     // 管理者用ルート
@@ -109,7 +110,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/faculties/{faculty}', [AdminController::class, 'destroyFaculty'])->name('faculties.destroy');
         Route::delete('/labs/{lab}', [AdminController::class, 'destroyLab'])->name('labs.destroy');
         Route::delete('/comments/{comment}', [AdminController::class, 'destroyComment'])->name('comments.destroy');
-        Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('deletion_requests.index'); // 追加
+        Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('deletion_requests.index');
     });
 });
 
