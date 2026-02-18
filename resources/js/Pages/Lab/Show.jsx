@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Head, router } from '@inertiajs/react';
+import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout';
 import StarRating from '@/Components/Lab/Star/StarRating';
 import Breadcrumb from '@/Components/Common/Breadcrumb';
@@ -58,6 +59,9 @@ const Show = ({
   const [isReviewEditModalOpen, setIsReviewEditModalOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCommentDeleteAlertOpen, setIsCommentDeleteAlertOpen] = useState(false);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
+  const [deletingComment, setDeletingComment] = useState(null);
   const menuRef = useRef(null);
 
   // 外側クリックでメニューポップオーバーを閉じる
@@ -524,6 +528,38 @@ const Show = ({
         onClose={() => setIsCommentListModalOpen(false)}
         labId={lab.id}
         totalCount={comments?.length || 0}
+        onDelete={(comment) => {
+          setDeletingComment(comment);
+          setIsCommentListModalOpen(false);
+          setIsCommentDeleteAlertOpen(true);
+        }}
+      />
+
+      {/* コメント削除確認モーダル */}
+      <AlertModal
+        isOpen={isCommentDeleteAlertOpen}
+        onClose={() => {
+          setIsCommentDeleteAlertOpen(false);
+          setIsCommentListModalOpen(true);
+        }}
+        title="コメントの削除"
+        message="このコメントを削除します。本当に削除しますか？"
+        actionLabel="削除する"
+        cancelLabel="キャンセル"
+        isProcessing={isDeletingComment}
+        onAction={async () => {
+          setIsDeletingComment(true);
+          try {
+            await axios.delete(route('comment.destroy', deletingComment.id));
+            setIsCommentDeleteAlertOpen(false);
+            setDeletingComment(null);
+            setIsCommentListModalOpen(true);
+          } catch (error) {
+            console.error('コメントの削除に失敗しました', error);
+          } finally {
+            setIsDeletingComment(false);
+          }
+        }}
       />
     </AppLayout>
   );

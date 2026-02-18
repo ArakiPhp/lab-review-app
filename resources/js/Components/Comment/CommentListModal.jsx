@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { usePage } from '@inertiajs/react';
 import Modal from '@/Components/Common/Modal';
+import EditIcon from '@/Assets/icons/edit.svg';
+import TrashIcon from '@/Assets/icons/trash.svg';
 
 /**
  * コメント一覧モーダルコンポーネント
@@ -12,8 +14,9 @@ import Modal from '@/Components/Common/Modal';
  * @param {number} props.labId - 研究室ID
  * @param {number} props.totalCount - コメント総数
  * @param {Function} props.onCommentPosted - コメント投稿後のコールバック
+ * @param {Function} props.onDelete - 削除アイコン押下時のコールバック（コメントオブジェクトを引数に受け取る）
  */
-const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPosted }) => {
+const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPosted, onDelete }) => {
   const { auth } = usePage().props;
   const [comments, setComments] = useState([]);
   const [hasMore, setHasMore] = useState(false);
@@ -22,15 +25,20 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [validationError, setValidationError] = useState('');
+  const [createValidationError, setCreateValidationError] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editContent, setEditContent] = useState('');
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+  const [editValidationError, setEditValidationError] = useState('');
   const textareaRef = useRef(null);
+  const editTextareaRef = useRef(null);
 
   /**
    * テキストエリアの高さを内容に応じて自動調整する
    */
-  const adjustTextareaHeight = () => {
-    const textarea = textareaRef.current;
+  const adjustTextareaHeight = (ref = textareaRef) => {
+    const textarea = ref.current;
     if (textarea) {
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
@@ -64,6 +72,14 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
     }
   }, [labId]);
 
+  // 編集テキストエリアが表示されたとき高さを自動調整する
+  useEffect(() => {
+    if (editingCommentId !== null && editTextareaRef.current) {
+      adjustTextareaHeight(editTextareaRef);
+      editTextareaRef.current.focus();
+    }
+  }, [editingCommentId]);
+
   // モーダルが開かれたときにコメントを初期取得する
   useEffect(() => {
     if (isOpen) {
@@ -73,7 +89,10 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
       setIsInitialLoad(true);
       setIsFocused(false);
       setNewComment('');
-      setValidationError('');
+      setCreateValidationError('');
+      setEditingCommentId(null);
+      setEditContent('');
+      setEditValidationError('');
       fetchComments();
     }
   }, [isOpen, fetchComments]);
@@ -90,11 +109,11 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
   /**
    * コメント投稿処理
    */
-  const handleSubmit = async () => {
+  const handleCreateSubmit = async () => {
     if (!newComment.trim()) return;
 
     setIsSubmitting(true);
-    setValidationError('');
+    setCreateValidationError('');
     try {
       await axios.post(route('comment.store', labId), {
         content: newComment,
@@ -110,10 +129,10 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
     } catch (error) {
       if (error.response?.status === 422) {
         const errors = error.response.data.errors;
-        setValidationError(errors?.content?.[0] || 'バリデーションエラーが発生しました。');
+        setCreateValidationError(errors?.content?.[0] || 'バリデーションエラーが発生しました。');
       } else {
         console.error('コメントの投稿に失敗しました', error);
-        setValidationError('コメントの投稿に失敗しました。');
+        setCreateValidationError('コメントの投稿に失敗しました。');
       }
     } finally {
       setIsSubmitting(false);
@@ -125,8 +144,59 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
    */
   const handleCancel = () => {
     setNewComment('');
-    setValidationError('');
+    setCreateValidationError('');
     setIsFocused(false);
+  };
+
+  /**
+   * 編集モードを開始する
+   * @param {Object} comment - 編集対象のコメント
+   */
+  const handleEditStart = (comment) => {
+    setEditingCommentId(comment.id);
+    setEditContent(comment.content);
+    setEditValidationError('');
+  };
+
+  /**
+   * 編集キャンセル処理
+   */
+  const handleEditCancel = () => {
+    setEditingCommentId(null);
+    setEditContent('');
+    setEditValidationError('');
+  };
+
+  /**
+   * 編集送信処理
+   */
+  const handleEditSubmit = async () => {
+    if (!editContent.trim()) return;
+
+    setIsEditSubmitting(true);
+    setEditValidationError('');
+    try {
+      await axios.put(route('comment.update', editingCommentId), {
+        content: editContent,
+      });
+      setEditingCommentId(null);
+      setEditContent('');
+      // コメント一覧を再取得
+      setComments([]);
+      setNextCursor(null);
+      setHasMore(false);
+      fetchComments();
+    } catch (error) {
+      if (error.response?.status === 422) {
+        const errors = error.response.data.errors;
+        setEditValidationError(errors?.content?.[0] || 'バリデーションエラーが発生しました。');
+      } else {
+        console.error('コメントの編集に失敗しました', error);
+        setEditValidationError('コメントの編集に失敗しました。');
+      }
+    } finally {
+      setIsEditSubmitting(false);
+    }
   };
 
   return (
@@ -140,7 +210,7 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
               value={newComment}
               onChange={(e) => {
                 setNewComment(e.target.value);
-                setValidationError('');
+                setCreateValidationError('');
                 adjustTextareaHeight();
               }}
               onFocus={() => setIsFocused(true)}
@@ -150,7 +220,7 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
               disabled={isSubmitting}
               className="w-full border-0 border-b border-gray-200 bg-[#EEF7FB] px-3 py-2 text-sm resize-none overflow-hidden focus:border-blue-500 focus:outline-none focus:ring-0 disabled:bg-gray-100"
             />
-            <ErrorSlot message={validationError} />
+            <ErrorSlot message={createValidationError} />
             {isFocused && (
               <div className="mt-2 flex justify-end">
                 <div className="flex gap-2">
@@ -162,7 +232,7 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
                     キャンセル
                   </button>
                   <button
-                    onClick={handleSubmit}
+                    onClick={handleCreateSubmit}
                     disabled={isSubmitting || !newComment.trim()}
                     className="rounded-md bg-[#33E1ED] px-3 py-1.5 text-sm text-white disabled:opacity-50"
                   >
@@ -180,12 +250,68 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
           <div className="space-y-3">
             {comments.map(comment => (
               <div key={comment.id} className="border-b border-gray-200 pb-3">
-                <h3 className="text-sm font-medium text-black">
-                  {comment.user?.name || '匿名'}
-                </h3>
-                <p className="text-sm text-[#747D8C] mt-1 whitespace-pre-wrap">
-                  {comment.content}
-                </p>
+                {editingCommentId === comment.id ? (
+                  /* 編集モード */
+                  <div>
+                    <h3 className="text-sm font-medium text-black mb-1">
+                      {comment.user?.name || '匿名'}
+                    </h3>
+                    <textarea
+                      ref={editTextareaRef}
+                      value={editContent}
+                      onChange={(e) => {
+                        setEditContent(e.target.value);
+                        setEditValidationError('');
+                        adjustTextareaHeight(editTextareaRef);
+                      }}
+                      rows={1}
+                      maxLength={1000}
+                      disabled={isEditSubmitting}
+                      className="w-full border-0 border-b border-gray-200 bg-[#EEF7FB] px-3 py-2 text-sm resize-none overflow-hidden focus:border-blue-500 focus:outline-none focus:ring-0 disabled:bg-gray-100"
+                    />
+                    <ErrorSlot message={editValidationError} />
+                    <div className="mt-2 flex justify-end">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleEditCancel}
+                          disabled={isEditSubmitting}
+                          className="rounded-md bg-transparent px-3 py-1.5 text-sm text-[#747D8C] disabled:opacity-50"
+                        >
+                          キャンセル
+                        </button>
+                        <button
+                          onClick={handleEditSubmit}
+                          disabled={isEditSubmitting || !editContent.trim()}
+                          className="rounded-md bg-[#33E1ED] px-3 py-1.5 text-sm text-white disabled:opacity-50"
+                        >
+                          {isEditSubmitting ? '編集中...' : '編集する'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* 通常表示モード */
+                  <>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium text-black">
+                        {comment.user?.name || '匿名'}
+                      </h3>
+                      {auth?.user?.id === comment.user_id && (
+                        <div className="flex items-center gap-2">
+                          <button type="button" className="p-1 hover:opacity-70" onClick={() => handleEditStart(comment)}>
+                            <img src={EditIcon} alt="編集" className="w-4 h-4" />
+                          </button>
+                          <button type="button" className="p-1 hover:opacity-70" onClick={() => onDelete?.(comment)}>
+                            <img src={TrashIcon} alt="削除" className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-sm text-[#747D8C] mt-1 whitespace-pre-wrap">
+                      {comment.content}
+                    </p>
+                  </>
+                )}
               </div>
             ))}
             {hasMore && (

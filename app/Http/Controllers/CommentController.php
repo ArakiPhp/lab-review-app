@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
-use Inertia\Inertia;
 
 class CommentController extends Controller
 {
@@ -34,17 +33,7 @@ class CommentController extends Controller
         return response()->json($comment->load('user'), 201);
     }
 
-    // 追加するメソッド
-    public function edit(Comment $comment)
-    {
-        // ポリシーで認可をチェック
-        $this->authorize('update', $comment);
-        return Inertia::render('Comment/Edit', [
-            'comment' => $comment,
-        ]);
-    }
-
-    public function update(Request $request, Comment $comment)
+    public function update(Request $request, Comment $comment): JsonResponse
     {
         // ポリシーで認可をチェック
         $this->authorize('update', $comment);
@@ -58,10 +47,10 @@ class CommentController extends Controller
         $comment->content = $validated['content'];
         $comment->save();
 
-        return redirect()->route('labs.show', ['lab' => $comment->lab])->with('success', 'コメントが更新されました。');
+        return response()->json($comment->load('user'));
     }
 
-    public function destroy(Comment $comment)
+    public function destroy(Comment $comment): JsonResponse
     {
         // ポリシーで認可をチェック
         $this->authorize('delete', $comment);
@@ -69,7 +58,7 @@ class CommentController extends Controller
         // コメントを削除
         $comment->delete();
 
-        return redirect()->route('labs.show', ['lab' => $comment->lab])->with('success', 'コメントが削除されました。');
+        return response()->json(['message' => 'コメントが削除されました。']);
     }
 
     public function index(Lab $lab, Request $request): JsonResponse
