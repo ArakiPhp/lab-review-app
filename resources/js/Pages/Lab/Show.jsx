@@ -429,18 +429,21 @@ const Show = ({
                       </p>
                     </div>
 
-                    {/* 2件以上の場合、もっと見るボタンを表示 */}
-                    {comments.length > 1 && (
-                      <button
-                        onClick={() => setIsCommentListModalOpen(true)}
-                        className="text-sm text-[#747D8C] hover:text-black hover:underline"
-                      >
-                        もっと見る...
-                      </button>
-                    )}
+                    {/* コメント一覧モーダルを開くボタン */}
+                    <button
+                      onClick={() => setIsCommentListModalOpen(true)}
+                      className="text-sm text-[#747D8C] hover:text-black hover:underline"
+                    >
+                      {comments.length > 1 ? 'もっと見る...' : 'コメント一覧を開く'}
+                    </button>
                   </div>
                 ) : (
-                  <p className="text-sm text-[#747D8C] ml-4">まだコメントがありません</p>
+                  <button
+                    onClick={() => setIsCommentListModalOpen(true)}
+                    className="text-sm text-[#747D8C] hover:text-black hover:underline"
+                  >
+                    まだコメントがありません
+                  </button>
                 )}
               </div>
 
