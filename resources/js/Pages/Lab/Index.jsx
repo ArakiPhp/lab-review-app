@@ -76,6 +76,15 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
   }
 
   /**
+   * メニューポップオーバーの「編集履歴を見る」クリック時の処理
+   * @returns {void}
+   */
+  const handleViewHistoryClick = () => {
+    setIsMenuOpen(false);
+    router.get(route('faculty.history', { faculty: faculty.id }), { query });
+  }
+
+  /**
    * ソート条件変更時のハンドラ
    * @param {Event} e - イベントオブジェクト
    */
@@ -122,7 +131,7 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
               >
                 <KebabIcon />
               </button>
-              {isMenuOpen && <MenuPopover addLabel="研究室を追加する" onAddClick={handleAddLabClick} onEditClick={handleEditClick} />}
+              {isMenuOpen && <MenuPopover addLabel="研究室を追加する" onAddClick={handleAddLabClick} onEditClick={handleEditClick} onViewHistoryClick={handleViewHistoryClick} />}
             </div>
           </div>
         </div>

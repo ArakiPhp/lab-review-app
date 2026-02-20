@@ -122,6 +122,8 @@ class FacultyController extends Controller
 
     public function history(Faculty $faculty)
     {
+        $query = request('query', '');
+
         $editHistory = $faculty->users()
             ->withPivot('comment', 'created_at', 'updated_at')
             ->get()
@@ -139,6 +141,7 @@ class FacultyController extends Controller
         return Inertia::render('Faculty/History', [
             'faculty' => $faculty,
             'editHistory' => $editHistory,
+            'query' => $query,
         ]);
     }
 }
