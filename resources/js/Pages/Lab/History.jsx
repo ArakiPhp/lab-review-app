@@ -1,54 +1,50 @@
-import React from "react";
-import { Head, Link, usePage } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
+import { Head, router } from "@inertiajs/react";
 
-export default function History() {
-    const { lab, editHistory } = usePage().props;
-
-    return (
-        <>
-            <Head title={`${lab.name} - 編集履歴`} />
-
-            <div>
-                <h1>{lab.name} - 編集履歴</h1>
-                <p>
-                    {lab.faculty?.university?.name} / {lab.faculty?.name}
-                </p>
-
-                {/* 編集履歴一覧 */}
-                <div>
-                    {editHistory.length > 0 ? (
-                        <div>
-                            {editHistory.map((history, index) => (
-                                <div key={index}>
-                                    <h3>編集 #{editHistory.length - index}</h3>
-                                    <p>
-                                        <strong>編集者:</strong> {history.user}
-                                    </p>
-                                    <p>
-                                        <strong>編集日時:</strong>{" "}
-                                        {new Date(
-                                            history.updated_at
-                                        ).toLocaleString("ja-JP")}
-                                    </p>
-                                    <p>
-                                        <strong>編集理由:</strong>{" "}
-                                        {history.comment || "作成しました。"}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p>編集履歴がありません。</p>
-                    )}
+/**
+ * 研究室編集履歴表示コンポーネント
+ * @param {Object} props - コンポーネントのprops
+ * @param {Object} props.lab - 研究室オブジェクト
+ * @param {Array} props.editHistory - 編集履歴の配列
+ * @param {string} props.query - 検索クエリ文字列
+ * @returns {JSX.Element} コンポーネントのJSX
+ */
+const History = ({ lab, editHistory, query = '' }) => {
+  return(
+    <AppLayout title={`${lab.name}の編集履歴`}>
+      <Head title={`${lab.name}の編集履歴`} />
+      <div className="flex flex-col items-center min-h-full">
+        <div className="w-full max-w-3xl">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => router.get(route('labs.show', { lab: lab.id }), { query })}
+              className="px-4 py-2 text-sm rounded-lg"
+              style={{ backgroundColor: '#8D9DB3 ', color: '#FFFFFF', fontWeight: 'bold' }}
+            >
+              ＜ 研究室に戻る
+            </button>
+          </div>
+          {editHistory.length > 0 ? (
+            <div className="divide-y divide-gray-200 border-t border-b border-gray-200">
+              {editHistory.map((history, index) => (
+                <div key={index} className="py-4 flex gap-6">
+                  <div className="flex-shrink-0">
+                    <p className="text-[#747D8C]">{new Date(history.updated_at).toLocaleString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</p>
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-[#747D8C]">{history.user || "退会したユーザーです"}</p>
+                    <p className="text-[#747D8C]">{history.comment || "作成しました。"}</p>
+                  </div>
                 </div>
-
-                {/* 戻るリンク */}
-                <div>
-                    <Link href={route("labs.show", lab.id)}>
-                        <button>研究室詳細に戻る</button>
-                    </Link>
-                </div>
+              ))}
             </div>
-        </>
-    );
+          ) : (
+            <p className="text-[#747D8C]">編集履歴がありません。</p>
+          )}
+        </div>
+      </div>
+    </AppLayout>
+  )
 }
+
+export default History;
