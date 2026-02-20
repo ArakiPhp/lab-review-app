@@ -39,7 +39,7 @@ const History = ({ university, editHistory, query = '' }) => {
               ))}
             </div>
           ) : (
-            <p>編集履歴がありません。</p>
+            <p className="text-[#747D8C]">編集履歴がありません。</p>
           )}
         </div>
       </div>
