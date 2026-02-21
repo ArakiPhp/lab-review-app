@@ -21,7 +21,7 @@ const History = ({ faculty, editHistory, query = '' }) => {
               className="px-4 py-2 text-sm rounded-lg"
               style={{ backgroundColor: '#8D9DB3 ', color: '#FFFFFF', fontWeight: 'bold' }}
             >
-              ＜ 大学に戻る
+              ＜ 学部に戻る
             </button>
           </div>
           {editHistory.length > 0 ? (
