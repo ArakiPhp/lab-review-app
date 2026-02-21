@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { useState, useEffect, useRef } from "react";
 import AppLayout from '@/Layouts/AppLayout';
 import FacultyCard from '../../Components/Faculty/FacultyCard';
@@ -51,6 +51,15 @@ const Index = ({ faculties, university, query = '' }) => {
     setIsEditModalOpen(true);
   }
 
+  /**
+   * メニューポップオーバーの「編集履歴を見る」クリック時の処理
+   * @returns {void}
+   */
+  const handleViewHistoryClick = () => {
+    setIsMenuOpen(false);
+    router.get(route('university.history', { university: university.id }), { query });
+  }
+
   return (
     <AppLayout title={`${university.name}の学部一覧`}>
       <Head title={`${university.name}の学部一覧`} />
@@ -72,7 +81,7 @@ const Index = ({ faculties, university, query = '' }) => {
               >
                 <KebabIcon />
               </button>
-              {isMenuOpen && <MenuPopover addLabel="学部を追加する" onAddClick={handleAddFacultyClick} onEditClick={handleEditClick} />}
+              {isMenuOpen && <MenuPopover addLabel="学部を追加する" onAddClick={handleAddFacultyClick} onEditClick={handleEditClick} onViewHistoryClick={handleViewHistoryClick} />}
             </div>
           </div>
         </div>

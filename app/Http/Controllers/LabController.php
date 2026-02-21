@@ -320,6 +320,8 @@ class LabController extends Controller
 
     public function history(Lab $lab)
     {
+        $query = request('query', '');
+
         $editHistory = $lab->users()
             ->withPivot('comment', 'created_at', 'updated_at')
             ->get()
@@ -337,6 +339,7 @@ class LabController extends Controller
         return Inertia::render('Lab/History', [
             'lab' => $lab,
             'editHistory' => $editHistory,
+            'query' => $query,
         ]);
     }
 }
