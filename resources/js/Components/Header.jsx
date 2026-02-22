@@ -7,6 +7,7 @@ import { Link } from '@inertiajs/react';
  * @param {Object} props - コンポーネントのprops
  * @param {string} props.title - ページタイトル
  * @param {Function} props.onOpenSidebar - サイドバーを開くためのコールバック関数
+ * @param {React.ReactNode} [props.headerRight] - ヘッダー右側に表示する追加コンテンツ
  * @returns {JSX.Element} コンポーネントのJSX
  */
 const Header = ({ title, onOpenSidebar, headerRight }) => {
