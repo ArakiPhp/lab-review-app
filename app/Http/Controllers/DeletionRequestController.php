@@ -10,51 +10,50 @@ use App\Models\User;
 use App\Notifications\DeletionRequestNotification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class DeletionRequestController extends Controller
 {
-    // 一般ユーザーが削除依頼を作成するためのフォーム表示
-    public function create(string $type, int $id)
+    public function create(string $type, int $id): Response
     {
+        $query = request('query', '');
+
         $model = match ($type) {
             'university' => University::find($id),
             'faculty' => Faculty::find($id),
             'lab' => Lab::find($id),
-            default => null,
         };
 
-        if (!$model) {
-            return redirect()->back()->withErrors(['target' => '対象が見つかりませんでした。']);
-        }
+        $backUrl = match ($type) {
+            'university' => route('faculties.index', ['university' => $model->id]),
+            'faculty' => route('labs.index', ['faculty' => $model->id]),
+            'lab' => route('labs.show', ['lab' => $model->id]),
+        };
 
         return Inertia::render('DeletionRequest/Create', [
             'target' => [
                 'id' => $model->id,
                 'name' => $model->name,
                 'type' => $type,
-            ]
+            ],
+            'backUrl' => $backUrl,
+            'query' => $query,
         ]);
     }
 
-    // 削除依頼の保存
-    public function store(Request $request)
+    public function store(Request $request): Response
     {
         $validated = $request->validate([
             'target_id' => 'required|integer',
             'target_type' => 'required|string|in:university,faculty,lab',
-            'reason' => 'nullable|string|max:1000',
+            'reason' => 'required|string|max:1000',
         ]);
 
         $model = match ($validated['target_type']) {
             'university' => University::class,
             'faculty' => Faculty::class,
             'lab' => Lab::class,
-            default => null,
         };
-
-        if (!$model || !$model::find($validated['target_id'])) {
-            return redirect()->back()->withErrors(['target_id' => '無効な対象IDです。']);
-        }
 
         $deletionRequests = new DeletionRequest();
         $deletionRequests->requested_by = $request->user()->id;
@@ -75,7 +74,7 @@ class DeletionRequestController extends Controller
             ));
         }
 
-        return redirect()->route('mypage.index')->with('success', '削除依頼が送信されました。');
+        return Inertia::render('DeletionRequest/Complete');
     }
 
     // 管理者に削除依頼を表示

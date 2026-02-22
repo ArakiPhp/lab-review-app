@@ -60,6 +60,15 @@ const Index = ({ faculties, university, query = '' }) => {
     router.get(route('university.history', { university: university.id }), { query });
   }
 
+  /**
+   * メニューポップオーバーの「削除依頼をする」クリック時の処理
+   * @returns {void}
+   */
+  const handleDeletionRequestClick = () => {
+    setIsMenuOpen(false);
+    router.get(route('deletion_requests.create', { type: 'university', id: university.id }), { query });
+  }
+
   return (
     <AppLayout title={`${university.name}の学部一覧`}>
       <Head title={`${university.name}の学部一覧`} />
@@ -81,7 +90,7 @@ const Index = ({ faculties, university, query = '' }) => {
               >
                 <KebabIcon />
               </button>
-              {isMenuOpen && <MenuPopover addLabel="学部を追加する" onAddClick={handleAddFacultyClick} onEditClick={handleEditClick} onViewHistoryClick={handleViewHistoryClick} />}
+              {isMenuOpen && <MenuPopover addLabel="学部を追加する" onAddClick={handleAddFacultyClick} onEditClick={handleEditClick} onViewHistoryClick={handleViewHistoryClick} onDeletionRequestClick={handleDeletionRequestClick} />}
             </div>
           </div>
         </div>
