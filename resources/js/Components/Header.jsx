@@ -9,7 +9,7 @@ import { Link } from '@inertiajs/react';
  * @param {Function} props.onOpenSidebar - サイドバーを開くためのコールバック関数
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const Header = ({ title, onOpenSidebar }) => {
+const Header = ({ title, onOpenSidebar, headerRight }) => {
   return (
     <header
       className="
@@ -41,8 +41,11 @@ const Header = ({ title, onOpenSidebar }) => {
         {title}
       </h1>
 
-      {/* 右：ハンバーガーアイコンメニュー */}
-      <HamburgerMenu onOpenSidebar={onOpenSidebar} />
+      {/* 右：追加コンテンツ＋ハンバーガーアイコンメニュー */}
+      <div className="flex items-center gap-4">
+        {headerRight}
+        <HamburgerMenu onOpenSidebar={onOpenSidebar} />
+      </div>
     </header>
   );
 };
