@@ -85,6 +85,15 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
   }
 
   /**
+   * メニューポップオーバーの「削除依頼をする」クリック時の処理
+   * @returns {void}
+   */
+  const handleDeletionRequestClick = () => {
+    setIsMenuOpen(false);
+    router.get(route('deletion_requests.create', { type: 'faculty', id: faculty.id }), { query });
+  }
+
+  /**
    * ソート条件変更時のハンドラ
    * @param {Event} e - イベントオブジェクト
    */
@@ -131,7 +140,7 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
               >
                 <KebabIcon />
               </button>
-              {isMenuOpen && <MenuPopover addLabel="研究室を追加する" onAddClick={handleAddLabClick} onEditClick={handleEditClick} onViewHistoryClick={handleViewHistoryClick} />}
+              {isMenuOpen && <MenuPopover addLabel="研究室を追加する" onAddClick={handleAddLabClick} onEditClick={handleEditClick} onViewHistoryClick={handleViewHistoryClick} onDeletionRequestClick={handleDeletionRequestClick} />}
             </div>
           </div>
         </div>

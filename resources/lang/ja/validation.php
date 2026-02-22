@@ -53,6 +53,12 @@ return [
             'url' => '教授のURLは有効なURL形式で入力してください。',
         ],
 
+        // 削除依頼関連
+        'reason' => [
+            'required' => '削除理由は必須項目です。',
+            'max' => '削除理由は1000文字以下にしてください。',
+        ],
+
         // レビュー関連
         'mentorship_style' => [
             'required' => '指導スタイルは必須です',
@@ -103,6 +109,7 @@ return [
         'professor_name' => '教授名',
         'url' => 'URL',
         'professor_url' => '教授のURL',
+        'reason' => '削除理由',
         'mentorship_style' => '指導スタイル',
         'lab_atmosphere' => '雰囲気・文化',
         'achievement_activity' => '成果・活動',

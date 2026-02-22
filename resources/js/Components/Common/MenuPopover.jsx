@@ -5,14 +5,15 @@
  * @param {Function} props.onAddClick - 「〇〇を追加する」クリック時のハンドラ
  * @param {Function} props.onEditClick - 「編集する」クリック時のハンドラ
  * @param {Function} props.onViewHistoryClick - 「編集履歴を見る」クリック時のハンドラ
+ * @param {Function} props.onDeletionRequestClick - 「削除依頼をする」クリック時のハンドラ
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const MenuPopover = ({ addLabel, onAddClick, onEditClick, onViewHistoryClick }) => {
+const MenuPopover = ({ addLabel, onAddClick, onEditClick, onViewHistoryClick, onDeletionRequestClick }) => {
   const menuItems = [
     ...(addLabel ? [{ label: addLabel, onClick: onAddClick }] : []),
     { label: '編集する', onClick: onEditClick },
     { label: '編集履歴を見る', onClick: onViewHistoryClick },
-    { label: '削除依頼をする', onClick: () => {} },
+    { label: '削除依頼をする', onClick: onDeletionRequestClick },
   ];
 
   return (

@@ -108,6 +108,15 @@ const Show = ({
     router.get(route('lab.history', { lab: lab.id }), { query });
   }
 
+  /**
+   * メニューポップオーバーの「削除依頼をする」クリック時の処理
+   * @returns {void}
+   */
+  const handleDeletionRequestClick = () => {
+    setIsMenuOpen(false);
+    router.get(route('deletion_requests.create', { type: 'lab', id: lab.id }), { query });
+  };
+
   // ブックマーク状態とカウントをローカルstateで管理
   const [isBookmarked, setIsBookmarked] = useState(auth?.user && userBookmark);
   const [currentBookmarkCount, setCurrentBookmarkCount] = useState(bookmarkCount || 0);
@@ -305,6 +314,7 @@ const Show = ({
                 {...(!userReview ? { addLabel: 'レビューを投稿する', onAddClick: handleAddReviewClick } : {})}
                 onEditClick={handleLabEditClick}
                 onViewHistoryClick={handleViewHistoryClick}
+                onDeletionRequestClick={handleDeletionRequestClick}
               />
             )}
           </div>
