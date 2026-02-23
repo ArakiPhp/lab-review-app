@@ -7,9 +7,10 @@ import { Link } from '@inertiajs/react';
  * @param {Object} props - コンポーネントのprops
  * @param {string} props.title - ページタイトル
  * @param {Function} props.onOpenSidebar - サイドバーを開くためのコールバック関数
+ * @param {React.ReactNode} [props.headerRight] - ヘッダー右側に表示する追加コンテンツ
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const Header = ({ title, onOpenSidebar }) => {
+const Header = ({ title, onOpenSidebar, headerRight }) => {
   return (
     <header
       className="
@@ -41,8 +42,11 @@ const Header = ({ title, onOpenSidebar }) => {
         {title}
       </h1>
 
-      {/* 右：ハンバーガーアイコンメニュー */}
-      <HamburgerMenu onOpenSidebar={onOpenSidebar} />
+      {/* 右：追加コンテンツ＋ハンバーガーアイコンメニュー */}
+      <div className="flex items-center gap-4">
+        {headerRight}
+        <HamburgerMenu onOpenSidebar={onOpenSidebar} />
+      </div>
     </header>
   );
 };

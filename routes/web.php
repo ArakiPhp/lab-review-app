@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
 
     // 通知関連
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
     // 管理者用ルート
     Route::prefix('admin')->name('admin.')->group(function () {

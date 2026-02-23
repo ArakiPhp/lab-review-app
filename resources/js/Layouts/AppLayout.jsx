@@ -11,9 +11,10 @@ import AuthModal from '@/Components/Auth/AuthModal';
  * @param {React.ReactNode} props.children - レイアウト内に表示するコンテンツ
  * @param {string} props.title - ページタイトル
  * @param {string} [props.mode='default'] - レイアウトモード
+ * @param {React.ReactNode} [props.headerRight] - ヘッダー右側に表示する追加コンテンツ
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const AppLayout = ({ children, title, mode='default' }) => {
+const AppLayout = ({ children, title, mode='default', headerRight }) => {
   // ユーザーの認証状態を管理
   const { props } = usePage();
   const isLoggedIn = !!props?.auth?.user;
@@ -55,7 +56,7 @@ const AppLayout = ({ children, title, mode='default' }) => {
         )
       ) : (
         /* デフォルト: フルヘッダー表示 */
-        <Header title={title} onOpenSidebar={() => setIsSidebarOpen(true)} />
+        <Header title={title} onOpenSidebar={() => setIsSidebarOpen(true)} headerRight={headerRight} />
       )}
 
       {/* メインコンテンツ領域 */}

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
-import dayjs from 'dayjs';
+import { router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import AppLayout from '@/Layouts/AppLayout';
 
 const getTargetRoute = (type, id) => {
   switch (type) {
@@ -30,36 +31,55 @@ const getTargetLabel = (type) => {
 
 export default function DeletionRequestIndex({ deletionRequests }) {
   return (
-    <div>
-      <h1>削除依頼一覧</h1>
-      <table border="1" cellPadding="8">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>対象名</th>
-            <th>種別</th>
-            <th>理由</th>
-            <th>依頼者</th>
-            <th>依頼日時</th>
-          </tr>
-        </thead>
-        <tbody>
-          {deletionRequests.map((req) => (
-            <tr key={req.id}>
-              <td>{req.id}</td>
-              <td>
-                <Link href={getTargetRoute(req.target_type, req.target_id)}>
-                  {req.target?.name ?? '（名称不明）'}
-                </Link>
-              </td>
-              <td>{getTargetLabel(req.target_type)}</td>
-              <td>{req.reason || '（理由なし）'}</td>
-              <td>{req.requester?.name ?? '（不明）'}</td>
-              <td>{dayjs(req.created_at).format('YYYY/MM/DD HH:mm')}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <AppLayout title="削除依頼一覧">
+      <Head title="削除依頼一覧" />
+      <div className="flex flex-col items-center min-h-full">
+        <div className="w-full max-w-3xl">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => router.get(route('mypage.index'))}
+              className="px-4 py-2 text-sm rounded-lg"
+              style={{ backgroundColor: '#8D9DB3', color: '#FFFFFF', fontWeight: 'bold' }}
+            >
+              ＜ マイページに戻る
+            </button>
+          </div>
+          {deletionRequests.length > 0 ? (
+            <div className="divide-y divide-gray-200 border-t border-b border-gray-200">
+              {deletionRequests.map((req) => (
+                <div key={req.id} className="py-4 flex gap-6">
+                  <div className="flex-shrink-0">
+                    <p className="text-[#747D8C]">
+                      {new Date(req.created_at).toLocaleString("ja-JP", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-[#747D8C]">
+                      <span
+                        onClick={() => router.get(getTargetRoute(req.target_type, req.target_id))}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {req.target?.name ?? '（名称不明）'}
+                      </span>
+                      （{getTargetLabel(req.target_type)}）への削除依頼
+                    </p>
+                    <p className="text-[#747D8C]">理由: {req.reason || '（理由なし）'}</p>
+                    <p className="text-[#747D8C]">依頼者: {req.requester?.name ?? '（不明）'}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[#747D8C]">削除依頼はありません。</p>
+          )}
+        </div>
+      </div>
+    </AppLayout>
   );
 }
