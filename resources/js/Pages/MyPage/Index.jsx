@@ -4,7 +4,7 @@ import UserInfoBar from "@/Components/MyPage/UserInfoBar";
 import LabCard from "@/Components/Lab/LabCard";
 import { useState, useRef } from "react";
 import CreateUniversityModal from "@/Components/University/CreateUniversityModal";
-import NotificationIcon from "@/Assets/icons/notification.svg";
+import NotificationDropdown from "@/Components/MyPage/NotificationDropdown";
 
 /**
  * マイページのトップコンポーネント
@@ -12,10 +12,10 @@ import NotificationIcon from "@/Assets/icons/notification.svg";
  * @param {string} props.title - ページタイトル
  * @param {Object} props.user - ユーザー情報オブジェクト
  * @param {Array} [props.bookmarks=[]] - ブックマークされた研究室のリスト
- * @param {number} [props.notificationCount=0] - 未読通知の数
+ * @param {Array} [props.notifications=[]] - 通知オブジェクトの配列
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const Index = ({ title, user, bookmarks = [], notificationCount = 0 }) => {
+const Index = ({ title, user, bookmarks = [], notifications = [] }) => {
 	// 大学作成モーダルの開閉状態
 	const [isUniversityModalOpen, setUniversityModalOpen] = useState(false);
 	// 横スクロール用インデックス
@@ -55,16 +55,9 @@ const Index = ({ title, user, bookmarks = [], notificationCount = 0 }) => {
 	// LabCardを1件だけ表示
 	const currentLab = bookmarks[currentIndex];
 
-	// ヘッダー右側に表示する通知アイコン
+	// ヘッダー右側に表示する通知ドロップダウン
 	const notificationHeaderIcon = (
-		<div className="relative">
-			<img src={NotificationIcon} alt="通知" className="w-7 h-7 cursor-pointer" />
-			{notificationCount > 0 && (
-				<span className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full z-10 flex items-center justify-center text-xs font-bold text-white">
-					{notificationCount}
-				</span>
-			)}
-		</div>
+		<NotificationDropdown notifications={notifications} />
 	);
 
 	return (

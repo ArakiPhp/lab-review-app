@@ -63,7 +63,7 @@ const Sidebar = ({ isOpen, onClose, isLoggedIn, onOpenAuthModal }) => {
       <div
         onClick={onClose}
         className={`
-          fixed inset-0 bg-black/40 transition-opacity duration-300
+          fixed inset-0 bg-black/40 transition-opacity duration-300 z-40
           ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
         `}
         aria-hidden="true"
@@ -74,7 +74,7 @@ const Sidebar = ({ isOpen, onClose, isLoggedIn, onOpenAuthModal }) => {
         role="dialog"
         aria-modal="true"
         className={`
-          fixed right-0 top-0 h-dvh w-[270px] max-w-[90vw] bg-[#EEF5F9] shadow-2xl
+          fixed right-0 top-0 h-dvh w-[270px] max-w-[90vw] bg-[#EEF5F9] shadow-2xl z-50
           transform transition-transform duration-300
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
           flex flex-col

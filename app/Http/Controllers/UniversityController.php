@@ -120,7 +120,7 @@ class UniversityController extends Controller
                     ->toArray();
     
                 $current->creator->notify(
-                    new ModelChangedNotification('edited', '大学', $current->name, $changes)
+                    new ModelChangedNotification('edited', '大学', $current->name, $current->id, $changes)
                 );
             }
 

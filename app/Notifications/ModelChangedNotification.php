@@ -14,16 +14,18 @@ class ModelChangedNotification extends Notification
     protected $action; // 'edited' or 'deleted'
     protected $modelType; // '大学', '学部', '研究室'
     protected $modelName; // 対象の名前
+    protected $modelId; // 対象のID
     protected $changes;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(string $action, string $modelType, string $modelName, ?array $changes = null)
+    public function __construct(string $action, string $modelType, string $modelName, ?int $modelId = null, ?array $changes = null)
     {
         $this->action = $action;
         $this->modelType = $modelType;
         $this->modelName = $modelName;
+        $this->modelId = $modelId;
         $this->changes = $changes;
     }
 
@@ -55,6 +57,7 @@ class ModelChangedNotification extends Notification
             'action' => $this->action,
             'model_type' => $this->modelType,
             'model_name' => $this->modelName,
+            'model_id' => $this->modelId,
             'changes' => $this->changes,
         ];
     }

@@ -307,7 +307,7 @@ class LabController extends Controller
                     ->toArray();
 
                 $current->creator->notify(
-                    new ModelChangedNotification('edited', '研究室', $current->name, $changes)
+                    new ModelChangedNotification('edited', '研究室', $current->name, $current->id, $changes)
                 );
             }
             
