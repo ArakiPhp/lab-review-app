@@ -56,7 +56,7 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
       if (cursor) params.append('cursor', cursor);
 
       const response = await axios.get(
-        route('comment.index', labId),
+        route('comments.index', labId),
         { params: { limit: 20, ...(cursor ? { cursor } : {}) } }
       );
       const data = response.data;
@@ -115,7 +115,7 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
     setIsSubmitting(true);
     setCreateValidationError('');
     try {
-      await axios.post(route('comment.store', labId), {
+      await axios.post(route('comments.store', labId), {
         content: newComment,
       });
       setNewComment('');
@@ -176,7 +176,7 @@ const CommentListModal = ({ isOpen, onClose, labId, totalCount = 0, onCommentPos
     setIsEditSubmitting(true);
     setEditValidationError('');
     try {
-      await axios.put(route('comment.update', editingCommentId), {
+      await axios.put(route('comments.update', editingCommentId), {
         content: editContent,
       });
       setEditingCommentId(null);

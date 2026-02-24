@@ -105,7 +105,7 @@ const Show = ({
    */
   const handleViewHistoryClick = () => {
     setIsMenuOpen(false);
-    router.get(route('lab.history', { lab: lab.id }), { query });
+    router.get(route('labs.history', { lab: lab.id }), { query });
   }
 
   /**
@@ -136,7 +136,7 @@ const Show = ({
 
     if (isBookmarked) {
       // ブックマーク解除
-      router.delete(route('bookmark.destroy', bookmarkId), {
+      router.delete(route('bookmarks.destroy', bookmarkId), {
         preserveScroll: true,
         onSuccess: () => {
           setIsBookmarked(false);
@@ -147,7 +147,7 @@ const Show = ({
     } else {
       // ブックマーク追加
       router.post(
-        route('bookmark.store'),
+        route('bookmarks.store'),
         {
           lab_id: lab.id,
         },
@@ -525,7 +525,7 @@ const Show = ({
         isProcessing={isDeleting}
         onAction={() => {
           setIsDeleting(true);
-          router.delete(route('review.destroy', userReview.id), {
+          router.delete(route('reviews.destroy', userReview.id), {
             preserveScroll: true,
             onSuccess: () => {
               setIsDeleteAlertOpen(false);
@@ -573,7 +573,7 @@ const Show = ({
         onAction={async () => {
           setIsDeletingComment(true);
           try {
-            await axios.delete(route('comment.destroy', deletingComment.id));
+            await axios.delete(route('comments.destroy', deletingComment.id));
             setIsCommentDeleteAlertOpen(false);
             setDeletingComment(null);
             setIsCommentListModalOpen(true);

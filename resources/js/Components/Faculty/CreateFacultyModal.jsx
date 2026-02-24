@@ -44,7 +44,7 @@ const CreateFacultyForm = ({ onClose, university }) => {
 
   const submit = e => {
     e.preventDefault();
-    post(route('faculty.store', university.id), {
+    post(route('faculties.store', university.id), {
       onSuccess: () => onClose(),
       preserveScroll: true,
     });

@@ -70,7 +70,7 @@ const CreateReviewForm = ({ onClose, lab, review }) => {
 
   const submit = e => {
     e.preventDefault();
-    post(route('review.store', lab.id), {
+    post(route('reviews.store', lab.id), {
       onSuccess: () => {
         reset();
         onClose();

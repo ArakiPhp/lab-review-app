@@ -50,7 +50,7 @@ const CreateLabForm = ({ onClose, faculty }) => {
 
   const submit = e => {
     e.preventDefault();
-    post(route('lab.store', faculty.id), {
+    post(route('labs.store', faculty.id), {
       onSuccess: () => onClose(),
       preserveScroll: true,
     });

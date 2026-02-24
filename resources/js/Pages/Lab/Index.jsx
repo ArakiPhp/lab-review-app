@@ -81,7 +81,7 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
    */
   const handleViewHistoryClick = () => {
     setIsMenuOpen(false);
-    router.get(route('faculty.history', { faculty: faculty.id }), { query });
+    router.get(route('faculties.history', { faculty: faculty.id }), { query });
   }
 
   /**
