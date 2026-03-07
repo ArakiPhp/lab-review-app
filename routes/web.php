@@ -53,34 +53,24 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // レビュー関連
-    Route::get(('/labs/{lab}/reviews/create'), [ReviewController::class, 'create'])->name('reviews.create');
     Route::post(('/labs/{lab}/reviews'), [ReviewController::class, 'store'])->name('reviews.store');
-    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // 大学関連
-    Route::get('/universities/create', [UniversityController::class, 'create'])->name('universities.create');
     Route::post('/universities', [UniversityController::class, 'store'])->name('universities.store');
-    Route::get('/universities/{university}/edit', [UniversityController::class, 'edit'])->name('universities.edit');
     Route::put('/universities/{university}', [UniversityController::class, 'update'])->name('universities.update');
 
     // 学部関連
-    Route::get('/universities/{university}/faculties/create', [FacultyController::class, 'create'])->name('faculties.create');
     Route::post('/universities/{university}/faculties', [FacultyController::class, 'store'])->name('faculties.store');
-    Route::get('/faculties/{faculty}/edit', [FacultyController::class, 'edit'])->name('faculties.edit');
     Route::put('/faculties/{faculty}', [FacultyController::class, 'update'])->name('faculties.update');
     
     // 研究室関連
-    Route::get('/faculties/{faculty}/labs/create', [LabController::class, 'create'])->name('labs.create');
     Route::post('/faculties/{faculty}/labs', [LabController::class, 'store'])->name('labs.store');
-    Route::get('/labs/{lab}/edit', [LabController::class, 'edit'])->name('labs.edit');
     Route::put('/labs/{lab}', [LabController::class, 'update'])->name('labs.update');
 
     // コメント関連
-    Route::get('/labs/{lab}/comments/create', [CommentController::class, 'create'])->name('comments.create');
     Route::post('/labs/{lab}/comments', [CommentController::class, 'store'])->name('comments.store');
-    Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comments.edit');
     Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
