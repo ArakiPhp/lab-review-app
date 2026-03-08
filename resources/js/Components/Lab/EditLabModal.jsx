@@ -68,7 +68,7 @@ const EditLabForm = ({ onClose, lab }) => {
 
   const submit = e => {
     e.preventDefault();
-    put(route('lab.update', lab.id), {
+    put(route('labs.update', lab.id), {
       onSuccess: () => {
         reset();
         onClose();

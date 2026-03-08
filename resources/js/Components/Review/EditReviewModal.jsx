@@ -106,7 +106,7 @@ const EditReviewForm = ({ onClose, review, isEditing }) => {
 
   const submit = e => {
     e.preventDefault();
-    put(route('review.update', review.id), {
+    put(route('reviews.update', review.id), {
       onSuccess: () => {
         reset();
         onClose();

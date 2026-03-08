@@ -56,7 +56,7 @@ const EditFacultyForm = ({ onClose, faculty }) => {
 
   const submit = e => {
     e.preventDefault();
-    put(route('faculty.update', faculty.id), {
+    put(route('faculties.update', faculty.id), {
       onSuccess: () => {
         reset();
         onClose();

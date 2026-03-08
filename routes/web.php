@@ -13,20 +13,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UniversityController;
-use App\Models\Lab;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// URLを'/auth'に変更
-Route::get('/auth', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
 
 // ホームページ
 Route::get('/', [HomeController::class, 'home'])->name('home');
@@ -39,10 +28,10 @@ Route::get('/faculties/{faculty}/labs', [LabController::class, 'index'])->name('
 Route::get('/labs/{lab}', [LabController::class, 'show'])->name('labs.show');
 Route::get('/universities', [UniversityController::class, 'index'])->name('universities.index');
 Route::get('/universities/{university}/faculties', [FacultyController::class, 'index'])->name('faculties.index');
-Route::get('/universities/{university}/history', [UniversityController::class, 'history'])->name('university.history');
-Route::get('/faculties/{faculty}/history', [FacultyController::class, 'history'])->name('faculty.history');
-Route::get('/labs/{lab}/history', [LabController::class, 'history'])->name('lab.history');
-Route::get('/labs/{lab}/comments', [CommentController::class, 'index'])->name('comment.index');
+Route::get('/universities/{university}/history', [UniversityController::class, 'history'])->name('universities.history');
+Route::get('/faculties/{faculty}/history', [FacultyController::class, 'history'])->name('faculties.history');
+Route::get('/labs/{lab}/history', [LabController::class, 'history'])->name('labs.history');
+Route::get('/labs/{lab}/comments', [CommentController::class, 'index'])->name('comments.index');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -54,40 +43,30 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // レビュー関連
-    Route::get(('/labs/{lab}/reviews/create'), [ReviewController::class, 'create'])->name('review.create');
-    Route::post(('/labs/{lab}/reviews'), [ReviewController::class, 'store'])->name('review.store');
-    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('review.edit');
-    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('review.update');
-    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('review.destroy');
+    Route::post(('/labs/{lab}/reviews'), [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // 大学関連
-    Route::get('/universities/create', [UniversityController::class, 'create'])->name('university.create');
-    Route::post('/universities', [UniversityController::class, 'store'])->name('university.store');
-    Route::get('/universities/{university}/edit', [UniversityController::class, 'edit'])->name('university.edit');
-    Route::put('/universities/{university}', [UniversityController::class, 'update'])->name('university.update');
+    Route::post('/universities', [UniversityController::class, 'store'])->name('universities.store');
+    Route::put('/universities/{university}', [UniversityController::class, 'update'])->name('universities.update');
 
     // 学部関連
-    Route::get('/universities/{university}/faculties/create', [FacultyController::class, 'create'])->name('faculty.create');
-    Route::post('/universities/{university}/faculties', [FacultyController::class, 'store'])->name('faculty.store');
-    Route::get('/faculties/{faculty}/edit', [FacultyController::class, 'edit'])->name('faculty.edit');
-    Route::put('/faculties/{faculty}', [FacultyController::class, 'update'])->name('faculty.update');
+    Route::post('/universities/{university}/faculties', [FacultyController::class, 'store'])->name('faculties.store');
+    Route::put('/faculties/{faculty}', [FacultyController::class, 'update'])->name('faculties.update');
     
     // 研究室関連
-    Route::get('/faculties/{faculty}/labs/create', [LabController::class, 'create'])->name('lab.create');
-    Route::post('/faculties/{faculty}/labs', [LabController::class, 'store'])->name('lab.store');
-    Route::get('/labs/{lab}/edit', [LabController::class, 'edit'])->name('lab.edit');
-    Route::put('/labs/{lab}', [LabController::class, 'update'])->name('lab.update');
+    Route::post('/faculties/{faculty}/labs', [LabController::class, 'store'])->name('labs.store');
+    Route::put('/labs/{lab}', [LabController::class, 'update'])->name('labs.update');
 
     // コメント関連
-    Route::get('/labs/{lab}/comments/create', [CommentController::class, 'create'])->name('comment.create');
-    Route::post('/labs/{lab}/comments', [CommentController::class, 'store'])->name('comment.store');
-    Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comment.edit');
-    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comment.update');
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comment.destroy');
+    Route::post('/labs/{lab}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
     // ブックマーク関連
-    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmark.store');
-    Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
+    Route::post('/bookmarks', [BookmarkController::class, 'store'])->name('bookmarks.store');
+    Route::delete('/bookmarks/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
 
     // マイページ関連
     Route::get('/mypage', [MyPageController::class, 'showUser'])->name('mypage.index');
@@ -95,7 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/mypage', [MyPageController::class, 'updateUser'])->name('mypage.update');
     Route::delete('/mypage', [MyPageController::class, 'deleteUser'])->name('mypage.delete');
     Route::get('/mypage/bookmarks', [MyPageController::class, 'showBookmarks'])->name('mypage.bookmarks');
-    Route::delete('/mypage/bookmarks/{bookmark}', [MyPageController::class, 'removeBookmark'])->name('mypage.bookmark.remove');
+    Route::delete('/mypage/bookmarks/{bookmark}', [MyPageController::class, 'removeBookmark'])->name('mypage.bookmarks.remove');
 
     // 削除依頼関連
     Route::get('/deletion-requests/create/{type}/{id}', [DeletionRequestController::class, 'create'])->name('deletion_requests.create');

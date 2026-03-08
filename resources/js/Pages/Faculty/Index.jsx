@@ -57,7 +57,7 @@ const Index = ({ faculties, university, query = '' }) => {
    */
   const handleViewHistoryClick = () => {
     setIsMenuOpen(false);
-    router.get(route('university.history', { university: university.id }), { query });
+    router.get(route('universities.history', { university: university.id }), { query });
   }
 
   /**

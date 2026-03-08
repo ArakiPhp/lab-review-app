@@ -52,7 +52,7 @@ class AdminController extends Controller
             ));
         }
         
-        return redirect()->route('labs.home')->with('success', '大学が削除されました。');
+        return redirect()->route('home')->with('success', '大学が削除されました。');
     }
 
     public function destroyFaculty(Faculty $faculty): RedirectResponse
@@ -90,7 +90,7 @@ class AdminController extends Controller
             ));
         }
 
-        return redirect()->route('labs.home')->with('success', '学部が削除されました。');
+        return redirect()->route('faculties.index', ['university' => $faculty->university_id])->with('success', '学部が削除されました。');
     }
 
     public function destroyLab(Lab $lab)
@@ -128,7 +128,7 @@ class AdminController extends Controller
             ));
         }
 
-        return redirect()->route('labs.home')->with('success', '研究室が削除されました。');
+        return redirect()->route('labs.index', ['faculty' => $lab->faculty_id])->with('success', '研究室が削除されました。');
     }
 
     public function destroyComment(Comment $comment)
@@ -137,6 +137,6 @@ class AdminController extends Controller
         $this->authorize('delete', $comment);
 
         $comment->delete();
-        return redirect()->route('labs.home')->with('success', 'コメントが削除されました。');
+        return redirect()->route('labs.show', ['lab' => $comment->lab_id])->with('success', 'コメントが削除されました。');
     }
 }
