@@ -12,12 +12,13 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
+    // ログイン・新規登録はモーダルで行うため、GETはホームへリダイレクト
+    Route::get('register', fn () => redirect('/'))
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
+    Route::get('login', fn () => redirect('/'))
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);

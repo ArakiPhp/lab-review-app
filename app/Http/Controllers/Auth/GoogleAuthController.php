@@ -6,23 +6,23 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class GoogleAuthController extends Controller
 {
-    public function redirect()
+    public function redirect(): RedirectResponse
     {
         return Socialite::driver('google')->redirect();
     }
 
-    public function callback()
+    public function callback(): RedirectResponse
     {
         try {
             $g = Socialite::driver('google')->user();
         } catch (\Throwable $e) {
-            return redirect()->route('login')->with('status', 'Google認証に失敗しました。もう一度お試しください。');
+            return redirect()->route('home')->with('status', 'Google認証に失敗しました。もう一度お試しください。');
         }
 
         // メール一致で既存ユーザーに紐付け（重複防止）
@@ -39,6 +39,6 @@ class GoogleAuthController extends Controller
 
         Auth::login($user, remember: true);
 
-        return redirect()->intended(route('labs.home'));
+        return redirect()->intended(route('home'))->with('success', 'Googleアカウントでログインしました。');
     }
 }

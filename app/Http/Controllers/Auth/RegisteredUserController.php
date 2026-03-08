@@ -10,21 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
     /**
-     * Display the registration view.
-     */
-    public function create(): Response
-    {
-        return Inertia::render('Auth/Register');
-    }
-
-    /**
-     * Handle an incoming registration request.
+     * 新規登録リクエストを処理する
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -46,6 +36,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->back();
+        return redirect()->back()->with('success', '登録に成功しました。');
     }
 }

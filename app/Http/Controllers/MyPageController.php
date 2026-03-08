@@ -90,7 +90,7 @@ class MyPageController extends Controller
         $user = Auth::user();
         $user->delete();
 
-        return redirect()->route('labs.home')->with('success', 'アカウントを削除しました');
+        return redirect()->route('home')->with('success', 'アカウントを削除しました');
     }
 
     public function showBookmarks()
