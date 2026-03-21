@@ -8,6 +8,7 @@ use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class GoogleAuthController extends Controller
@@ -22,7 +23,8 @@ class GoogleAuthController extends Controller
         try {
             $g = Socialite::driver('google')->user();
         } catch (\Throwable $e) {
-            return redirect()->route('home')->with('status', 'Google認証に失敗しました。もう一度お試しください。');
+            Log::error('Google認証エラー: ' . $e->getMessage());
+            return redirect()->route('home')->with('error', 'Google認証に失敗しました。もう一度お試しください。');
         }
 
         // メール一致で既存ユーザーに紐付け（重複防止）
