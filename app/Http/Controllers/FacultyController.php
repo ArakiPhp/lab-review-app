@@ -8,6 +8,7 @@ use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -72,6 +73,9 @@ class FacultyController extends Controller
             'version' => 'required|integer',
         ]);
 
+        // 変更前の値を保持（通知用）
+        $oldValues = $faculty->only(['name']);
+
         // トランザクション
         DB::beginTransaction();
 
@@ -98,12 +102,18 @@ class FacultyController extends Controller
             ]);
 
             DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
 
+        // 作成者へ通知を送信（トランザクション外）
+        try {
             if ($userId !== $current->created_by && $current->creator) {
                 $changes = collect($current->getChanges())
                     ->only(['name'])
                     ->map(fn($new, $key) => [
-                        'old' => $old[$key] ?? null,
+                        'old' => $oldValues[$key] ?? null,
                         'new' => $new,
                     ])
                     ->toArray();
@@ -112,12 +122,11 @@ class FacultyController extends Controller
                     new ModelChangedNotification('edited', '学部', $current->name, $current->id, $changes)
                 );
             }
-
-            return redirect()->route('labs.index', ['faculty' => $current])->with('success', '大学情報が更新されました。');
         } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
+            Log::error('学部更新通知の送信に失敗', ['faculty_id' => $current->id, 'message' => $e->getMessage()]);
         }
+
+        return redirect()->route('labs.index', ['faculty' => $current])->with('success', '学部情報が更新されました。');
     }
 
     public function history(Faculty $faculty)

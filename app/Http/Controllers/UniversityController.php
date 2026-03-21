@@ -7,6 +7,7 @@ use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -79,6 +80,9 @@ class UniversityController extends Controller
             'version' => 'required|integer',
         ]);
 
+        // 変更前の値を保持（通知用）
+        $oldValues = $university->only(['name']);
+
         // トランザクション開始
         DB::beginTransaction();
 
@@ -107,29 +111,32 @@ class UniversityController extends Controller
                 'updated_at' => now(),
             ]);
 
-            DB::commit(); // トランザクション処理終了
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
 
-            // 作成者へ通知を送信
+        // 作成者へ通知を送信（トランザクション外）
+        try {
             if ($userId !== $current->created_by && $current->creator) {
                 $changes = collect($current->getChanges())
                     ->only(['name'])
                     ->map(fn($new, $key) => [
-                        'old' => $old[$key] ?? null,
+                        'old' => $oldValues[$key] ?? null,
                         'new' => $new,
                     ])
                     ->toArray();
-    
+
                 $current->creator->notify(
                     new ModelChangedNotification('edited', '大学', $current->name, $current->id, $changes)
                 );
             }
-
-             // リダイレクト
-            return redirect()->route('faculties.index', ['university' => $current])->with('success', '大学情報が更新されました。');
         } catch (\Exception $e) {
-            DB::rollBack(); // エラー時はロールバック
-            throw $e;
+            Log::error('大学更新通知の送信に失敗', ['university_id' => $current->id, 'message' => $e->getMessage()]);
         }
+
+        return redirect()->route('faculties.index', ['university' => $current])->with('success', '大学情報が更新されました。');
     }
 
     public function history(University $university)
