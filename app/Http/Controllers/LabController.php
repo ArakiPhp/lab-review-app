@@ -20,6 +20,9 @@ class LabController extends Controller
 {
     use AuthorizesRequests;
 
+    /**
+     * 研究室の詳細を表示する
+     */
     public function show(Lab $lab, Request $request): Response
     {
         // 大学・学部、レビューのデータも一緒に渡す
@@ -96,6 +99,9 @@ class LabController extends Controller
         ]);
     }
 
+    /**
+     * 新規研究室を作成する
+     */
     public function store(Request $request, Faculty $faculty): RedirectResponse
     {
         // 認可
@@ -142,6 +148,9 @@ class LabController extends Controller
         return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が作成されました。');
     }
 
+    /**
+     * 研究室の一覧を表示する
+     */
     public function index(Faculty $faculty, Request $request): Response
     {
         // 評価項目のカラム名を定義
@@ -209,6 +218,9 @@ class LabController extends Controller
         ]);
     }
 
+    /**
+     * 研究室情報を更新する
+     */
     public function update(Request $request, Lab $lab): RedirectResponse
     {
         $this->authorize('update', Lab::class);
@@ -298,6 +310,9 @@ class LabController extends Controller
         return redirect()->route('labs.show', ['lab' => $lab])->with('success', '研究室が更新されました。');
     }
 
+    /**
+     * 研究室の編集履歴を表示する
+     */
     public function history(Lab $lab): Response
     {
         $query = request('query', '');
