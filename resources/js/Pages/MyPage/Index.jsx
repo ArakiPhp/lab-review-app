@@ -1,5 +1,5 @@
 import AppLayout from "@/Layouts/AppLayout";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import UserInfoBar from "@/Components/MyPage/UserInfoBar";
 import LabCard from "@/Components/Lab/LabCard";
 import { useState, useRef } from "react";
@@ -101,7 +101,7 @@ const Index = ({ title, user, bookmarks = [], notifications = [] }) => {
 				<div className="mt-6 mb-4 flex items-center">
 					<button
 						type="button"
-						onClick={() => {}}
+						onClick={() => router.get(route('mypage.withdrawal'))}
 						className="text-lg font-semibold text-[#747D8C] hover:underline cursor-pointer text-left"
 					>
 						退会
