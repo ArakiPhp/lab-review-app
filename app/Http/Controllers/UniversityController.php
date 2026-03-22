@@ -5,23 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\University;
 use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class UniversityController extends Controller
 {
     use AuthorizesRequests;
 
-    public function create()
-    {
-        $this->authorize('create', University::class);
-        return Inertia::render('University/Create');
-    }
-
-    public function store(Request $request)
+    /**
+     * 新規大学を保存する
+     */
+    public function store(Request $request): RedirectResponse
     {
         $this->authorize('create', University::class);
         
@@ -42,7 +41,10 @@ class UniversityController extends Controller
         return redirect()->route('faculties.index', ['university' => $university])->with('success', '大学が作成されました。'); // 修正: リダイレクト先を変更
     }
 
-    public function index(Request $request)
+    /**
+     * 大学一覧を表示する
+     */
+    public function index(Request $request): Response
     {
         $query = $request->input('query', '');
 
@@ -60,16 +62,10 @@ class UniversityController extends Controller
         ]);
     }
 
-    public function edit(University $university)
-    {
-        $this->authorize('update', University::class);
-        return Inertia::render('University/Edit', [
-            'university' => $university,
-        ]);
-    }
-
-    // versionの更新処理・トランザクション処理
-    public function update(Request $request, University $university)
+    /**
+     * 大学情報を更新する
+     */
+    public function update(Request $request, University $university): RedirectResponse
     {
         $this->authorize('update', University::class);
 
@@ -139,7 +135,10 @@ class UniversityController extends Controller
         return redirect()->route('faculties.index', ['university' => $current])->with('success', '大学情報が更新されました。');
     }
 
-    public function history(University $university)
+    /**
+     * 大学編集履歴を表示する
+     */
+    public function history(University $university): Response
     {
         $query = request('query', '');
 

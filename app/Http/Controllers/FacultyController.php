@@ -6,25 +6,22 @@ use App\Models\Faculty;
 use App\Models\University;
 use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class FacultyController extends Controller
 {
     use AuthorizesRequests;
 
-    public function create(University $university)
-    {
-        $this->authorize('create', Faculty::class);
-        return Inertia::render('Faculty/Create', [
-            'university' => $university
-        ]);
-    }
-
-    public function store(Request $request, University $university)
+    /**
+     * 新規学部を作成する
+     */
+    public function store(Request $request, University $university): RedirectResponse
     {
         $this->authorize('create', Faculty::class);
 
@@ -44,10 +41,13 @@ class FacultyController extends Controller
         return redirect()->route('labs.index', ['faculty' => $faculty])->with('success', '学部が作成されました。');
     }
 
-    public function index(Request $request, University $university)
+    /**
+     * 学部一覧を表示する
+     */
+    public function index(Request $request, University $university): Response
     {
         $query = $request->input('query', '');
-        $faculties = $university->faculties()->get(); // 修正: 名前のソートを削除
+        $faculties = $university->faculties()->get();
         return Inertia::render('Faculty/Index', [
             'faculties' => $faculties,
             'university' => $university,
@@ -55,15 +55,10 @@ class FacultyController extends Controller
         ]);
     }
 
-    public function edit(Faculty $faculty)
-    {
-        $this->authorize('update', Faculty::class);
-        return Inertia::render('Faculty/Edit', [
-            'faculty' => $faculty,
-        ]);
-    }
-
-    public function update(Request $request, Faculty $faculty)
+    /**
+     * 学部情報を更新する
+     */
+    public function update(Request $request, Faculty $faculty): RedirectResponse
     {
         $this->authorize('update', Faculty::class);
 
@@ -129,7 +124,10 @@ class FacultyController extends Controller
         return redirect()->route('labs.index', ['faculty' => $current])->with('success', '学部情報が更新されました。');
     }
 
-    public function history(Faculty $faculty)
+    /**
+     * 学部の編集履歴を表示する
+     */
+    public function history(Faculty $faculty): Response
     {
         $query = request('query', '');
 

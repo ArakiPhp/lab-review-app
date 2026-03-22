@@ -13,6 +13,9 @@ class CommentController extends Controller
 {
     use AuthorizesRequests;
 
+    /**
+     * コメントを保存する
+     */
     public function store(Request $request, Lab $lab): JsonResponse
     {
         // ポリシーで認可をチェック
@@ -33,6 +36,9 @@ class CommentController extends Controller
         return response()->json($comment->load('user'), 201);
     }
 
+    /**
+     * コメントを更新する
+     */
     public function update(Request $request, Comment $comment): JsonResponse
     {
         // ポリシーで認可をチェック
@@ -50,6 +56,9 @@ class CommentController extends Controller
         return response()->json($comment->load('user'));
     }
 
+    /**
+    * コメントを削除する
+    */
     public function destroy(Comment $comment): JsonResponse
     {
         // ポリシーで認可をチェック
@@ -61,6 +70,9 @@ class CommentController extends Controller
         return response()->json(['message' => 'コメントが削除されました。']);
     }
 
+    /**
+     * コメントの一覧を取得する
+     */
     public function index(Lab $lab, Request $request): JsonResponse
     {
         // 取得上限数を定義する

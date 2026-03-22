@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bookmark;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,7 +12,10 @@ class BookmarkController extends Controller
 {
     use AuthorizesRequests;
 
-    public function store(Request $request)
+    /**
+     * ブックマークを保存する
+     */
+    public function store(Request $request): RedirectResponse
     {
         // ポリシーで認可をチェック
         $this->authorize('create', Bookmark::class);
@@ -40,7 +44,10 @@ class BookmarkController extends Controller
         return redirect()->route('labs.show', $bookmark->lab_id)->with('success', 'ブックマークが保存されました。');
     }
 
-    public function destroy(Bookmark $bookmark)
+    /**
+     * ブックマークを削除する
+     */
+    public function destroy(Bookmark $bookmark): RedirectResponse
     {
         // ポリシーで認可をチェック
         $this->authorize('delete', $bookmark);
