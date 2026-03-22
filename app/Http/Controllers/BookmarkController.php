@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bookmark;
-use App\Models\Lab;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +27,7 @@ class BookmarkController extends Controller
             ->exists();
 
         if ($existingBookmark) {
-            return redirect()->route('lab.show', $request->input('lab_id'))
+            return redirect()->route('labs.show', $request->input('lab_id'))
                 ->with('error', 'この研究室は既にブックマークされています。');
         }
 

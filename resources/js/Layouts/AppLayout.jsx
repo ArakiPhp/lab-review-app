@@ -4,6 +4,7 @@ import Header from "../Components/Header";
 import Sidebar from "../Components/Sidebar";
 import HamburgerMenu from '@/Components/HamburgerMenu';
 import AuthModal from '@/Components/Auth/AuthModal';
+import FlashToast from '../Components/Common/FlashToast';
 
 /**
  * アプリケーションのレイアウトコンポーネント
@@ -90,6 +91,8 @@ const AppLayout = ({ children, title, mode='default', headerRight }) => {
         onClose={() => setAuthModal(null)}
         switchMode={(mode) => setAuthModal(mode)}
       />
+
+      <FlashToast />
     </div>
   );
 }
