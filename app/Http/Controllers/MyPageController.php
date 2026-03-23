@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MyPageController extends Controller
 {
@@ -82,6 +83,14 @@ class MyPageController extends Controller
         $user->save();
 
         return redirect()->route('mypage.index')->with('success', 'ユーザー情報を更新しました');
+    }
+
+    /**
+     * 退会用ページを表示する
+     */
+    public function showWithdrawal(): Response
+    {
+        return Inertia::render('MyPage/Withdrawal');
     }
 
     public function deleteUser()

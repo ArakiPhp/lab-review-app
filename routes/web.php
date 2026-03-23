@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/mypage', [MyPageController::class, 'updateUser'])->name('mypage.update');
     Route::delete('/mypage', [MyPageController::class, 'deleteUser'])->name('mypage.delete');
     Route::get('/mypage/bookmarks', [MyPageController::class, 'showBookmarks'])->name('mypage.bookmarks');
+    Route::get('/mypage/withdrawal', [MyPageController::class, 'showWithdrawal'])->name('mypage.withdrawal');
     Route::delete('/mypage/bookmarks/{bookmark}', [MyPageController::class, 'removeBookmark'])->name('mypage.bookmarks.remove');
 
     // 削除依頼関連
