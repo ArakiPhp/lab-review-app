@@ -70,7 +70,6 @@ Route::middleware('auth')->group(function () {
 
     // マイページ関連
     Route::get('/mypage', [MyPageController::class, 'showUser'])->name('mypage.index');
-    Route::get('/mypage/edit', [MyPageController::class, 'editUser'])->name('mypage.edit');
     Route::put('/mypage', [MyPageController::class, 'updateUser'])->name('mypage.update');
     Route::delete('/mypage', [MyPageController::class, 'deleteUser'])->name('mypage.delete');
     Route::get('/mypage/bookmarks', [MyPageController::class, 'showBookmarks'])->name('mypage.bookmarks');
