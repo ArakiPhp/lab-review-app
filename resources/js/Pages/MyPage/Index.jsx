@@ -6,6 +6,7 @@ import UniversityCard from "@/Components/University/UniversityCard";
 import FacultyCard from "@/Components/Faculty/FacultyCard";
 import { useState, useRef } from "react";
 import CreateUniversityModal from "@/Components/University/CreateUniversityModal";
+import EditUserModal from "@/Components/MyPage/EditUserModal";
 import NotificationDropdown from "@/Components/MyPage/NotificationDropdown";
 
 /**
@@ -20,6 +21,8 @@ import NotificationDropdown from "@/Components/MyPage/NotificationDropdown";
 const Index = ({ title, user, bookmarks = [], notifications = [], universities = [], faculties = [], createdLabs = [] }) => {
 	// 大学作成モーダルの開閉状態
 	const [isUniversityModalOpen, setUniversityModalOpen] = useState(false);
+	// ユーザー情報編集モーダルの開閉状態
+	const [isUserEditModalOpen, setUserEditModalOpen] = useState(false);
 	// 横スクロール用インデックス
 	const [currentIndex, setCurrentIndex] = useState(0);
 	// 大学カルーセル用インデックス
@@ -181,7 +184,7 @@ const Index = ({ title, user, bookmarks = [], notifications = [], universities =
 				<div className="mt-6 mb-4 flex items-center">
 					<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">ニックネーム</h3>
 					<div className="w-96">
-						<UserInfoBar value={user?.name} onOpenEditModal={() => {}} />
+						<UserInfoBar value={user?.name} onOpenEditDialog={() => setUserEditModalOpen(true)} />
 					</div>
 				</div>
 
@@ -189,7 +192,7 @@ const Index = ({ title, user, bookmarks = [], notifications = [], universities =
 				<div className="mt-6 mb-4 flex items-center">
 					<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">e-Mailアドレス</h3>
 					<div className="w-96">
-						<UserInfoBar value={user?.email} onOpenEditModal={() => {}} />
+						<UserInfoBar value={user?.email} onOpenEditDialog={() => setUserEditModalOpen(true)} />
 					</div>
 				</div>
 
@@ -197,7 +200,7 @@ const Index = ({ title, user, bookmarks = [], notifications = [], universities =
 				<div className="mt-6 mb-4 flex items-center">
 					<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">パスワード</h3>
 					<div className="w-96">
-						<UserInfoBar value="••••••••" onOpenEditModal={() => {}} />
+						<UserInfoBar value="••••••••" onOpenEditDialog={() => setUserEditModalOpen(true)} />
 					</div>
 				</div>
 
@@ -322,6 +325,9 @@ const Index = ({ title, user, bookmarks = [], notifications = [], universities =
 				</div>
 				{/* 大学作成モーダル */}
 				<CreateUniversityModal isOpen={isUniversityModalOpen} onClose={() => setUniversityModalOpen(false)} />
+
+				{/* ユーザー情報編集モーダル */}
+				<EditUserModal isOpen={isUserEditModalOpen} onClose={() => setUserEditModalOpen(false)} user={user} />
 
 				{/* 作成済み学部 */}
 				<div className="flex items-center justify-between border-b border-black pb-2 w-full mt-8">

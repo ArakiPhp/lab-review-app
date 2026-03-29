@@ -9,9 +9,14 @@ use Inertia\Response;
 use App\Models\University;
 use App\Models\Faculty;
 use App\Models\Lab;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
 
 class MyPageController extends Controller
 {
+    /**
+     * ユーザー情報を表示する
+     */
     public function showUser(): Response
     {
         $user = Auth::user();
@@ -92,17 +97,31 @@ class MyPageController extends Controller
         ]);
     }
 
-    public function updateUser(Request $request)
+    /**
+     * ユーザー情報を更新
+     */
+    public function updateUser(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $rules = [
+            'nickname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            $rules['password'] = 'required|string|min:8|confirmed';
+        }
+
+        $request->validate($rules);
 
         /** @var User $user */
         $user = Auth::user();
-        $user->name = $request->name;
+        $user->name = $request->nickname;
         $user->email = $request->email;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
         $user->save();
 
         return redirect()->route('mypage.index')->with('success', 'ユーザー情報を更新しました');
