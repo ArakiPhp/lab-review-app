@@ -1,3 +1,5 @@
+import { usePage } from '@inertiajs/react';
+
 /**
  * メニューポップオーバーコンポーネント
  * @param {Object} props - コンポーネントのプロパティ
@@ -9,11 +11,13 @@
  * @returns {JSX.Element} コンポーネントのJSX
  */
 const MenuPopover = ({ addLabel, onAddClick, onEditClick, onViewHistoryClick, onDeletionRequestClick }) => {
+  const user = usePage().props.auth.user;
+
   const menuItems = [
-    ...(addLabel ? [{ label: addLabel, onClick: onAddClick }] : []),
-    { label: '編集する', onClick: onEditClick },
+    ...(addLabel && user ? [{ label: addLabel, onClick: onAddClick }] : []),
+    ...(user ? [{ label: '編集する', onClick: onEditClick }] : []),
     { label: '編集履歴を見る', onClick: onViewHistoryClick },
-    { label: '削除依頼をする', onClick: onDeletionRequestClick },
+    ...(user ? [{ label: '削除依頼をする', onClick: onDeletionRequestClick }] : []),
   ];
 
   return (
