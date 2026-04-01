@@ -14,7 +14,11 @@ const Header = ({ title, onOpenSidebar, headerRight }) => {
   return (
     <header
       className="
-        relative
+        fixed
+        top-0
+        left-0
+        w-full
+        z-50
         h-14
         flex
         items-center
