@@ -61,7 +61,7 @@ const AppLayout = ({ children, title, mode='default', headerRight }) => {
       )}
 
       {/* メインコンテンツ領域 */}
-      <main className="flex-1 bg-transparent flex">
+      <main className={`flex-1 bg-transparent flex${isHome ? '' : ' pt-14'}`}>
         <div
           className="
             mx-auto
