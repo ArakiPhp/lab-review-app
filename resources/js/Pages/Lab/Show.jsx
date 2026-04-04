@@ -301,9 +301,15 @@ const Show = ({
             >
               レビューを投稿済みです。
             </button>
-          ) : (
-            <p className="text-[#747D8C]">まだ、レビューを投稿していません。</p>
-          )}
+          ) : auth?.user ? (
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(true)}
+              className="text-[#747D8C] hover:underline cursor-pointer"
+            >
+              まだ、レビューを投稿していません。
+            </button>
+          ) : null}
           {/* ケバブメニュー */}
           <div className="relative" ref={menuRef}>
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-full">
