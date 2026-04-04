@@ -18,7 +18,7 @@ const Header = ({ title, onOpenSidebar, headerRight }) => {
         top-0
         left-0
         w-full
-        z-50
+        z-40
         h-14
         flex
         items-center
