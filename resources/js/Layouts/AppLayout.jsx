@@ -51,7 +51,7 @@ const AppLayout = ({ children, title, mode='default', headerRight }) => {
       {/* ホームモード: ハンバーガーアイコンのみを固定表示（サイドバー非表示時のみ） */}
       {isHome ? (
         !isSidebarOpen && (
-          <div className="fixed top-4 right-6 z-50">
+          <div className="fixed top-4 right-6 z-40">
             <HamburgerMenu onOpenSidebar={() => setSidebarOpen(true)} />
           </div>
         )

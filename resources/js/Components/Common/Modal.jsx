@@ -41,7 +41,7 @@ const Modal = ({ isOpen, onClose, children, title, size = 'md' }) => {
       <div
         onClick={onClose}
         className={`
-          fixed inset-0 bg-black/40 transition-opacity duration-300
+          fixed inset-0 bg-black/40 transition-opacity duration-300 z-50
           ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
         `}
         aria-hidden="true"
@@ -53,7 +53,7 @@ const Modal = ({ isOpen, onClose, children, title, size = 'md' }) => {
        aria-modal="true"
        aria-activedescendant={title ? 'modal-title' : undefined}
        className={`
-          fixed inset-0 z-[101] flex items-center justify-center p-4
+          fixed inset-0 z-[60] flex items-center justify-center p-4
           transition-all duration-300
           ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
       `}
