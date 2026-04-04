@@ -301,6 +301,14 @@ const Show = ({
             >
               レビューを投稿済みです。
             </button>
+          ) : auth?.user ? (
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(true)}
+              className="text-[#747D8C] hover:underline cursor-pointer"
+            >
+              まだ、レビューを投稿していません。
+            </button>
           ) : (
             <p className="text-[#747D8C]">まだ、レビューを投稿していません。</p>
           )}
