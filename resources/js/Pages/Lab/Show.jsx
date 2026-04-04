@@ -309,9 +309,7 @@ const Show = ({
             >
               まだ、レビューを投稿していません。
             </button>
-          ) : (
-            <p className="text-[#747D8C]">まだ、レビューを投稿していません。</p>
-          )}
+          ) : null}
           {/* ケバブメニュー */}
           <div className="relative" ref={menuRef}>
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-full">
