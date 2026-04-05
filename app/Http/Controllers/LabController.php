@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Faculty;
 use App\Models\Lab;
-use App\Models\Review;
 use App\Notifications\ModelChangedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,43 +31,19 @@ class LabController extends Controller
         // コメントデータを取得（投稿者情報も含む）
         $comments = $lab->comments()->with('user')->latest()->get();
 
-        // 平均値を計算するために、評価項目のカラム名を定義
-        $ratingColumns = [
-            'mentorship_style',
-            'lab_atmosphere',
-            'achievement_activity',
-            'constraint_level',
-            'facility_quality',
-            'work_style',
-            'student_balance',
-        ];
+        // 各評価項目の平均値と総合評価を計算
+        $averagePerItem = $lab->getAveragePerItem();
+        $overallAverage = $lab->getOverallAverage();
 
-        // 1. 各評価項目のユーザー間の平均値 (Average per Item) を計算
-        $averagePerItem = collect($ratingColumns)->mapWithKeys(function ($column) use ($lab) {
-            // 各評価項目の平均を計算（全レビューを対象）
-            return [$column => $lab->reviews->avg($column)];
-        });
-
-        // 2. 新しい「総合評価」：各項目の平均値のさらに平均を計算
-        // $averagePerItem の値（平均点）をコレクションとして取り出し、その平均を求める
-        $overallAverage = $averagePerItem->avg();
-
-        // 3. 現在のユーザーのレビューを取得
+        // 現在のユーザーのレビューを取得
         $userReview = null;
         $userOverallAverage = null;
         
         if (Auth::check()) {
             $userReview = $lab->reviews->where('user_id', Auth::id())->first();
             
-            // ユーザーのレビューが存在する場合、個別の総合評価を計算
             if ($userReview) {
-                $userRatings = collect($ratingColumns)->map(function ($column) use ($userReview) {
-                    return $userReview->$column;
-                })->filter(function ($value) {
-                    return $value !== null;
-                });
-                
-                $userOverallAverage = $userRatings->avg();
+                $userOverallAverage = Lab::getUserReviewAverage($userReview);
             }
         }
 
@@ -90,7 +65,7 @@ class LabController extends Controller
             'bookmarkCount' => $bookmarkCount,
             'query' => $searchQuery,
             'ratingData' => [
-                'columns' => $ratingColumns,
+                'columns' => Lab::RATING_COLUMNS,
             ],
             'comments' => $comments,
             'auth' => [
@@ -153,43 +128,14 @@ class LabController extends Controller
      */
     public function index(Faculty $faculty, Request $request): Response
     {
-        // 評価項目のカラム名を定義
-        $ratingColumns = [
-            'mentorship_style',
-            'lab_atmosphere',
-            'achievement_activity',
-            'constraint_level',
-            'facility_quality',
-            'work_style',
-            'student_balance',
-        ];
-
         // UIからソート条件を取得
         $sort = $request->query('sort', 'overall');
 
-        // 各評価項目の平均値を計算するためのSQL断片を作成
-        $avgSum = implode(' + ', array_map(fn($c) => "AVG($c)", $ratingColumns));
-        $count = count($ratingColumns);
+        $query = $faculty->labs()->withRatingAverages();
 
-        $query = $faculty->labs()
-            ->select('labs.*')
-            ->withCount('reviews');
-
-        // 各項目の平均を追加
-        foreach ($ratingColumns as $column) {
-            $query->withAvg("reviews as avg_{$column}", $column);
-        }
-
-        // 総合評価を追加
-        $query->addSelect([
-            'overall_avg' => Review::query()
-                ->selectRaw("($avgSum) / $count")
-                ->whereColumn('reviews.lab_id', 'labs.id'),
-        ]);
-
-        // ソートマップも $ratingColumns から生成
+        // ソートマップを生成
         $sortMap = ['overall' => 'overall_avg', 'reviews_count' => 'reviews_count'];
-        foreach ($ratingColumns as $column) {
+        foreach (Lab::RATING_COLUMNS as $column) {
             $sortMap[$column] = "avg_{$column}";
         }
 
