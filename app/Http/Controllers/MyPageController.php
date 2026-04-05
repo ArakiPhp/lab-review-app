@@ -29,31 +29,7 @@ class MyPageController extends Controller
             $lab = $bookmark->lab;
             if (!$lab) return null;
 
-            // 評価項目
-            $ratingColumns = [
-                'mentorship_style',
-                'lab_atmosphere',
-                'achievement_activity',
-                'constraint_level',
-                'facility_quality',
-                'work_style',
-                'student_balance',
-            ];
-            // 各項目の平均値
-            $averagePerItem = collect($ratingColumns)->mapWithKeys(function ($column) use ($lab) {
-                return [$column => $lab->reviews->avg($column)];
-            });
-            // 総合評価値
-            $overallAverage = $averagePerItem->avg();
-
-            $lab->overall_avg = $overallAverage;
-            foreach ($ratingColumns as $column) {
-                $lab->{"avg_{$column}"} = $averagePerItem[$column];
-            }
-            // reviews_countも追加
-            $lab->reviews_count = $lab->reviews->count();
-
-            // 大学・学部名も追加
+            $lab->appendRatingAverages();
             $lab->load(['faculty.university']);
 
             return $lab;
@@ -63,17 +39,7 @@ class MyPageController extends Controller
         $universities = University::where('created_by', $user->id)->get();
         $faculties = Faculty::where('created_by', $user->id)->with('university')->get();
         $createdLabs = Lab::where('created_by', $user->id)->with(['faculty.university', 'reviews'])->get()->map(function ($lab) {
-            $ratingColumns = [
-                'mentorship_style', 'lab_atmosphere', 'achievement_activity',
-                'constraint_level', 'facility_quality', 'work_style', 'student_balance',
-            ];
-            $averagePerItem = collect($ratingColumns)->mapWithKeys(fn($col) => [$col => $lab->reviews->avg($col)]);
-            $lab->overall_avg = $averagePerItem->avg();
-            foreach ($ratingColumns as $col) {
-                $lab->{"avg_{$col}"} = $averagePerItem[$col];
-            }
-            $lab->reviews_count = $lab->reviews->count();
-            return $lab;
+            return $lab->appendRatingAverages();
         });
 
         return Inertia::render('MyPage/Index', [
