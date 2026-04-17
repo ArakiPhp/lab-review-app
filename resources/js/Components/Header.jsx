@@ -1,4 +1,5 @@
-import logo from '../Assets/logo/header.svg';
+import logoPC from '../Assets/logo/header.svg';
+import logoMobile from '../Assets/logo/header-mobile.svg';
 import HamburgerMenu from './HamburgerMenu';
 import { Link } from '@inertiajs/react';
 
@@ -10,7 +11,7 @@ import { Link } from '@inertiajs/react';
  * @param {React.ReactNode} [props.headerRight] - ヘッダー右側に表示する追加コンテンツ
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const Header = ({ title, onOpenSidebar, headerRight }) => {
+const Header = ({ title, mobileTitle, onOpenSidebar, headerRight }) => {
   return (
     <header
       className="
@@ -37,13 +38,17 @@ const Header = ({ title, onOpenSidebar, headerRight }) => {
       {/* 左：ロゴ */}
       <div className="flex items-center">
         <Link href={route('home')} aria-label="トップページへ">
-          <img src={logo} alt="App Logo" className="h-9 w-auto" />
+          <img src={logoPC} alt="App Logo" className="hidden md:block h-9 w-auto" />
+          <img src={logoMobile} alt="App Logo" className="md:hidden h-9 w-auto" />
         </Link>
       </div>
 
       {/* 中央：タイトル */}
-      <h1 className="absolute left-1/2 -translate-x-1/2 text-xl font-semibold text-black">
-        {title}
+      <h1 className="absolute left-1/2 -translate-x-1/2 w-[50%] text-center truncate text-sm md:text-xl font-semibold text-black">
+        {mobileTitle && (
+          <span className="md:hidden">{mobileTitle}</span>
+        )}
+        <span className={mobileTitle ? 'hidden md:inline' : ''}>{title}</span>
       </h1>
 
       {/* 右：追加コンテンツ＋ハンバーガーアイコンメニュー */}

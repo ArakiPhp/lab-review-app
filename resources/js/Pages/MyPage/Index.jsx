@@ -181,25 +181,25 @@ const Index = ({ title, user, bookmarks = [], notifications = [], universities =
 				</div>
 
 				{/* ニックネーム */}
-				<div className="mt-6 mb-4 flex items-center">
-					<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">ニックネーム</h3>
-					<div className="w-96">
+				<div className="mt-6 mb-4 flex flex-col md:flex-row md:items-center">
+					<h3 className="text-base md:text-lg font-semibold text-[#747D8C] md:w-40 md:shrink-0">ニックネーム</h3>
+					<div className="mt-2 md:mt-0 w-full md:w-96">
 						<UserInfoBar value={user?.name} onOpenEditDialog={() => setUserEditModalOpen(true)} />
 					</div>
 				</div>
 
 				{/* e-Mailアドレス */}
-				<div className="mt-6 mb-4 flex items-center">
-					<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">e-Mailアドレス</h3>
-					<div className="w-96">
+				<div className="mt-6 mb-4 flex flex-col md:flex-row md:items-center">
+					<h3 className="text-base md:text-lg font-semibold text-[#747D8C] md:w-40 md:shrink-0">e-Mailアドレス</h3>
+					<div className="mt-2 md:mt-0 w-full md:w-96">
 						<UserInfoBar value={user?.email} onOpenEditDialog={() => setUserEditModalOpen(true)} />
 					</div>
 				</div>
 
 				{/* パスワード */}
-				<div className="mt-6 mb-4 flex items-center">
-					<h3 className="text-lg font-semibold text-[#747D8C] w-40 shrink-0">パスワード</h3>
-					<div className="w-96">
+				<div className="mt-6 mb-4 flex flex-col md:flex-row md:items-center">
+					<h3 className="text-base md:text-lg font-semibold text-[#747D8C] md:w-40 md:shrink-0">パスワード</h3>
+					<div className="mt-2 md:mt-0 w-full md:w-96">
 						<UserInfoBar value="••••••••" onOpenEditDialog={() => setUserEditModalOpen(true)} />
 					</div>
 				</div>
