@@ -25,9 +25,39 @@ const Breadcrumb = ({ university, faculty, lab, query }) => {
     return baseParams;
   };
 
+  // スマホ用：現在のページの一つ上の階層を返す
+  const getPreviousItem = () => {
+    if (lab) {
+      if (faculty) return { label: faculty.name, href: route('labs.index', buildParams({ faculty: faculty.id })) };
+      if (university) return { label: university.name, href: route('faculties.index', buildParams({ university: university.id })) };
+      if (query) return { label: `「${query}」の検索結果`, href: route('universities.index', { query }) };
+    }
+    if (faculty) {
+      if (university) return { label: university.name, href: route('faculties.index', buildParams({ university: university.id })) };
+      if (query) return { label: `「${query}」の検索結果`, href: route('universities.index', { query }) };
+    }
+    if (university) {
+      if (query) return { label: `「${query}」の検索結果`, href: route('universities.index', { query }) };
+    }
+    return null;
+  };
+
+  const previousItem = getPreviousItem();
+
   return (
     <nav className="text-sm text-[#747D8C] mb-4">
-      <ol className="flex items-center gap-2 flex-wrap">
+      {/* スマホ：一つ前だけ表示 */}
+      {previousItem && (
+        <div className="md:hidden">
+          <Link href={previousItem.href} className="flex items-center gap-1 hover:text-black hover:underline">
+            <span>←</span>
+            <span className="truncate">{previousItem.label}</span>
+          </Link>
+        </div>
+      )}
+
+      {/* PC：全項目表示 */}
+      <ol className="hidden md:flex items-center gap-2 flex-wrap">
         {/* 検索クエリがある場合、検索結果へのリンクを表示 */}
         {query && (
           <>

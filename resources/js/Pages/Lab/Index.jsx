@@ -109,7 +109,7 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
   };
 
   return (
-    <AppLayout title={`${faculty.university.name} ${faculty.name}`}>
+    <AppLayout title={`${faculty.university.name} ${faculty.name}`} mobileTitle={faculty.name}>
       <Head title={`${faculty.university.name} ${faculty.name}`} />
 
       <div className="flex flex-col items-center min-h-full">
@@ -124,7 +124,7 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
             <select
               value={sort}
               onChange={handleSortChange}
-              className="text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
+              className="hidden md:block text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
             >
               {sortOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -143,6 +143,20 @@ const Index = ({ labs, faculty, query, sort = 'overall' }) => {
               {isMenuOpen && <MenuPopover addLabel="研究室を追加する" onAddClick={handleAddLabClick} onEditClick={handleEditClick} onViewHistoryClick={handleViewHistoryClick} onDeletionRequestClick={handleDeletionRequestClick} />}
             </div>
           </div>
+        </div>
+        {/* スマホ用ソート：左寄せで下に配置 */}
+        <div className="w-full md:hidden mt-2">
+          <select
+            value={sort}
+            onChange={handleSortChange}
+            className="text-sm text-[#747D8C] bg-[#EEF5F9] border border-[#747D8C] rounded px-3 py-1 pr-8 outline-none focus:outline-none focus:ring-0 focus:border-[#747D8C]"
+          >
+            {sortOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
         {hasResults ? (
           <>

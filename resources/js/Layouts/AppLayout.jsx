@@ -15,7 +15,7 @@ import FlashToast from '../Components/Common/FlashToast';
  * @param {React.ReactNode} [props.headerRight] - ヘッダー右側に表示する追加コンテンツ
  * @returns {JSX.Element} コンポーネントのJSX
  */
-const AppLayout = ({ children, title, mode='default', headerRight }) => {
+const AppLayout = ({ children, title, mobileTitle, mode='default', headerRight }) => {
   // ユーザーの認証状態を管理
   const { props } = usePage();
   const isLoggedIn = !!props?.auth?.user;
@@ -57,7 +57,7 @@ const AppLayout = ({ children, title, mode='default', headerRight }) => {
         )
       ) : (
         /* デフォルト: フルヘッダー表示 */
-        <Header title={title} onOpenSidebar={() => setIsSidebarOpen(true)} headerRight={headerRight} />
+        <Header title={title} mobileTitle={mobileTitle} onOpenSidebar={() => setIsSidebarOpen(true)} headerRight={headerRight} />
       )}
 
       {/* メインコンテンツ領域 */}

@@ -278,7 +278,7 @@ const Show = ({
   };
 
   return (
-    <AppLayout title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`}>
+    <AppLayout title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`} mobileTitle={lab.name}>
       <Head title={`${lab.faculty.university.name} ${lab.faculty.name} ${lab.name}`} />
       {/* パンくずリスト＋レビュー投稿状態＋ケバブメニュー 横並び */}
       <div className="w-full flex flex-row items-center justify-between">
@@ -409,7 +409,7 @@ const Show = ({
                     `(${lab.gender_ratio_male}:${lab.gender_ratio_female})`}
                 </h2>
                 {lab.gender_ratio_male != null && lab.gender_ratio_female != null ? (
-                  <div className="flex w-full h-6 rounded overflow-hidden text-sm text-white font-medium ml-4">
+                  <div className="flex w-full h-6 rounded overflow-hidden text-sm text-white font-medium md:ml-4">
                     {lab.gender_ratio_male > 0 && (
                       <div
                         className="flex items-center justify-center"

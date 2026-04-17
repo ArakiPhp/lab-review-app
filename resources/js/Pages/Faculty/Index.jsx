@@ -97,7 +97,7 @@ const Index = ({ faculties, university, query = '' }) => {
 
         {/* コンテンツ部分 */}
         {hasResults ? (
-          <div className="w-full grid grid-cols-3 gap-6 mt-8 justify-items-center">
+          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 justify-items-center">
             {faculties.map(faculty => (
               <FacultyCard key={faculty.id} faculty={faculty} query={query} />
             ))}

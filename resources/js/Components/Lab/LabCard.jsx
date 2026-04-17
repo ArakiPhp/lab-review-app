@@ -52,8 +52,8 @@ const LabCard = ({ lab, query, sort = 'overall' }) => {
       <div className="absolute top-1 left-1">
         <RankingBadge rank={lab.rank} className="flex-shrink-0 text-3xl" />
       </div>
-      <div className="ml-6">
-        <span className="text-2xl font-bold text-[#747D8C]">
+      <div className="ml-6 min-w-0">
+        <span className="block text-xl md:text-2xl font-bold text-[#747D8C] truncate">
           {lab.name}
         </span>
         {formattedReview && (
