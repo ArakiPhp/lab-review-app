@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // 論理削除
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 class Lab extends Model
 {
-    use SoftDeletes; // 論理削除
+    use HasFactory, SoftDeletes;
 
     public const RATING_COLUMNS = [
         'mentorship_style',

@@ -22,7 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_admin', // 追加: 管理者フラグ
+        'is_admin', // 管理者フラグ
     ];
 
     /**
@@ -94,7 +94,7 @@ class User extends Authenticatable
         return $this->hasMany(Bookmark::class);
     }
 
-    // 追加: 通知とのリレーション（一対多）
+    // 通知とのリレーション（一対多）
     public function notifications()
     {
         return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
