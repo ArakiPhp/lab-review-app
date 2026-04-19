@@ -19,8 +19,8 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::inRandomOrder()->first()->id,
-            'lab_id' => Lab::inRandomOrder()->first()->id,
+            'user_id' => User::factory(),
+            'lab_id' => Lab::factory(),
             'mentorship_style' => $this->faker->numberBetween(1, 5),
             'lab_atmosphere' => $this->faker->numberBetween(1, 5),
             'achievement_activity' => $this->faker->numberBetween(1, 5),

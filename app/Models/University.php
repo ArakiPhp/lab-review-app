@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class University extends Model
 {
-    use SoftDeletes; // 論理削除
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
