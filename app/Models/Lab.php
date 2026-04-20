@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
@@ -28,45 +32,60 @@ class Lab extends Model
     ];
 
     // リレーションの定義
-    // ユーザーとのリレーション（多対多）
-    // 中間テーブル名を明示的に指定
-    public function users()
+    /**
+     * ユーザーとのリレーション（多対多）
+     *
+     * 中間テーブル名を明示的に指定
+     */
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'lab_edit_histories')->withTimestamps();
     }
 
-    // 学部とのリレーション（多対一）
-    public function faculty()
+    /**
+     * 学部とのリレーション（多対一）
+     */
+    public function faculty(): BelongsTo
     {
         return $this->belongsTo(Faculty::class);
     }
 
-    // レビューとのリレーション（一対多）
-    public function reviews()
+    /**
+     * レビューとのリレーション（一対多）
+     */
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
-    // コメントとのリレーション（一対多）
-    public function comments()
+    /**
+     * コメントとのリレーション（一対多）
+     */
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    // ブックマークとのリレーション（一対多）
-    public function bookmarks()
+    /**
+     * ブックマークとのリレーション（一対多）
+     */
+    public function bookmarks(): HasMany
     {
         return $this->hasMany(Bookmark::class);
     }
 
-    // 削除依頼とのポリモーフィックリレーション(一対多)
-    public function deletionRequests()
+    /**
+     * 削除依頼とのポリモーフィックリレーション（一対多）
+     */
+    public function deletionRequests(): MorphMany
     {
         return $this->morphMany(DeletionRequest::class, 'target');
     }
 
-    // 追加: 作成者とのリレーション（多対一）
-    public function creator()
+    /**
+     * 作成者とのリレーション（多対一）
+     */
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }

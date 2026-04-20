@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth as FacadesAuth;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
@@ -24,14 +23,18 @@ class Review extends Model
     ];
 
     // リレーションシップの定義
-    // ユーザーとのリレーション（多対一）
-    public function user()
+    /**
+     * ユーザーとのリレーション（多対一）
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    // 研究室とのリレーション（多対一）
-    public function lab()
+    /**
+     * 研究室とのリレーション（多対一）
+     */
+    public function lab(): BelongsTo
     {
         return $this->belongsTo(Lab::class);
     }
