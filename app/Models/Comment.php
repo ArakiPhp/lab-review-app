@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Comment extends Model
 {
@@ -12,14 +13,19 @@ class Comment extends Model
         'content',
     ];
 
-    // リレーション
-    // ここでは一対多
-    public function user()
+    // リレーションの定義
+    /**
+     * ユーザーとのリレーション（多対一）
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function lab()
+    /**
+     * 研究室とのリレーション（多対一）
+     */
+    public function lab(): BelongsTo
     {
         return $this->belongsTo(Lab::class);
     }

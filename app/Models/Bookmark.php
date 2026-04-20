@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Bookmark extends Model
 {
@@ -15,12 +16,18 @@ class Bookmark extends Model
     ];
 
     // リレーション定義
-    public function user()
+    /**
+     * ユーザーとのリレーション（多対一）
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function lab()
+    /**
+     * 研究室とのリレーション（多対一）
+     */
+    public function lab(): BelongsTo
     {
         return $this->belongsTo(Lab::class);
     }

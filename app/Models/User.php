@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
@@ -48,54 +50,73 @@ class User extends Authenticatable
         ];
     }
 
-    // 管理者かどうかを判定するメソッド
-    public function is_admin()
+    /**
+     * 管理者かどうかを判定するメソッド
+     */
+    public function is_admin(): bool
     {
         return $this->is_admin;
     }
 
-    // リレーションの定義
-    // 大学とのリレーション（多対多）
-    // 中間テーブル名を明示的に指定
-    public function universities()
+    /**
+     * リレーションの定義
+     *
+     * 大学とのリレーション（多対多）
+     * 中間テーブル名を明示的に指定
+     */
+    public function universities(): BelongsToMany
     {
         return $this->belongsToMany(University::class, 'university_edit_histories')->withTimestamps();
     }
 
-    // 学部とのリレーション（多対多）
-    // 中間テーブル名を明示的に指定
-    public function faculties()
+    /**
+     * 学部とのリレーション（多対多）
+     * 
+     * 中間テーブル名を明示的に指定
+     */
+    public function faculties(): BelongsToMany
     {
         return $this->belongsToMany(Faculty::class, 'faculty_edit_histories')->withTimestamps();
     }
 
-    // 研究室とのリレーション（多対多）
-    // 中間テーブル名を明示的に指定
-    public function labs()
+    /**
+     * 研究室とのリレーション（多対多）
+     * 
+     * 中間テーブル名を明示的に指定
+     */
+    public function labs(): BelongsToMany
     {
         return $this->belongsToMany(Lab::class, 'lab_edit_histories')->withTimestamps();
     }
 
-    // レビューとのリレーション（一対多）
-    public function reviews()
+    /**
+     * レビューとのリレーション（一対多）
+     */
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
-    // コメントとのリレーション（一対多）
-    public function comments()
+    /**
+     * コメントとのリレーション（一対多）
+     */
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    // ブックマークとのリレーション（一対多）
-    public function bookmarks()
+    /**
+     * ブックマークとのリレーション（一対多）
+     */
+    public function bookmarks(): HasMany
     {
         return $this->hasMany(Bookmark::class);
     }
 
-    // 通知とのリレーション（一対多）
-    public function notifications()
+    /**
+     * 通知とのリレーション（一対多）
+     */
+    public function notifications(): MorphMany
     {
         return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
     }
