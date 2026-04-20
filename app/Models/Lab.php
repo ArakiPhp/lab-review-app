@@ -78,7 +78,8 @@ class Lab extends Model
     public function getAveragePerItem(): Collection
     {
         return collect(self::RATING_COLUMNS)->mapWithKeys(function ($column) {
-            return [$column => $this->reviews->avg($column)];
+            $avg = $this->reviews->avg($column);
+            return [$column => $avg !== null ? round($avg, 3) : null];
         });
     }
 
@@ -87,7 +88,8 @@ class Lab extends Model
      */
     public function getOverallAverage(): ?float
     {
-        return $this->getAveragePerItem()->avg();
+        $avg = $this->getAveragePerItem()->avg();
+        return $avg !== null ? round($avg, 3) : null;
     }
 
     /**
@@ -95,10 +97,11 @@ class Lab extends Model
      */
     public static function getUserReviewAverage(Review $review): ?float
     {
-        return collect(self::RATING_COLUMNS)
+        $avg = collect(self::RATING_COLUMNS)
             ->map(fn($column) => $review->$column)
             ->filter(fn($value) => $value !== null)
             ->avg();
+        return $avg !== null ? round($avg, 3) : null;
     }
 
     /**
@@ -109,7 +112,8 @@ class Lab extends Model
     {
         $averagePerItem = $this->getAveragePerItem();
 
-        $this->overall_avg = $averagePerItem->avg();
+        $avg = $averagePerItem->avg();
+        $this->overall_avg = $avg !== null ? round($avg, 3) : null;
         foreach (self::RATING_COLUMNS as $column) {
             $this->{"avg_{$column}"} = $averagePerItem[$column];
         }
@@ -126,15 +130,19 @@ class Lab extends Model
         $query->select('labs.*')->withCount('reviews');
 
         foreach (self::RATING_COLUMNS as $column) {
-            $query->withAvg("reviews as avg_{$column}", $column);
+            $query->addSelect([
+                "avg_{$column}" => Review::query()
+                    ->selectRaw("ROUND(AVG($column), 3)")
+                    ->whereColumn('reviews.lab_id', 'labs.id'),
+            ]);
         }
 
-        $avgSum = implode(' + ', array_map(fn($c) => "AVG($c)", self::RATING_COLUMNS));
+        $avgSum = implode(' + ', array_map(fn($c) => "ROUND(AVG($c), 3)", self::RATING_COLUMNS));
         $count = count(self::RATING_COLUMNS);
 
         $query->addSelect([
             'overall_avg' => Review::query()
-                ->selectRaw("($avgSum) / $count")
+                ->selectRaw("ROUND(($avgSum) / $count, 3)")
                 ->whereColumn('reviews.lab_id', 'labs.id'),
         ]);
 
