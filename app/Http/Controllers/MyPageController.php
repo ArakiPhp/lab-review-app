@@ -53,16 +53,6 @@ class MyPageController extends Controller
         ]);
     }
 
-    public function editUser(Request $request)
-    {
-        $user = Auth::user();
-
-        return Inertia::render('MyPage/Edit', [
-            'user' => $user,
-            'errors' => $request->session()->get('errors'),
-        ]);
-    }
-
     /**
      * ユーザー情報を更新
      */
@@ -101,7 +91,10 @@ class MyPageController extends Controller
         return Inertia::render('MyPage/Withdrawal');
     }
 
-    public function deleteUser()
+    /**
+     * ユーザーを削除する（退会処理）
+     */
+    public function deleteUser(): RedirectResponse
     {
         /** @var User $user */
         $user = Auth::user();
@@ -110,18 +103,10 @@ class MyPageController extends Controller
         return redirect()->route('home')->with('success', 'アカウントを削除しました');
     }
 
-    public function showBookmarks()
-    {
-        /** @var User $user */
-        $user = Auth::user();
-        $bookmarks = $user->bookmarks()->with('lab')->get();
-
-        return Inertia::render('MyPage/Bookmarks', [
-            'bookmarks' => $bookmarks,
-        ]);
-    }
-
-    public function removeBookmark($bookmarksId)
+    /**
+     * ブックマーク解除する
+     */
+    public function removeBookmark($bookmarksId): RedirectResponse
     {
         /** @var User $user */
         $user = Auth::user();
