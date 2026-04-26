@@ -14,6 +14,9 @@ use Inertia\Response;
 
 class DeletionRequestController extends Controller
 {
+    /**
+     * 削除依頼フォームを表示する
+     */
     public function create(string $type, int $id): Response
     {
         $query = request('query', '');
@@ -41,6 +44,9 @@ class DeletionRequestController extends Controller
         ]);
     }
 
+    /**
+    * 削除依頼を保存する
+    */
     public function store(Request $request): Response
     {
         $validated = $request->validate([
@@ -77,9 +83,13 @@ class DeletionRequestController extends Controller
         return Inertia::render('DeletionRequest/Complete');
     }
 
-    // 管理者に削除依頼を表示
-    public function index()
+    /**
+     * 管理者に削除依頼を表示
+     */
+    public function index(): Response
     {
+        abort_unless(auth()->user()->is_admin(), 403);
+
         $deletionRequests = DeletionRequest::with(['requester', 'target'])
             ->where('status', 'pending')
             ->latest()
