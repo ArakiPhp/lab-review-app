@@ -9,6 +9,24 @@ use PHPUnit\Framework\TestCase;
 
 class CommentPolicyTest extends TestCase
 {
+    public function test_ログイン済みユーザーはコメントを作成できる(): void
+    {
+        $user = new User();
+        $user->exists = true;
+        $policy = new CommentPolicy();
+
+        $this->assertTrue($policy->create($user));
+    }
+
+    public function test_未ログインユーザーはコメントを作成できない(): void
+    {
+        $user = new User();
+        $user->exists = false;
+        $policy = new CommentPolicy();
+
+        $this->assertFalse($policy->create($user));
+    }
+
     public function test_自分のコメントは編集できる(): void
     {
         // Arrange

@@ -9,6 +9,24 @@ use PHPUnit\Framework\TestCase;
 
 class BookmarkPolicyTest extends TestCase
 {
+    public function test_ログイン済みユーザーはブックマークを作成できる(): void
+    {
+        $user = new User();
+        $user->exists = true;
+        $policy = new BookmarkPolicy();
+
+        $this->assertTrue($policy->create($user));
+    }
+
+    public function test_未ログインユーザーはブックマークを作成できない(): void
+    {
+        $user = new User();
+        $user->exists = false;
+        $policy = new BookmarkPolicy();
+
+        $this->assertFalse($policy->create($user));
+    }
+
     public function test_自分のブックマークは削除できる(): void
     {
         // Arrange
