@@ -3,11 +3,15 @@
 namespace Tests\Feature\Controllers\Admin;
 
 use App\Models\Comment;
+use App\Models\DeletionRequest;
 use App\Models\Faculty;
 use App\Models\Lab;
 use App\Models\University;
 use App\Models\User;
+use App\Notifications\DeletionCompletedNotification;
+use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class AdminControllerTest extends TestCase
@@ -61,6 +65,62 @@ class AdminControllerTest extends TestCase
         $this->assertDatabaseHas('universities', ['id' => $university->id]);
     }
 
+    public function test_大学削除時に削除依頼者へDeletionCompletedNotificationが送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $requester = User::factory()->create();
+        $university = University::factory()->create();
+        DeletionRequest::create([
+            'requested_by' => $requester->id,
+            'target_type'  => University::class,
+            'target_id'    => $university->id,
+            'status'       => 'pending',
+        ]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.universities.destroy', $university));
+
+        // Assert
+        Notification::assertSentTo($requester, DeletionCompletedNotification::class);
+    }
+
+    public function test_大学削除時に作成者へModelChangedNotificationが送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $admin = User::factory()->create(['is_admin' => true]);
+        $university = University::factory()->create(['created_by' => $creator->id]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.universities.destroy', $university));
+
+        // Assert
+        Notification::assertSentTo($creator, ModelChangedNotification::class);
+    }
+
+    public function test_管理者自身が作成した大学を削除しても作成者へ通知は送られない(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $university = University::factory()->create(['created_by' => $admin->id]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.universities.destroy', $university));
+
+        // Assert
+        Notification::assertNothingSent();
+    }
+
     // -------------------------
     // destroyFaculty
     // -------------------------
@@ -108,6 +168,62 @@ class AdminControllerTest extends TestCase
         $this->assertDatabaseHas('faculties', ['id' => $faculty->id]);
     }
 
+    public function test_学部削除時に削除依頼者へDeletionCompletedNotificationが送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $requester = User::factory()->create();
+        $faculty = Faculty::factory()->create();
+        DeletionRequest::create([
+            'requested_by' => $requester->id,
+            'target_type'  => Faculty::class,
+            'target_id'    => $faculty->id,
+            'status'       => 'pending',
+        ]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.faculties.destroy', $faculty));
+
+        // Assert
+        Notification::assertSentTo($requester, DeletionCompletedNotification::class);
+    }
+
+    public function test_学部削除時に作成者へModelChangedNotificationが送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $admin = User::factory()->create(['is_admin' => true]);
+        $faculty = Faculty::factory()->create(['created_by' => $creator->id]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.faculties.destroy', $faculty));
+
+        // Assert
+        Notification::assertSentTo($creator, ModelChangedNotification::class);
+    }
+
+    public function test_管理者自身が作成した学部を削除しても作成者へ通知は送られない(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $faculty = Faculty::factory()->create(['created_by' => $admin->id]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.faculties.destroy', $faculty));
+
+        // Assert
+        Notification::assertNothingSent();
+    }
+
     // -------------------------
     // destroyLab
     // -------------------------
@@ -153,6 +269,62 @@ class AdminControllerTest extends TestCase
         // Assert
         $response->assertRedirect('/');
         $this->assertDatabaseHas('labs', ['id' => $lab->id]);
+    }
+
+    public function test_研究室削除時に削除依頼者へDeletionCompletedNotificationが送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $requester = User::factory()->create();
+        $lab = Lab::factory()->create();
+        DeletionRequest::create([
+            'requested_by' => $requester->id,
+            'target_type'  => Lab::class,
+            'target_id'    => $lab->id,
+            'status'       => 'pending',
+        ]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.labs.destroy', $lab));
+
+        // Assert
+        Notification::assertSentTo($requester, DeletionCompletedNotification::class);
+    }
+
+    public function test_研究室削除時に作成者へModelChangedNotificationが送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $admin = User::factory()->create(['is_admin' => true]);
+        $lab = Lab::factory()->create(['created_by' => $creator->id]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.labs.destroy', $lab));
+
+        // Assert
+        Notification::assertSentTo($creator, ModelChangedNotification::class);
+    }
+
+    public function test_管理者自身が作成した研究室を削除しても作成者へ通知は送られない(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $lab = Lab::factory()->create(['created_by' => $admin->id]);
+
+        // Act
+        $this->actingAs($admin)
+            ->delete(route('admin.labs.destroy', $lab));
+
+        // Assert
+        Notification::assertNothingSent();
     }
 
     // -------------------------

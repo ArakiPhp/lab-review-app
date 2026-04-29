@@ -4,7 +4,9 @@ namespace Tests\Feature\Controllers;
 
 use App\Models\University;
 use App\Models\User;
+use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class UniversityControllerTest extends TestCase
@@ -178,6 +180,59 @@ class UniversityControllerTest extends TestCase
             'id' => $university->id,
             'name' => '更新前大学',
         ]);
+    }
+
+    public function test_他のユーザーが大学を更新すると作成者へ通知が送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $updater = User::factory()->create();
+        $university = University::factory()->create([
+            'created_by' => $creator->id,
+            'name' => '更新前大学',
+            'type' => 'national',
+            'version' => 1,
+        ]);
+
+        // Act
+        $this->actingAs($updater)
+            ->put(route('universities.update', $university), [
+                'name' => '更新後大学',
+                'type' => 'public',
+                'comment' => '名称変更',
+                'version' => 1,
+            ]);
+
+        // Assert
+        Notification::assertSentTo($creator, ModelChangedNotification::class);
+    }
+
+    public function test_作成者自身が大学を更新しても通知は送られない(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $university = University::factory()->create([
+            'created_by' => $creator->id,
+            'name' => '更新前大学',
+            'type' => 'national',
+            'version' => 1,
+        ]);
+
+        // Act
+        $this->actingAs($creator)
+            ->put(route('universities.update', $university), [
+                'name' => '更新後大学',
+                'type' => 'public',
+                'comment' => '自分で更新',
+                'version' => 1,
+            ]);
+
+        // Assert
+        Notification::assertNothingSent();
     }
 
     // -------------------------
