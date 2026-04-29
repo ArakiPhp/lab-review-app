@@ -5,7 +5,9 @@ namespace Tests\Feature\Controllers;
 use App\Models\Faculty;
 use App\Models\University;
 use App\Models\User;
+use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class FacultyControllerTest extends TestCase
@@ -164,6 +166,55 @@ class FacultyControllerTest extends TestCase
             'id' => $faculty->id,
             'name' => '更新前学部',
         ]);
+    }
+
+    public function test_他のユーザーが学部を更新すると作成者へ通知が送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $updater = User::factory()->create();
+        $faculty = Faculty::factory()->create([
+            'created_by' => $creator->id,
+            'name' => '更新前学部',
+            'version' => 1,
+        ]);
+
+        // Act
+        $this->actingAs($updater)
+            ->put(route('faculties.update', $faculty), [
+                'name' => '更新後学部',
+                'comment' => '名称変更',
+                'version' => 1,
+            ]);
+
+        // Assert
+        Notification::assertSentTo($creator, ModelChangedNotification::class);
+    }
+
+    public function test_作成者自身が学部を更新しても通知は送られない(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $faculty = Faculty::factory()->create([
+            'created_by' => $creator->id,
+            'name' => '更新前学部',
+            'version' => 1,
+        ]);
+
+        // Act
+        $this->actingAs($creator)
+            ->put(route('faculties.update', $faculty), [
+                'name' => '更新後学部',
+                'comment' => '自分で更新',
+                'version' => 1,
+            ]);
+
+        // Assert
+        Notification::assertNothingSent();
     }
 
     // -------------------------

@@ -6,7 +6,9 @@ use App\Models\Faculty;
 use App\Models\Lab;
 use App\Models\Review;
 use App\Models\User;
+use App\Notifications\ModelChangedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class LabControllerTest extends TestCase
@@ -264,6 +266,67 @@ class LabControllerTest extends TestCase
             'id' => $lab->id,
             'name' => '更新前研究室',
         ]);
+    }
+
+    public function test_他のユーザーが研究室を更新すると作成者へ通知が送られる(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $updater = User::factory()->create();
+        $lab = Lab::factory()->create([
+            'created_by' => $creator->id,
+            'name' => '更新前研究室',
+            'version' => 1,
+        ]);
+
+        // Act
+        $this->actingAs($updater)
+            ->put(route('labs.update', $lab), [
+                'name' => '更新後研究室',
+                'description' => null,
+                'url' => null,
+                'professor_name' => null,
+                'professor_url' => null,
+                'gender_ratio_male' => 6,
+                'gender_ratio_female' => 4,
+                'comment' => '名称変更',
+                'version' => 1,
+            ]);
+
+        // Assert
+        Notification::assertSentTo($creator, ModelChangedNotification::class);
+    }
+
+    public function test_作成者自身が研究室を更新しても通知は送られない(): void
+    {
+        // Arrange
+        Notification::fake();
+
+        $creator = User::factory()->create();
+        $lab = Lab::factory()->create([
+            'created_by' => $creator->id,
+            'name' => '更新前研究室',
+            'version' => 1,
+        ]);
+
+        // Act
+        $this->actingAs($creator)
+            ->put(route('labs.update', $lab), [
+                'name' => '更新後研究室',
+                'description' => null,
+                'url' => null,
+                'professor_name' => null,
+                'professor_url' => null,
+                'gender_ratio_male' => 6,
+                'gender_ratio_female' => 4,
+                'comment' => '自分で更新',
+                'version' => 1,
+            ]);
+
+        // Assert
+        Notification::assertNothingSent();
     }
 
     // -------------------------
