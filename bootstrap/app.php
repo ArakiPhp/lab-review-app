@@ -20,5 +20,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo('/');
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response) {
+            if (in_array($response->getStatusCode(), [400, 401, 403, 404, 500, 503])
+                && ! app()->runningInConsole()
+            ) {
+                return \Inertia\Inertia::render('Error', ['status' => $response->getStatusCode()])
+                    ->toResponse(request())
+                    ->setStatusCode($response->getStatusCode());
+            }
+            return $response;
+        });
     })->create();
