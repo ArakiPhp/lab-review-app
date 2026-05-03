@@ -6,13 +6,13 @@ const FlashToast = () => {
   const { flash } = usePage().props;
 
   useEffect(() => {
-    if (flash.success) {
+    if (flash?.success) {
       toast.success(flash.success);
     }
-    if (flash.error) {
+    if (flash?.error) {
       toast.error(flash.error);
     }
-  }, [flash.success, flash.error]);
+  }, [flash?.success, flash?.error]);
 
   return null; // 描画はsonnerの<Toaster />が担当
 };
