@@ -71,12 +71,12 @@ const EditFacultyForm = ({ onClose, faculty }) => {
         {/* 入力欄 */}
         <ErrorSlot message={errors.name} />
 
-        {/* 大学名 */}
+        {/* 学部名 */}
         <InputField
           type="text"
           value={data.name}
           onChange={e => setData('name', e.target.value)}
-          placeholder="大学名（正式名称）"
+          placeholder="学部名（正式名称）"
           size="sm"
           className="mb-2 w-full"
         />
