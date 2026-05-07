@@ -1,0 +1,29 @@
+services:
+  php:
+    build:
+      context: ./docker-config/php
+      dockerfile: Dockerfile.prod
+    container_name: "labchart-php-prod"
+    volumes:
+      - ./src:/var/www
+    restart: always
+    networks:
+      - labchart-network
+    
+  nginx:
+    image: nginx:latest
+    container_name: "labchart-nginx-prod"
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www
+      - ./docker-config/nginx/default.prod.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    restart: always
+    networks:
+      - labchart-network
+
+networks:
+  labchart-network:
+    driver: bridge

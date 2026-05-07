@@ -2,3 +2,4 @@ docker-config/mariadb/data/
 .env
 src/.env
 *:Zone.Identifier
+.env.production

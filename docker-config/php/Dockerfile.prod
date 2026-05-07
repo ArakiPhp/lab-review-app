@@ -1,0 +1,39 @@
+FROM php:8.2-fpm
+
+# 本番用php.iniをコピー
+COPY php.prod.ini /usr/local/etc/php/php.ini
+
+# パッケージインストール（本番に必要なもののみ）
+RUN apt-get update \
+    && apt-get install -y \
+        zlib1g-dev \
+        libzip-dev \
+        libsqlite3-dev \
+        curl \
+        gnupg \
+    && docker-php-ext-install zip pdo_mysql pdo_sqlite \
+    && docker-php-ext-install opcache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Node.js 20.x のインストール（npm run build用）
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Composerインストール
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_HOME /composer
+ENV PATH $PATH:/composer/vendor/bin
+
+# 作業ディレクトリ
+WORKDIR /var/www
+
+# entrypointスクリプト
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+CMD ["/usr/local/bin/entrypoint.sh"]
