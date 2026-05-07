@@ -1,0 +1,50 @@
+version: '3'
+services:
+  db:
+    image: mariadb:10.6 # 修正: MariaDBのバージョンを指定
+    container_name: "mariadb-lab" # 修正: コンテナ名を変更
+    environment:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        TZ: ${TZ}
+    ports:
+        - 3306:3306
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db_data:/var/lib/mysql
+      - db_my.cnf:/etc/mysql/conf.d/my.cnf
+      - db_sql:/docker-entrypoint-initdb.d
+
+  php:
+    build:
+      context: ./docker-config/php
+      args:
+        USER_NAME: ${USER_NAME}
+        GROUP_NAME: ${GROUP_NAME}
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+    container_name: "php-lab" # 修正: コンテナ名を変更
+    ports:
+      - 5173:5173
+    volumes:
+      - ./src:/var/www # 修正: XXは要らない？
+    user: ${USER_NAME} # 修正: .envファイルから取得
+
+  nginx:
+    image: nginx:latest
+    container_name: "nginx-lab" # 修正: コンテナ名を変更
+    ports:
+      - 80:80
+    tty: true
+    volumes:
+      - ./src:/var/www
+      - ./docker-config/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+
+volumes:
+  db_data:
+  db_my.cnf:
+  db_sql:
